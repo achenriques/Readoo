@@ -1,0 +1,11 @@
+{
+  "name": "readooclient",
+  "version": "1.0.0",
+  "description": "A react-redux app for Readoo client side",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alex Carballo Henriques",
+  "license": "ISC"
+}
