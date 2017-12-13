@@ -97,9 +97,18 @@ class UsuarioProvider {
                     response.release();
                     if (err)
                     {
-                        console.log(err);
-                        res.status(204)        // HTTP status 204: NotContent
-                          .send('Failed at consult');
+                        if (err.code == 'ER_DUP_ENTRY')
+                        {
+                            console.log(err);
+                            res.status(206)        // HTTP status 206: Duplicated entry
+                                .send('Duplicated Entry');
+                        }
+                        else
+                        {
+                            console.log(err);
+                            res.status(204)        // HTTP status 204: NotContent
+                                .send('Failed at consult');
+                        }
                     } else {
                         res.setHeader('Content-Type', 'application/json');
                         res.status(200).json(result.affectedRows);
@@ -138,9 +147,17 @@ class UsuarioProvider {
                     response.release();
                     if (err)
                     {
-                        console.log(err);
-                        res.status(204)        // HTTP status 204: NotContent
-                          .send('Failed at consult');
+                        if (err.code == 'ER_DUP_ENTRY')
+                        {   
+                            console.log(err);
+                            res.status(206)        // HTTP status 206: Duplicated entry
+                                .send('Duplicated Entry');
+                        } else
+                        {
+                            console.log(err);
+                            res.status(204)        // HTTP status 204: NotContent
+                              .send('Failed at consult');
+                        }
                     } else {
                         res.setHeader('Content-Type', 'application/json');
                         res.status(200).json(result.affectedRows);
