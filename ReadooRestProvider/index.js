@@ -10,6 +10,9 @@ var db = new Connection();
 var LibroProvider = require('./RestModules/LibroProvider')
 new LibroProvider(app, db);
 
+var UsuarioProvider = require('./RestModules/UsuarioProvider');
+new UsuarioProvider(app, db);
+
 /*
 app.get('/', function (req, res) {
   var con = db.getConn(db.connect).then(function(response)
