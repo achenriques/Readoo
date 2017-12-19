@@ -13,6 +13,15 @@ new LibroProvider(app, db);
 var UsuarioProvider = require('./RestModules/UsuarioProvider');
 new UsuarioProvider(app, db);
 
+var UsuarioCategoriaProvider = require('./RestModules/UsuarioCategoriaProvider');
+new UsuarioCategoriaProvider(app, db);
+
+var UltimoProvider = require('./RestModules/UltimoProvider');
+new UltimoProvider(app, db);
+
+var UsuarioLikeLibroProvider = require('./RestModules/UsuarioLikeLibroProvider');
+new UsuarioLikeLibroProvider(app, db);
+
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!');
 });
