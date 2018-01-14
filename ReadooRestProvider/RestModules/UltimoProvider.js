@@ -88,7 +88,8 @@ class UtimoProvider {
         
                 var con = db.getConn(db.connect).then(function(response)
                 {
-                    var statement = "INSERT INTO ultimo VALUES (" + ultimo.idUsuario + ", " + ultimo.idLibro + ", current_timestamp());";
+                    var statement = "INSERT INTO ultimo VALUES (" + ultimo.idUsuario + ", " + 
+                    ultimo.idLibro + ", current_timestamp());";
         
                     response.query(statement, function (err, result) {
                         response.release();
@@ -127,7 +128,9 @@ class UtimoProvider {
           console.log("Estoy deleteando " + idToDelte);
           var con = db.getConn(db.connect).then(function(response)
           {
-            response.query("DELETE FROM ultimo WHERE Usuario_idUsuario = " + idToDelte + ";", function (err, result) {
+            var statement = "DELETE FROM ultimo WHERE Usuario_idUsuario = " + idToDelte + ";";
+            
+            response.query(statement, function (err, result) {
               response.release();
               if (err)
               {

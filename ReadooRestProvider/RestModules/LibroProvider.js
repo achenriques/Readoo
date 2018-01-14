@@ -89,9 +89,10 @@ class LibroProvider {
           var con = db.getConn(db.connect).then(function(response)
           {
             var statement = "INSERT INTO libro (idLibro, titulo, autor, descripcion, review, likes, fecha, coverUrl, " +
-            "Usuario_idUsuario, Categoria_idCategoria) VALUES (" + 0 + ", '" + String(libroToInsert.titulo) + "', '" + libroToInsert.autor +
+            "Usuario_idUsuario, Categoria_idCategoria, visible) VALUES (" + 0 + ", '" + String(libroToInsert.titulo) + "', '" + libroToInsert.autor +
             "', '" + libroToInsert.descripcion + "', '" + libroToInsert.review + "', " + libroToInsert.likes + " , current_timestamp(), '" +
-            libroToInsert.coverUrl + "', " + libroToInsert.Usuario_idUsuario + ", " + libroToInsert.Categoria_idCategoria + ")";
+            libroToInsert.coverUrl + "', " + libroToInsert.Usuario_idUsuario + ", " + libroToInsert.Categoria_idCategoria + ", '" + 
+            libroToInsert.visible + "');";
     
             response.query(statement, function (err, result) {
               response.release();

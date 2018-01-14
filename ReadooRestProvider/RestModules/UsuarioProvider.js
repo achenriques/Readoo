@@ -90,7 +90,8 @@ class UsuarioProvider {
                 {
                 var statement = "UPDATE usuario SET nombre = '" + usuarioToInsert.nombre + "', apellido = '" + usuarioToInsert.apellido +
                 "', apodo = '" + usuarioToInsert.apodo + "', pass = '" + usuarioToInsert.pass + "', email = '" + usuarioToInsert.email + 
-                "', sobreMi = '" + usuarioToInsert.sobreMi + "', karma = " + usuarioToInsert.karma + ", avatarUrl = '" + usuarioToInsert.avatarUrl + 
+                "', sobreMi = '" + usuarioToInsert.sobreMi + "', karma = " + usuarioToInsert.karma + ", avatarUrl = '" 
+                + usuarioToInsert.avatarUrl + "', visible = '" + usuarioToInsert.visible +
                 "' WHERE idUsuario = " + usuarioToInsert.idUsuario + ";";
         
                 response.query(statement, function (err, result) {
@@ -141,7 +142,7 @@ class UsuarioProvider {
                 {
                 var statement = "INSERT INTO usuario VALUES (" + 0 + ", '" + usuarioToInsert.nombre + "', '" + usuarioToInsert.apellido +
                 "', '" + usuarioToInsert.apodo + "', '" + usuarioToInsert.pass + "', '" + usuarioToInsert.email + "', '" + 
-                usuarioToInsert.sobreMi + "', " + usuarioToInsert.karma + ", '" + usuarioToInsert.avatarUrl + "');";
+                usuarioToInsert.sobreMi + "', " + usuarioToInsert.karma + ", '" + usuarioToInsert.avatarUrl + "', '" + usuarioToInsert.visible + "');";
         
                 response.query(statement, function (err, result) {
                     response.release();

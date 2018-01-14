@@ -7,7 +7,7 @@ class UsuarioLikeLibroProvider {
         this.getAll(app,db);    //Get
         this.getOneUser(app, db); //Get
         this.getOneLike(app, db); //Get
-        this.modifyOne(app, db);    //Put
+        this.modifyOne(app, db);    //Put Probablemente inutil. Solo borrado o insert
         this.insertOne(app, db); // Post
         this.deleteOne(app, db);  //Delete   
       }
@@ -17,7 +17,7 @@ class UsuarioLikeLibroProvider {
         app.get('/usuariolikelibro', function (req, res) {
           var con = db.getConn(db.connect).then(function(response)
           {
-            response.query("SELECT * FROM usuariolikelibro", function (err, result, fields) {
+            response.query("SELECT * FROM usuario_like_libro", function (err, result, fields) {
               response.release();
               if (err)
               {
@@ -49,7 +49,7 @@ class UsuarioLikeLibroProvider {
             {
                 var con = db.getConn(db.connect).then(function(response)
                 {
-                    response.query("SELECT * FROM usuariolikelibro WHERE Usuario_idUsuario =" + idusuario + ";", function (err, result, fields) {
+                    response.query("SELECT * FROM usuario_like_libro WHERE Usuario_idUsuario =" + idusuario + ";", function (err, result, fields) {
                     response.release();
                     if (err)
                     {
@@ -82,12 +82,15 @@ class UsuarioLikeLibroProvider {
         {
             var idUsuario = req.params.idUsuario;
             var idLibro = req.params.idLibro;
-            console.log("Estoy getteando " + idUsuario);     
+            console.log("Estoy getteando like " + idUsuario);     
             if (idUsuario)
             {
                 var con = db.getConn(db.connect).then(function(response)
                 {
-                    response.query("SELECT * FROM usuariolikelibro WHERE Usuario_idUsuario =" + idUsuario + " AND Libro_idLibro = " + idLibro + " ;", function (err, result, fields) {
+                    var statement = "SELECT * FROM usuario_like_libro WHERE Usuario_idUsuario =" + 
+                    idUsuario + " AND Libro_idLibro = " + idLibro + " ;";
+
+                    response.query(statement, function (err, result, fields) {
                     response.release();
                     if (err)
                     {
@@ -127,7 +130,8 @@ class UsuarioLikeLibroProvider {
         
                 var con = db.getConn(db.connect).then(function(response)
                 {
-                    var statement = "INSERT INTO usuariolikelibro VALUES (" + like.idUsuario + ", " + like.idLibro + ", '" + like.comentario + "', '" + like.gusta + "');";
+                    var statement = "INSERT INTO usuario_like_libro VALUES (" + like.idUsuario + ", " 
+                    + like.idLibro + ");";
         
                     response.query(statement, function (err, result) {
                         response.release();
@@ -172,7 +176,7 @@ class UsuarioLikeLibroProvider {
         
                 var con = db.getConn(db.connect).then(function(response)
                 {
-                var statement = "UPDATE usuariolikelibro SET comentario = '" + like.comentario + "', gusta = '" + like.gusta +
+                var statement = "UPDATE usuario_like_libro SET gusta = '" + like.gusta +
                 "' WHERE Usuario_idUsuario = " + like.idUsuario + " AND Libro_idLibro = " + like.idLibro + ";";
         
                 response.query(statement, function (err, result) {
@@ -213,7 +217,10 @@ class UsuarioLikeLibroProvider {
           console.log("Estoy deleteando " + like.idUsuario + ", " + like.idLibro );
           var con = db.getConn(db.connect).then(function(response)
           {
-            response.query("DELETE FROM usuariolikelibro WHERE Usuario_idUsuario = " + like.idUsuario + " AND Libro_idLibro = " + like.idLibro + ";", function (err, result) {
+            var statement = "DELETE FROM usuario_like_libro WHERE Usuario_idUsuario = " + 
+            like.idUsuario + " AND Libro_idLibro = " + like.idLibro + ";";
+
+            response.query(statement, function (err, result) {
               response.release();
               if (err)
               {
