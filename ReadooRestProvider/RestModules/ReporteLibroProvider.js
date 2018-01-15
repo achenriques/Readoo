@@ -93,7 +93,7 @@ class ReporteLibroProvider {
             var con = db.getConn(db.connect).then(function(response)
             {
                 var statement = "INSERT INTO usuario_reporta_libroo VALUES (" + 
-                reporte.idusuario + ", " + reporte.idLibro + ", '" + reporte.motivo + "');";
+                reporte.idUsuario + ", " + reporte.idLibro + ", '" + reporte.motivo + "');";
     
                 response.query(statement, function (err, result) {
                     response.release();
@@ -129,9 +129,9 @@ class ReporteLibroProvider {
   {
     app.delete('/reporteLibro', function (req, res) {
       var idToDeleteUsuario = req.body.idUsuario;
-      var idToDeleteComentario = req.body.idLibro;          
+      var idToDeleteLibro = req.body.idLibro;          
       console.log("Estoy deleteando " + idToDeleteComentario);
-      if (idToDeleteComentario && idToDeleteUsuario) {
+      if (idToDeleteLibro && idToDeleteUsuario) {
         var con = db.getConn(db.connect).then(function(response)
         {
           var statement = "DELETE FROM usuario_reporta_libro WHERE usuario_idUsuario = " + 

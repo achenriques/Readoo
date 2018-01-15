@@ -44,7 +44,7 @@ class ComentarioProvider {
         {
             var idlibro = req.params.id;
             console.log("Estoy getteando " + idlibro);     
-            if (idusuario)
+            if (idlibro)
             {
                 var con = db.getConn(db.connect).then(function(response)
                 {
@@ -84,7 +84,7 @@ class ComentarioProvider {
             var idLibro = req.params.id;
             var idFromComentario= req.params.idComentario
             console.log("Estoy getteando " + idLibro);     
-            if (idusuario)
+            if (idLibro && idFromComentario)
             {
                 var con = db.getConn(db.connect).then(function(response)
                 {
@@ -134,7 +134,14 @@ class ComentarioProvider {
                 {
                     var statement = "INSERT INTO usuario_comenta_libro VALUES (" + 0 + ", " + 
                     comentario.idUsuario + ", " + comentario.idLibro + ", current_timestamp(), '"+ 
-                    comentario.comentario + "', " + comentario.idComentarioPadre + ");";
+                    comentario.comentario + "', ";
+
+                    if (comentario.idComentarioPadre) 
+                        statement += comentario.idComentarioPadre + ");";
+                    else
+                    statement += "null);";
+
+                    + comentario.idComentarioPadre + ");";
         
                     response.query(statement, function (err, result) {
                         response.release();

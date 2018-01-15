@@ -93,7 +93,7 @@ class ReporteComentarioProvider {
             var con = db.getConn(db.connect).then(function(response)
             {
                 var statement = "INSERT INTO usuario_reporta_comentario VALUES (" + 
-                reporte.idusuario + ", " + reporte.idComentario + ", '" + reporte.motivo + "');";
+                reporte.idUsuario + ", " + reporte.idComentario + ", '" + reporte.motivo + "');";
     
                 response.query(statement, function (err, result) {
                     response.release();
