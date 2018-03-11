@@ -89,10 +89,10 @@ class LibroProvider {
           var con = db.getConn(db.connect).then(function(response)
           {
             var statement = "INSERT INTO libro (idLibro, titulo, autor, descripcion, review, likes, fecha, coverUrl, " +
-            "Usuario_idUsuario, Categoria_idCategoria, visible) VALUES (" + 0 + ", '" + String(libroToInsert.titulo) + "', '" + libroToInsert.autor +
-            "', '" + libroToInsert.descripcion + "', '" + libroToInsert.review + "', " + libroToInsert.likes + " , current_timestamp(), '" +
-            libroToInsert.coverUrl + "', " + libroToInsert.Usuario_idUsuario + ", " + libroToInsert.Categoria_idCategoria + ", '" + 
-            libroToInsert.visible + "');";
+            "Usuario_idUsuario, Categoria_idCategoria, visible) VALUES (" + 0 + ", " + db.escape(String(libroToInsert.titulo)) + ", " + db.escape(libroToInsert.autor) +
+            ", " + db.escape(libroToInsert.descripcion) + ", " + db.escape(libroToInsert.review) + "', " + db.escape(libroToInsert.likes) + " , current_timestamp(), " +
+            db.escape(libroToInsert.coverUrl) + ", " + db.escape(libroToInsert.Usuario_idUsuario) + ", " + db.escape(libroToInsert.Categoria_idCategoria) + ", " + 
+            db.escape(libroToInsert.visible) + ");";
     
             response.query(statement, function (err, result) {
               response.release();
@@ -124,7 +124,7 @@ class LibroProvider {
       console.log("Estoy deleteando " + idToDelete);
       var con = db.getConn(db.connect).then(function(response)
       {
-        response.query("DELETE FROM libro WHERE idLibro =" + idToDelete, function (err, result) {
+        response.query("DELETE FROM libro WHERE idLibro =" + db.escape(idToDelete), function (err, result) {
           response.release();
           if (err)
           {

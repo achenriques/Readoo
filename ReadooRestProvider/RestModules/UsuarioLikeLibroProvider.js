@@ -49,7 +49,8 @@ class UsuarioLikeLibroProvider {
             {
                 var con = db.getConn(db.connect).then(function(response)
                 {
-                    response.query("SELECT * FROM usuario_like_libro WHERE Usuario_idUsuario =" + idusuario + ";", function (err, result, fields) {
+                    response.query("SELECT * FROM usuario_like_libro WHERE Usuario_idUsuario =" + db.escape(idusuario) + ";", 
+                    function (err, result, fields) {
                     response.release();
                     if (err)
                     {
@@ -88,7 +89,7 @@ class UsuarioLikeLibroProvider {
                 var con = db.getConn(db.connect).then(function(response)
                 {
                     var statement = "SELECT * FROM usuario_like_libro WHERE Usuario_idUsuario =" + 
-                    idUsuario + " AND Libro_idLibro = " + idLibro + " ;";
+                    db.escape(idUsuario) + " AND Libro_idLibro = " + db.escape(idLibro) + " ;";
 
                     response.query(statement, function (err, result, fields) {
                     response.release();
@@ -130,8 +131,8 @@ class UsuarioLikeLibroProvider {
         
                 var con = db.getConn(db.connect).then(function(response)
                 {
-                    var statement = "INSERT INTO usuario_like_libro VALUES (" + like.idUsuario + ", " 
-                    + like.idLibro + ");";
+                    var statement = "INSERT INTO usuario_like_libro VALUES (" + db.escape(like.idUsuario) + ", " 
+                    + db.escape(like.idLibro) + ");";
         
                     response.query(statement, function (err, result) {
                         response.release();
@@ -176,8 +177,8 @@ class UsuarioLikeLibroProvider {
         
                 var con = db.getConn(db.connect).then(function(response)
                 {
-                var statement = "UPDATE usuario_like_libro SET gusta = '" + like.gusta +
-                "' WHERE Usuario_idUsuario = " + like.idUsuario + " AND Libro_idLibro = " + like.idLibro + ";";
+                var statement = "UPDATE usuario_like_libro SET gusta = '" + db.escape(like.gusta) +
+                "' WHERE Usuario_idUsuario = " + db.escape(like.idUsuario) + " AND Libro_idLibro = " + db.escape(like.idLibro) + ";";
         
                 response.query(statement, function (err, result) {
                     response.release();
@@ -218,7 +219,7 @@ class UsuarioLikeLibroProvider {
           var con = db.getConn(db.connect).then(function(response)
           {
             var statement = "DELETE FROM usuario_like_libro WHERE Usuario_idUsuario = " + 
-            like.idUsuario + " AND Libro_idLibro = " + like.idLibro + ";";
+            db.escape(like.idUsuario) + " AND Libro_idLibro = " + db.escape(like.idLibro) + ";";
 
             response.query(statement, function (err, result) {
               response.release();

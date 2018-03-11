@@ -49,7 +49,7 @@ class ReporteLibroProvider {
             var con = db.getConn(db.connect).then(function(response)
             {
                 var statement = "SELECT * FROM usuario_reporta_libro WHERE libro_idLibro =" + 
-                idReporte + ";";
+                db.escape(idReporte) + ";";
 
                 response.query(statement, function (err, result, fields) {
                 response.release();
@@ -93,7 +93,8 @@ class ReporteLibroProvider {
             var con = db.getConn(db.connect).then(function(response)
             {
                 var statement = "INSERT INTO usuario_reporta_libroo VALUES (" + 
-                reporte.idUsuario + ", " + reporte.idLibro + ", '" + reporte.motivo + "');";
+                db.escape(reporte.idUsuario) + ", " + db.escape(reporte.idLibro) + ", " + 
+                db.escape(reporte.motivo) + ");";
     
                 response.query(statement, function (err, result) {
                     response.release();
@@ -135,7 +136,7 @@ class ReporteLibroProvider {
         var con = db.getConn(db.connect).then(function(response)
         {
           var statement = "DELETE FROM usuario_reporta_libro WHERE usuario_idUsuario = " + 
-          idToDeleteUsuario + " AND libro_idLibro = " + idToDeleteLibro + ";";
+          db.escape(idToDeleteUsuario) + " AND libro_idLibro = " + db.escape(idToDeleteLibro) + ";";
           
           response.query(statement, function (err, result) {
             response.release();

@@ -1,11 +1,21 @@
 var express = require('express');
 var app = express();
 
-var bodyParser = require('body-parser')
-app.use( bodyParser.json() );
+var router = express.Router();
+var bodyParser = require('body-parser');
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+var basicAuth = require('express-basic-auth')
+var serverCredentials = require('./Util/serverOptions');
+app.use(basicAuth(serverCredentials));
 
 var Connection = require('./Util/dbConnection');
 var db = new Connection();
+
+var LoginController = require('./LoginController');
+new LoginController(app, db);
 
 var LibroProvider = require('./RestModules/LibroProvider')
 new LibroProvider(app, db);

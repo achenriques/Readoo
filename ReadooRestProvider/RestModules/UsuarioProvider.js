@@ -161,7 +161,8 @@ class UsuarioProvider {
                         }
                     } else {
                         res.setHeader('Content-Type', 'application/json');
-                        res.status(200).json(result.affectedRows);
+                        res.status(200).json(result);
+                        console.log(result);
                     }
                 });
                 }, function (error)

@@ -49,7 +49,7 @@ class ReporteComentarioProvider {
             var con = db.getConn(db.connect).then(function(response)
             {
                 var statement = "SELECT * FROM usuario_reporta_comentario WHERE usuario_comenta_libro_idComentario =" + 
-                idReporte + ";";
+                db.escape(idReporte) + ";";
 
                 response.query(statement, function (err, result, fields) {
                 response.release();
@@ -93,7 +93,7 @@ class ReporteComentarioProvider {
             var con = db.getConn(db.connect).then(function(response)
             {
                 var statement = "INSERT INTO usuario_reporta_comentario VALUES (" + 
-                reporte.idUsuario + ", " + reporte.idComentario + ", '" + reporte.motivo + "');";
+                db.escape(reporte.idUsuario) + ", " + db.escape(reporte.idComentario) + ", " + db.escape(reporte.motivo) + ");";
     
                 response.query(statement, function (err, result) {
                     response.release();
@@ -135,7 +135,7 @@ class ReporteComentarioProvider {
         var con = db.getConn(db.connect).then(function(response)
         {
           var statement = "DELETE FROM usuario_reporta_comentario WHERE usuario_idUsuario = " + 
-          idToDeleteUsuario + " AND usuario_comenta_libro_idComentario = " + idToDeleteComentario + ";";
+          db.escape(idToDeleteUsuario) + " AND usuario_comenta_libro_idComentario = " + db.escape(idToDeleteComentario) + ";";
           
           response.query(statement, function (err, result) {
             response.release();

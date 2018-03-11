@@ -48,7 +48,7 @@ class ComentarioProvider {
             {
                 var con = db.getConn(db.connect).then(function(response)
                 {
-                    var statement = "SELECT * FROM usuario_comenta_libro WHERE libro_idLibro =" + idlibro + ";";
+                    var statement = "SELECT * FROM usuario_comenta_libro WHERE libro_idLibro =" + db.escape(idlibro) + ";";
 
                     response.query(statement, function (err, result, fields) {
                     response.release();
@@ -89,7 +89,7 @@ class ComentarioProvider {
                 var con = db.getConn(db.connect).then(function(response)
                 {
                     var statement = "SELECT * FROM usuario_comenta_libro WHERE libro_idLibro = " + 
-                    idlibro + " AND idComentarioPadre = " + idFromComentario + ";";
+                    db.escape(idlibro) + " AND idComentarioPadre = " + db.escape(idFromComentario) + ";";
 
                     response.query(statement, function (err, result, fields) {
                     response.release();
@@ -133,11 +133,11 @@ class ComentarioProvider {
                 var con = db.getConn(db.connect).then(function(response)
                 {
                     var statement = "INSERT INTO usuario_comenta_libro VALUES (" + 0 + ", " + 
-                    comentario.idUsuario + ", " + comentario.idLibro + ", current_timestamp(), '"+ 
-                    comentario.comentario + "', ";
+                    db.escape(comentario.idUsuario) + ", " + db.escape(comentario.idLibro) + ", current_timestamp(), "+ 
+                    db.escape(comentario.comentario) + ", ";
 
                     if (comentario.idComentarioPadre) 
-                        statement += comentario.idComentarioPadre + ");";
+                        statement += db.escape(comentario.idComentarioPadre) + ");";
                     else
                     statement += "null);";
 
@@ -180,7 +180,7 @@ class ComentarioProvider {
           console.log("Estoy deleteando " + idToDelte);
           var con = db.getConn(db.connect).then(function(response)
           {
-            var statement = "DELETE FROM usuario_comenta_libro WHERE idComentario = " + idToDelte + ";";
+            var statement = "DELETE FROM usuario_comenta_libro WHERE idComentario = " + db.escape(idToDelte) + ";";
             
             response.query(statement, function (err, result) {
               response.release();

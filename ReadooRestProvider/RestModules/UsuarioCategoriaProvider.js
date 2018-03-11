@@ -47,7 +47,7 @@ class UsuarioCategoriaProvider {
             {
                 var con = db.getConn(db.connect).then(function(response)
                 {
-                    response.query("SELECT * FROM usuario_categoria WHERE Usuario_idUsuario =" + idusuario + ";", function (err, result, fields) {
+                    response.query("SELECT * FROM usuario_categoria WHERE Usuario_idUsuario =" + db.escape(idusuario) + ";", function (err, result, fields) {
                     response.release();
                     if (err)
                     {
@@ -89,8 +89,8 @@ class UsuarioCategoriaProvider {
                 usuariocategoria.idCategoria.forEach(idsCategoria => {
                 var con = db.getConn(db.connect).then(function(response)
                 {
-                    var statement = "INSERT INTO usuario_categoria VALUES (" + usuariocategoria.idUsuario + ", " + 
-                    idsCategoria + ");";
+                    var statement = "INSERT INTO usuario_categoria VALUES (" + db.escape(usuariocategoria.idUsuario) + ", " + 
+                    db.escape(idsCategoria) + ");";
         
                     response.query(statement, function (err, result) {
                         response.release();
@@ -131,7 +131,7 @@ class UsuarioCategoriaProvider {
           var con = db.getConn(db.connect).then(function(response)
           {
             var statement = "DELETE FROM usuario_categoria WHERE Usuario_idUsuario = " + 
-            usuariocategoria.idUsuario /*+ " AND Categoria_idCategoria = " + 
+            db.escape(usuariocategoria.idUsuario) /*+ " AND Categoria_idCategoria = " + 
             usuariocategoria.idCategoria */+ ";";
 
             response.query(statement, function (err, result) {
