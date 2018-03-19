@@ -2,11 +2,12 @@ import { combineReducers } from 'redux';
 
 import {
   // Las actions
-  TAB_CHANGE, MODAL_ADD_LIBRO
-} from './actions'
+  TAB_CHANGE, MODAL_ADD_LIBRO, UPLOAD_LIBRO
+} from './actions';
 // Asi puedo tener varios modulos
 
-const successType = (actionType) => `${actionType}_SUCCESS`
+const failureType = (actionType) => `${actionType}_FAILURE`;
+const successType = (actionType) => `${actionType}_SUCCESS`;
 
 /**
  * Un state por defecto, con valores a tener en cuenta para saber si se han obrado modificaciones, y con valores necesarios para  evitar un
@@ -27,6 +28,9 @@ const initialState = {
     apellido: '',
     avatar: '',
     sobreMi: '',
+  },
+  libros: {
+    uploadSuccess: undefined
   },
   filtros: [],
 }
@@ -51,7 +55,7 @@ const tabs = (state = initialState.tabs, { type, payload, data }) => {
 
 const dialogs = (state = initialState.dialogs, { type, payload, data }) => {
   switch (type) {
-    case successType(MODAL_ADD_LIBRO):
+    case MODAL_ADD_LIBRO:
       console.log('abro modal: ' + payload.isOpen)
       return {
         ...state,
@@ -62,7 +66,31 @@ const dialogs = (state = initialState.dialogs, { type, payload, data }) => {
       return state;
   }
 }
- 
+
+/**
+ * Reducer para los libros a mostrar y operaciones de los mismos
+ */
+const libros = (state = initialState.libros, { type, payload, data }) => {
+  switch (type) {
+    case successType(UPLOAD_LIBRO):
+      console.log(UPLOAD_LIBRO);
+      return {
+        ...state,
+        uploadSuccess: true,
+      }
+
+    case failureType(UPLOAD_LIBRO):
+      console.log(UPLOAD_LIBRO + '_fail');
+      return {
+        ...state,
+        uploadSuccess: false,
+      }
+
+    default:
+      return state
+  }
+}
+
 /**
  * Reducer para el usuario actual de la aplicación. Responde al login inicial y ofrece los datos del mismo para futuras peticiones y otras
  * secciones de la aplicacion

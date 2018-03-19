@@ -11,6 +11,8 @@
     "popper.js": "^1.12.9",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-material-responsive-grid": "^1.2.1",
+    "react-pure-grid": "^2.1.1",
     "react-redux": "^5.0.7",
     "react-scripts": "1.1.1",
     "react-tap-event-plugin": "^3.0.2",
