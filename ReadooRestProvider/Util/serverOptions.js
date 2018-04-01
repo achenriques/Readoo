@@ -5,4 +5,6 @@ ServerCredentials = {
     }
 }
 
+const uploadDir = '/Upload';
+
 module.exports = ServerCredentials;

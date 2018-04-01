@@ -8,13 +8,11 @@ import Favorite from 'material-ui/svg-icons/action/favorite';
 import ChatBubble from 'material-ui/svg-icons/communication/chat-bubble';
 import MapsPersonPin from 'material-ui/svg-icons/maps/person-pin';
 import Paper from 'material-ui/Paper';
-import IconLocationOn from 'material-ui/svg-icons/communication/location-on';
 
 const explore = <Explore />;
 const favoritesIcon = <Favorite />;
 const chatBubble = <ChatBubble />;
 const perfil = <MapsPersonPin />;
-const nearbyIcon = <IconLocationOn />;
 
 class ShortcutBar extends Component {
 

@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { bAuth } from '../constants/server_configs';
 const baseURL = 'http://localhost:3030';
 
 //ACTION TYPES
@@ -10,7 +9,7 @@ export const UPLOAD_LIBRO = 'UPLOAD_LIBRO';
 export const DO_LOGIN = 'DO_LOGIN';
 
 // Default basic auth
-axios.defaults.headers.common['Authorization'] = bAuth.bUser;
+//axios.defaults.headers.common['Authorization'] = bAuth.bUser;
 
 //ACTION CREATORS
 export const fetchTabsInicial = (idUsuario) => ({
@@ -39,20 +38,12 @@ export const setIsOpenAddLibro = (isOpen) => ({
 
 export const uploadLibro = (datosLibro) => ({
   type: UPLOAD_LIBRO,
+  payload: {},
   promise: axios.post(
-    `${baseURL}/libro`,
+    `${baseURL}/newLibro`,
+    datosLibro.form,
     {
-      idLibro: 0,
-      titulo: datosLibro.titulo,
-      autor: datosLibro.autor,
-      descripcion: datosLibro.historia,
-      review: datosLibro.opinion,
-      likes: 0,
-      fecha: "",
-      coverUrl: datosLibro.img,
-      Usuario_idUsuario: 2,
-      Categoria_idCategoria: 13,
-      visible: "S"
+      headers: { 'Content-Type': 'multipart/form-data' }
     }
   )
 })
