@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { setIsOpenAddLibro, uploadLibro } from '../../app_state/actions';
+import { setIsOpenAddLibro, uploadLibro, fetchCategorias } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -33,6 +33,7 @@ const portadaPreview = {
 class SubirLibroModal extends Component {
 
     initialState = {
+        disabledButton: false,
         add_libro_titulo: "",
         add_libro_autor: "",
         add_libro_historia: "",
@@ -40,6 +41,7 @@ class SubirLibroModal extends Component {
         add_libro_categoria: null,
         add_libro_imagen: null,
         add_libro_imagen_file: null,
+        categoria_items: [],
 
         error: {
             add_libro_titulo: "",
@@ -51,10 +53,34 @@ class SubirLibroModal extends Component {
         },
     };
 
+    categoria_items = [];
+
     constructor(props) {
         super(props);
         this.state = { ...this.initialState };
+        props.fetchCategorias();
     };
+
+    // CICLO DE VIDA
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.uploadLibroSuccess) {
+            this.setState({
+                ...this.state,
+                disabledButton: false
+            })
+        }
+
+        if (nextProps.categorias) {
+            let menuItems = nextProps.categorias.map((i) => {
+                return <MenuItem key={i.idCategoria} value={i.idCategoria} primaryText={i.tipo} />;
+            });
+            this.categoria_items = menuItems;
+            this.setState({
+                ...this.state,
+                categoria_items: menuItems
+            })
+        }
+    }
 
     oChangeInput = (evt) => {
         const value = evt.target.value;
@@ -81,6 +107,7 @@ class SubirLibroModal extends Component {
     subirLibro_aceptar = () => {
         this.setState({
             ...this.state,
+            disabledButton: true,
             error: {
                 add_libro_titulo: (this.state.add_libro_titulo === "") ? COMPLETA_CAMPO : "",
                 add_libro_autor: (this.state.add_libro_autor === "") ? COMPLETA_CAMPO : "",
@@ -99,14 +126,13 @@ class SubirLibroModal extends Component {
             formData.set('opinion', this.state.add_libro_opinion);
             formData.set('portada', this.state.add_libro_imagen_file);
             formData.set('usuario', 2);     // TODO : cambiar
-            formData.set('categoria', 22);
+            formData.set('categoria', this.state.add_libro_categoria);
 
             this.props.uploadLibro({
                 form: formData
-            }
-            );
+            });
         }
-    };
+    }
 
     cargarImagenPortada = (evt) => {
         const callState = () => {
@@ -130,29 +156,52 @@ class SubirLibroModal extends Component {
     }
 
     handleClose = () => {
-        this.setState({ ...this.initialState });
+        this.setState({ 
+            ...this.initialState,
+            disabledButton: false,
+            categoria_items: this.categoria_items
+        });
         this.props.openAddLibro(false);
-    };
+    }
+
+    handleCategoria = (event, index, value) => {
+        const callState = () => {
+            if (this.state.error.add_libro_categoria !== "") {
+                this.setState({
+                    ...this.state,
+                    error: {
+                        ...this.state.error,
+                        add_libro_categoria: ""
+                    }
+                });
+            }
+        };
+
+        this.setState({
+            ...this.state,
+            add_libro_categoria: value
+        }, callState);
+    }
 
     render() {
-        const items = [
+        /* const items = [
             <MenuItem key={1} value={1} primaryText="Never" />,
             <MenuItem key={2} value={2} primaryText="Every Night" />,
             <MenuItem key={3} value={3} primaryText="Weeknights" />,
             <MenuItem key={4} value={4} primaryText="Weekends" />,
             <MenuItem key={5} value={5} primaryText="Weekly" />,
-        ];
+        ]; */
 
         const actions = [
             <FlatButton
                 label="Cancelar"
                 primary={true}
-                onClick={this.handleClose}
+                onClick={this.handleClose.bind(this)}
             />,
             <FlatButton
                 label="Súbelo"
                 primary={true}
-                //disabled={true}
+                disabled={this.state.disabledButton}
                 onClick={this.subirLibro_aceptar.bind(this)}
             />,
         ];
@@ -218,7 +267,7 @@ class SubirLibroModal extends Component {
                                 errorText={this.state.error.add_libro_categoria}
                                 fullWidth
                             >
-                                {items}
+                                {this.state.categoria_items}
                             </SelectField>
                         </Col>
                         <Col sm={6}>
@@ -232,11 +281,11 @@ class SubirLibroModal extends Component {
                                 containerElement="label"
                                 fullWidth
                             >
-                                <input type="file" className="imageInput" accept="image/*" onChange={this.cargarImagenPortada.bind(this)} />
+                            <input type="file" className="imageInput" accept="image/*" onChange={this.cargarImagenPortada.bind(this)} />
                             </RaisedButton>
                             <p id="error_add_img" className="errorInput" hidden={!this.state.error.add_libro_imagen}>
                                 Debes añadir una imagen de la portada
-                                        </p>
+                            </p>
                         </Col>
                     </Row>
                 </Grid>
@@ -248,10 +297,13 @@ class SubirLibroModal extends Component {
 export default connect(
     (state) => ({
         isOpenModal: appState.getIsOpenModal(state).isOpenAddLibro,
-        selectedIndex: appState.getCurrentTabID(state)
+        selectedIndex: appState.getCurrentTabID(state),
+        uploadLibroSuccess: appState.libroSuccessUpload(state),
+        categorias: appState.allCategorias(state)
     }),
     (dispatch) => ({
         openAddLibro: (isOpen) => dispatch(setIsOpenAddLibro(isOpen)),
-        uploadLibro: (datosLibro) => dispatch(uploadLibro(datosLibro))
+        uploadLibro: (datosLibro) => dispatch(uploadLibro(datosLibro)),
+        fetchCategorias: () => dispatch(fetchCategorias())
     })
 )(SubirLibroModal);

@@ -32,6 +32,9 @@ new LibroProvider(app, db);
 var UsuarioProvider = require('./RestModules/UsuarioProvider');
 new UsuarioProvider(app, db);
 
+var CategoriaProvider = require('./RestModules/CategoriaProvider');
+new CategoriaProvider(app, db);
+
 var UsuarioCategoriaProvider = require('./RestModules/UsuarioCategoriaProvider');
 new UsuarioCategoriaProvider(app, db);
 

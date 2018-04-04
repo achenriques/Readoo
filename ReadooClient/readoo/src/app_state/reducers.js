@@ -1,12 +1,14 @@
 import { combineReducers } from 'redux';
+import * as constantes from '../constants/appConstants';
 
 import {
   // Las actions
-  TAB_CHANGE, MODAL_ADD_LIBRO, UPLOAD_LIBRO
+  TAB_CHANGE, MODAL_ADD_LIBRO, UPLOAD_LIBRO, UPLOAD_LIBRO_200, FETCH_CATEGORIAS
 } from './actions';
 // Asi puedo tener varios modulos
 
 const failureType = (actionType) => `${actionType}_FAILURE`;
+const loadingType = (actionType) => `${actionType}_LOADING`;
 const successType = (actionType) => `${actionType}_SUCCESS`;
 
 /**
@@ -30,7 +32,14 @@ const initialState = {
     sobreMi: '',
   },
   libros: {
-    uploadSuccess: undefined
+
+  },
+  categorias: {
+    todas: [],
+    usuario_categoria: {}
+  },
+  controllerStatus: {
+    uploadLibroSuccess: 0
   },
   filtros: [],
 }
@@ -68,26 +77,57 @@ const dialogs = (state = initialState.dialogs, { type, payload, data }) => {
 }
 
 /**
- * Reducer para los libros a mostrar y operaciones de los mismos
+ * Reducer para las categorias a mostrar y operaciones de las mismas
  */
-const libros = (state = initialState.libros, { type, payload, data }) => {
+const categorias = (state = initialState.categorias, { type, payload, data }) => {
   switch (type) {
-    case successType(UPLOAD_LIBRO):
-      console.log(UPLOAD_LIBRO);
+    case successType(FETCH_CATEGORIAS):
+      console.log(successType(FETCH_CATEGORIAS));
       return {
         ...state,
-        uploadSuccess: true,
+        todas: data.data,
       }
 
-    case failureType(UPLOAD_LIBRO):
-      console.log(UPLOAD_LIBRO + '_fail');
+    case failureType(FETCH_CATEGORIAS):
+      console.log(failureType(FETCH_CATEGORIAS));
       return {
         ...state,
-        uploadSuccess: false,
+        todas: null,
       }
 
     default:
-      return state
+      return state;
+  }
+}
+
+/**
+ * Reducer para los estados inherentes a mostrar operaciones REST
+ */
+const controllerStatus = (state = initialState.controllerStatus, { type, payload, data }) => {
+  switch (type) {
+    case successType(UPLOAD_LIBRO):
+      console.log(successType(UPLOAD_LIBRO));
+      return {
+        ...state,
+        uploadLibroSuccess: constantes.REST_SUCCESS,
+      }
+
+    case failureType(UPLOAD_LIBRO):
+      console.log(failureType(UPLOAD_LIBRO));
+      return {
+        ...state,
+        uploadLibroSuccess: constantes.REST_FAILURE,
+      }
+
+    case UPLOAD_LIBRO_200:
+      console.log('UPLOAD_LIBRO_200');
+      return {
+        ...state,
+        uploadLibroSuccess: constantes.REST_DEFAULT,
+      }
+
+    default:
+      return state;
   }
 }
 
@@ -115,7 +155,9 @@ const user = (state = initialState.user, { type, payload, data }) => {
  */
 export default combineReducers({
   tabs,
-  dialogs
+  dialogs,
+  categorias,
+  controllerStatus
 })
 
 /**
@@ -125,4 +167,6 @@ export default combineReducers({
  */
 export const getCurrentTabID = (state) => state.tabs.currentTabID;
 export const getIsOpenModal = (state) => state.dialogs;
-export const getUserId = (state) => state.user.id
+export const getUserId = (state) => state.user.id;
+export const libroSuccessUpload = (state) => state.controllerStatus.uploadLibroSuccess;
+export const allCategorias = (state) => state.categorias.todas;
