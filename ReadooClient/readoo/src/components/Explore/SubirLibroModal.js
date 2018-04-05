@@ -107,7 +107,6 @@ class SubirLibroModal extends Component {
     subirLibro_aceptar = () => {
         this.setState({
             ...this.state,
-            disabledButton: true,
             error: {
                 add_libro_titulo: (this.state.add_libro_titulo === "") ? COMPLETA_CAMPO : "",
                 add_libro_autor: (this.state.add_libro_autor === "") ? COMPLETA_CAMPO : "",
@@ -119,6 +118,11 @@ class SubirLibroModal extends Component {
 
         if (this.state.add_libro_titulo && this.state.add_libro_autor
             && this.state.add_libro_historia && this.state.add_libro_imagen != null) {
+            this.setState({
+                ...this.state,
+                disabledButton: true,
+            });
+
             var formData = new FormData();
             formData.set('titulo', this.state.add_libro_titulo);
             formData.set('autor', this.state.add_libro_autor);
@@ -160,8 +164,7 @@ class SubirLibroModal extends Component {
             ...this.initialState,
             disabledButton: false,
             categoria_items: this.categoria_items
-        });
-        this.props.openAddLibro(false);
+        }, this.props.openAddLibro.bind(this, false));
     }
 
     handleCategoria = (event, index, value) => {
@@ -281,7 +284,7 @@ class SubirLibroModal extends Component {
                                 containerElement="label"
                                 fullWidth
                             >
-                            <input type="file" className="imageInput" accept="image/*" onChange={this.cargarImagenPortada.bind(this)} />
+                                <input type="file" className="imageInput" accept="image/*" onChange={this.cargarImagenPortada.bind(this)} />
                             </RaisedButton>
                             <p id="error_add_img" className="errorInput" hidden={!this.state.error.add_libro_imagen}>
                                 Debes añadir una imagen de la portada
