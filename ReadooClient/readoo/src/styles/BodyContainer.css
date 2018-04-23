@@ -34,3 +34,25 @@ body {
     color: rgb(244, 67, 54)
 }
 
+.arrowButtonLeft {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+}
+
+.imageExplore {
+    position: relative;
+    width: 100%;
+    min-height: 100px;
+    max-height: 50%
+}
+
+.arrowButtonRight {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+}
+
+a:hover { 
+    cursor: pointer;
+}

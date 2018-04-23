@@ -6,6 +6,7 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Snackbar from 'material-ui/Snackbar';
 import { Grid, Row, Col } from 'react-material-responsive-grid';
+import ExploreView from './Explore/ExploreView';
 import SubirLibroModal from './Explore/SubirLibroModal';
 import { REST_SUCCESS, REST_DEFAULT, REST_FAILURE } from '../constants/appConstants';
 import '../styles/BodyContainer.css';
@@ -40,7 +41,7 @@ class BodyContainer extends Component {
         }
     }
 
-    showSubidoFinalizado = (status) => {
+    showSubidoFinalizado (status) {
         switch (status) {
             case REST_SUCCESS:
                 this.setState({
@@ -63,18 +64,18 @@ class BodyContainer extends Component {
         }
     }
 
-    handleSnakRequestClose = () => {
+    handleSnakRequestClose () {
         this.setState({
             ...this.state,
             openSnackBar: false,
         });
     };
 
-    hadleOpenAddLibro = () => {
+    hadleOpenAddLibro() {
         this.props.openAddLibro(true);
     };
 
-    handleCloseAddLibro = () => {
+    handleCloseAddLibro() {
         // Por si se quiere cerrar el modal pulsando esc o fuera del mismo
         this.props.openAddLibro(false);
     };
@@ -84,10 +85,8 @@ class BodyContainer extends Component {
             case 0:
                 return (
                     <div>
-                        <h1 align="center">
-                            Soy un body
-                        </h1>
-                        <FloatingActionButton onClick={this.hadleOpenAddLibro} style={styleButton}>
+                        <ExploreView/>
+                        <FloatingActionButton onClick={this.hadleOpenAddLibro.bind(this)} style={styleButton}>
                             <ContentAdd />
                         </FloatingActionButton>
                         <SubirLibroModal />

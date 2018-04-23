@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { NUM_LIBROS } from '../constants/appConstants';
 const baseURL = 'http://localhost:3030';
 
 //ACTION TYPES
@@ -8,6 +9,9 @@ export const UPLOAD_LIBRO = 'UPLOAD_LIBRO';
 export const DO_LOGIN = 'DO_LOGIN';
 export const UPLOAD_LIBRO_200 = 'UPLOAD_LIBRO_200';
 export const FETCH_CATEGORIAS = 'FETCH_CATEGORIAS';
+export const PASAR_LIBRO = 'PASAR_LIBRO';
+export const FETCH_LIBROS = 'FETCH_LIBROS';
+export const FETCH_MORE_LIBROS = 'FETCH_MORE_LIBROS';
 
 // Default basic auth
 //axios.defaults.headers.common['Authorization'] = bAuth.bUser;
@@ -66,6 +70,39 @@ export const fetchCategorias = () => ({
   promise: axios.get(
     `${baseURL}/categoria`,
     {}
+  )
+})
+
+export const pasarLibro = () => ({
+  type: PASAR_LIBRO,
+  payload: {},
+})
+
+export const fetchLibros = (idUltimo, categorias) => ({
+  type: FETCH_LIBROS,
+  promise: axios.post(
+    `${baseURL}/libro`,
+    {
+      ultimo: {
+        idUsuario: 2,  // TODO
+        idUltimoLibro: idUltimo,
+        numeroLibros: NUM_LIBROS
+      }
+    }
+  )
+})
+
+export const fetchMoreLibros = (idUltimo, categorias) => ({
+  type: FETCH_MORE_LIBROS,
+  promise: axios.post(
+    `${baseURL}/libro`,
+    {
+      ultimo: {
+        idUsuario: 2,  // TODO
+        idUltimoLibro: idUltimo,
+        numeroLibros: NUM_LIBROS
+      }
+    }
   )
 })
 

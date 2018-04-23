@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 const multer = require('multer');
 const path = require('path');
+const encoder64 = require('../Util/functions')
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -28,7 +29,7 @@ class LibroProvider {
     this.getPortada(app, db); //Get
     this.getAll(app, db); //Get
     this.deleteOne(app, db);  //Delete
-    this.getBucnh(app, db); // Post
+    this.getBunch(app, db); // Post
     this.insertOne(app, db); // Post
   }
 
@@ -76,7 +77,7 @@ class LibroProvider {
     });
   }
 
-  getBucnh(app, db) {
+  getBunch(app, db) {
     app.post('/libro', function (req, res) {
       var ultimo = req.body.ultimo;
       console.log("Deberia cojer n libros " + ultimo);
@@ -85,23 +86,42 @@ class LibroProvider {
 
         var idUsuario = ultimo.idUsuario;
         var idUltimoLibro = ultimo.idUltimoLibro;
+        var categorias = ultimo.categorias;
         var fechaUltimo = ultimo.fechaUltimo;
-        var numberOfBooks = ultimo.numberOfBooks;
+        var numberOfBooks = ultimo.numeroLibros;
+
+        if (categorias == null) {
+          categorias = [];
+        }
 
         console.log(idUsuario + " , " + idUltimoLibro + " , " + fechaUltimo + " , " + numberOfBooks);
 
         var con = db.getConn(db.connect).then(function (response) {
-          var statement = "SELECT * FROM libro WHERE idLibro > " + idUltimoLibro + /*" AND fecha > '" + fechaUltimo + */" LIMIT " + numberOfBooks + ";";
+          var statement = "SELECT * FROM libro WHERE idLibro > " + mysql.escape(numberOfBooks) 
+            /*" AND fecha > '" + fechaUltimo + */;
+          if (categorias.length) {
+            statement += "AND categoria_idCategoria = ? ";
+          }
+          statement += " LIMIT " + numberOfBooks + ";";    
 
-          response.query(statement, function (err, result) {
+          response.query(statement, categorias, function (err, result) {
             response.release();
             if (err) {
               console.log(err);
               res.status(204)        // HTTP status 204: NotContent
                 .send('Failed at consult');
             } else {
+              var auxResult = result.map(function (lib) {
+                  if (lib.coverUrl.length != 0) {
+                    var archivo = path.resolve('./ReadooRestProvider/Uploads/Portadas/' + lib.coverUrl);
+                      if (archivo) {
+                        lib.coverUrl = encoder64(archivo);
+                      }
+                  }
+                  return lib;
+              });
               res.setHeader('Content-Type', 'application/json');
-              res.status(200).json(result);
+              res.status(200).json(auxResult);
             }
           });
         }, function (error) {
@@ -166,7 +186,6 @@ class LibroProvider {
       });
     });
   };
-
 }
 
 module.exports = LibroProvider;

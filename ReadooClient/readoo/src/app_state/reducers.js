@@ -3,7 +3,8 @@ import * as constantes from '../constants/appConstants';
 
 import {
   // Las actions
-  TAB_CHANGE, MODAL_ADD_LIBRO, UPLOAD_LIBRO, UPLOAD_LIBRO_200, FETCH_CATEGORIAS
+  TAB_CHANGE, MODAL_ADD_LIBRO, UPLOAD_LIBRO, UPLOAD_LIBRO_200, FETCH_CATEGORIAS,
+  PASAR_LIBRO, FETCH_LIBROS, FETCH_MORE_LIBROS
 } from './actions';
 // Asi puedo tener varios modulos
 
@@ -32,11 +33,14 @@ const initialState = {
     sobreMi: '',
   },
   libros: {
-
+    libro_actual: 0,
+    mostrados: [],
+    cargados: [],
+    success_fetch: true
   },
   categorias: {
     todas: [],
-    usuario_categoria: {}
+    usuario_categorias: []
   },
   controllerStatus: {
     uploadLibroSuccess: 0
@@ -77,9 +81,71 @@ const dialogs = (state = initialState.dialogs, { type, payload, data }) => {
 }
 
 /**
+ * Reducer para los libros a mostrar y operaciones de las mismas
+ */
+const libros = (state = initialState.libros, { type, payload, data }) => {
+  switch (type) {
+    case PASAR_LIBRO:
+      console.log(successType(PASAR_LIBRO));
+      let toRet = {};
+      if (state.libro_actual +1 < state.mostrados.length -1) {
+        toRet = {
+          ...state,
+          libro_actual: state.libro_actual + 1,
+        }
+      }
+
+      if (state.libro_actual + 1 === state.mostrados.length -1) 
+      {
+        toRet = {
+          ...state,
+          mostrados: state.cargados.slice(0),
+          libro_actual: 0,
+        }
+      }
+
+      return toRet;
+
+    case successType(FETCH_LIBROS):
+      console.log(successType(FETCH_LIBROS));
+      return {
+        ...state,
+        mostrados: data.data,
+        cargados: data.data,
+        success_fetch: true,
+      }
+
+    case failureType(FETCH_LIBROS):
+      console.log(failureType(FETCH_LIBROS));
+      return {
+        ...state,
+        success_fetch: false,
+      }
+
+    case successType(FETCH_MORE_LIBROS):
+      console.log(successType(FETCH_MORE_LIBROS));
+      return {
+        ...state,
+        cargados: data.data,
+        success_fetch: true,
+      }
+
+    case failureType(FETCH_MORE_LIBROS):
+      console.log(failureType(FETCH_MORE_LIBROS));
+      return {
+        ...state,
+        success_fetch: false,
+      }
+
+    default:
+      return state;
+  }
+}
+
+/**
  * Reducer para las categorias a mostrar y operaciones de las mismas
  */
-const categorias = (state = initialState.categorias, { type, payload, data }) => {
+const categorias = (state = initialState.libros, { type, payload, data }) => {
   switch (type) {
     case successType(FETCH_CATEGORIAS):
       console.log(successType(FETCH_CATEGORIAS));
@@ -156,6 +222,7 @@ const user = (state = initialState.user, { type, payload, data }) => {
 export default combineReducers({
   tabs,
   dialogs,
+  libros,
   categorias,
   controllerStatus
 })
@@ -170,3 +237,7 @@ export const getIsOpenModal = (state) => state.dialogs;
 export const getUserId = (state) => state.user.id;
 export const libroSuccessUpload = (state) => state.controllerStatus.uploadLibroSuccess;
 export const allCategorias = (state) => state.categorias.todas;
+export const usuarioCategorias = (state) => state.categorias.usuario_categorias;
+export const getIndiceLibro = (state) => state.libros.libro_actual;
+export const getLibroSuccess = (state) => state.libros.success_fetch;
+export const getLibros = (state) => state.libros.mostrados;
