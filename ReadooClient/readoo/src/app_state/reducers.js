@@ -1,10 +1,12 @@
 import { combineReducers } from 'redux';
 import * as constantes from '../constants/appConstants';
+import noHayNada from '../resources/noHayNada.png';
+import sinRed from '../resources/sinRed.png';
 
 import {
   // Las actions
   TAB_CHANGE, MODAL_ADD_LIBRO, UPLOAD_LIBRO, UPLOAD_LIBRO_200, FETCH_CATEGORIAS,
-  PASAR_LIBRO, FETCH_LIBROS, FETCH_MORE_LIBROS
+  PASAR_LIBRO, FETCH_LIBROS
 } from './actions';
 // Asi puedo tener varios modulos
 
@@ -33,10 +35,29 @@ const initialState = {
     sobreMi: '',
   },
   libros: {
-    libro_actual: 0,
+    libroDefault: {
+      id: -1,
+      titulo : 'Has explorados todos los libros de tus deseos.',
+      autor: 'Prueba a cambiar tus filtos en tu perfil de usuario.',
+      coverUrl: noHayNada,
+      descripcion: '',
+      review: '',
+      likes: 0
+    },
+    libroFailure: {
+      id: -1,
+      titulo : 'Jope! Se ha producido un error de red...',
+      autor: 'Prueba a refrescar la aplicación o espera a que el problema se resuelva.',
+      coverUrl: sinRed,
+      descripcion: '',
+      review: '',
+      likes: 0
+    },
+    libroActual: 0,
     mostrados: [],
     cargados: [],
-    success_fetch: true
+    success_fetch: true,
+    primeraVez: true
   },
   categorias: {
     todas: [],
@@ -86,54 +107,62 @@ const dialogs = (state = initialState.dialogs, { type, payload, data }) => {
 const libros = (state = initialState.libros, { type, payload, data }) => {
   switch (type) {
     case PASAR_LIBRO:
-      console.log(successType(PASAR_LIBRO));
+      console.log(PASAR_LIBRO + ': ' + state.libroActual + '- m:' + state.mostrados.length + '- c' + state.cargados.length);
+      console.log(state.mostrados);
+      console.log(state.cargados);
+
       let toRet = {};
-      if (state.libro_actual +1 < state.mostrados.length -1) {
+      if (state.libroActual +1 < state.mostrados.length) {
         toRet = {
           ...state,
-          libro_actual: state.libro_actual + 1,
+          libroActual: state.libroActual + 1,
         }
       }
 
-      if (state.libro_actual + 1 === state.mostrados.length -1) 
+      if (state.libroActual + 1 === state.mostrados.length
+        && state.mostrados.length === constantes.NUM_LIBROS) 
       {
         toRet = {
           ...state,
           mostrados: state.cargados.slice(0),
-          libro_actual: 0,
+          libroActual: 0,
         }
       }
 
+      if (state.libroActual + 1 === state.mostrados.length
+        && state.mostrados.length < constantes.NUM_LIBROS) 
+      {
+        toRet = {
+          ...state,
+          mostrados: [ state.libroDefault ],
+          libroActual: 0,
+        }
+      }
       return toRet;
 
     case successType(FETCH_LIBROS):
       console.log(successType(FETCH_LIBROS));
-      return {
-        ...state,
-        mostrados: data.data,
-        cargados: data.data,
-        success_fetch: true,
+      if (state.primeraVez) {
+        return {
+          ...state,
+          mostrados: data.data,
+          cargados: data.data,
+          success_fetch: true,
+          primeraVez: false
+        }
+      } else {
+        return {
+          ...state,
+          cargados: data.data,
+          success_fetch: true,
+        }
       }
 
     case failureType(FETCH_LIBROS):
       console.log(failureType(FETCH_LIBROS));
       return {
         ...state,
-        success_fetch: false,
-      }
-
-    case successType(FETCH_MORE_LIBROS):
-      console.log(successType(FETCH_MORE_LIBROS));
-      return {
-        ...state,
-        cargados: data.data,
-        success_fetch: true,
-      }
-
-    case failureType(FETCH_MORE_LIBROS):
-      console.log(failureType(FETCH_MORE_LIBROS));
-      return {
-        ...state,
+        mostrados: [ state.libroFailure ],
         success_fetch: false,
       }
 
@@ -238,6 +267,6 @@ export const getUserId = (state) => state.user.id;
 export const libroSuccessUpload = (state) => state.controllerStatus.uploadLibroSuccess;
 export const allCategorias = (state) => state.categorias.todas;
 export const usuarioCategorias = (state) => state.categorias.usuario_categorias;
-export const getIndiceLibro = (state) => state.libros.libro_actual;
+export const getIndiceLibro = (state) => state.libros.libroActual;
 export const getLibroSuccess = (state) => state.libros.success_fetch;
 export const getLibros = (state) => state.libros.mostrados;

@@ -10,6 +10,7 @@ export const DO_LOGIN = 'DO_LOGIN';
 export const UPLOAD_LIBRO_200 = 'UPLOAD_LIBRO_200';
 export const FETCH_CATEGORIAS = 'FETCH_CATEGORIAS';
 export const PASAR_LIBRO = 'PASAR_LIBRO';
+export const ATRAS_LIBRO = 'ATRAS_LIBRO';
 export const FETCH_LIBROS = 'FETCH_LIBROS';
 export const FETCH_MORE_LIBROS = 'FETCH_MORE_LIBROS';
 
@@ -75,6 +76,11 @@ export const fetchCategorias = () => ({
 
 export const pasarLibro = () => ({
   type: PASAR_LIBRO,
+  payload: {},
+})
+
+export const atrasLibro = () => ({
+  type: ATRAS_LIBRO,
   payload: {},
 })
 

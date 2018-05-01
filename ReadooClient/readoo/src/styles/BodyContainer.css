@@ -42,9 +42,9 @@ body {
 
 .imageExplore {
     position: relative;
-    width: 100%;
-    min-height: 100px;
-    max-height: 50%
+    /*width: 100%;*/
+    min-height: 300px;
+    max-height: 500px;
 }
 
 .arrowButtonRight {
