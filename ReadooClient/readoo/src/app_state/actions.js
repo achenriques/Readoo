@@ -84,8 +84,9 @@ export const atrasLibro = () => ({
   payload: {},
 })
 
-export const fetchLibros = (idUltimo, categorias) => ({
+export const fetchLibros = (idUltimo, categorias, primeraVez) => ({
   type: FETCH_LIBROS,
+  payload: { primeraVez: primeraVez },
   promise: axios.post(
     `${baseURL}/libro`,
     {

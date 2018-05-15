@@ -2,8 +2,12 @@ body {
     margin: 0px;
 }
 
+.bodyContainer {
+    margin-top: 63px;
+}
+
 .boton-anadir {
-    position: absolute;
+    position: fixed;
     bottom: 50px;
     right: 50px;
 }
@@ -55,4 +59,17 @@ body {
 
 a:hover { 
     cursor: pointer;
+}
+
+.divComentario {
+    margin-top: 50px;
+    padding-left: 25px;
+    padding-right: 15px;
+}
+
+.respuestaComentario {
+    padding-left: 25px;
+    margin-top: 1em;
+    margin-bottom: 5px;
+    text-align: left;
 }

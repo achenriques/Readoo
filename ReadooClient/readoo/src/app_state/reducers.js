@@ -57,7 +57,10 @@ const initialState = {
     mostrados: [],
     cargados: [],
     success_fetch: true,
-    primeraVez: true
+  },
+  comentarios: {
+    cargandoComentarios: true,
+    comentariosLibro: []
   },
   categorias: {
     todas: [],
@@ -142,13 +145,12 @@ const libros = (state = initialState.libros, { type, payload, data }) => {
 
     case successType(FETCH_LIBROS):
       console.log(successType(FETCH_LIBROS));
-      if (state.primeraVez) {
+      if (payload.primeraVez) {
         return {
           ...state,
           mostrados: data.data,
           cargados: data.data,
           success_fetch: true,
-          primeraVez: false
         }
       } else {
         return {
@@ -270,3 +272,4 @@ export const usuarioCategorias = (state) => state.categorias.usuario_categorias;
 export const getIndiceLibro = (state) => state.libros.libroActual;
 export const getLibroSuccess = (state) => state.libros.success_fetch;
 export const getLibros = (state) => state.libros.mostrados;
+export const getComentarios = (state) => state.comentarios.comentariosLibro;

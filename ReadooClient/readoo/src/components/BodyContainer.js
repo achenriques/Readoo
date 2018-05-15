@@ -6,13 +6,13 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Snackbar from 'material-ui/Snackbar';
 import { Grid, Row, Col } from 'react-material-responsive-grid';
-import ExploreView from './Explore/ExploreView';
-import SubirLibroModal from './Explore/SubirLibroModal';
+import ExploreView from './explore/ExploreView';
+import SubirLibroModal from './explore/SubirLibroModal';
 import { REST_SUCCESS, REST_DEFAULT, REST_FAILURE } from '../constants/appConstants';
 import '../styles/BodyContainer.css';
 
 const styleButton = {
-    position: 'absolute',
+    position: 'fixed',
     bottom: '50px',
     right: '50px',
 }
@@ -84,7 +84,7 @@ class BodyContainer extends Component {
         switch (this.props.selectedIndex) {
             case 0:
                 return (
-                    <div>
+                    <div className='bodyContainer'>
                         <ExploreView/>
                         <FloatingActionButton onClick={this.hadleOpenAddLibro.bind(this)} style={styleButton}>
                             <ContentAdd />
@@ -103,7 +103,7 @@ class BodyContainer extends Component {
 
             case 1:
                 return (
-                    <div>
+                    <div className='bodyContainer'>
                         <h1 align="center">
                             Soy un body 2
                         </h1>
@@ -112,19 +112,19 @@ class BodyContainer extends Component {
 
             case 2:
                 return (
-                    <div>
+                    <div className='bodyContainer'>
                         <h1 align="center">
                             Soy un body 3
-                    </h1>
+                        </h1>
                     </div>
                 );
 
             case 3:
                 return (
-                    <div>
+                    <div className='bodyContainer'>
                         <h1 align="center">
                             Soy un body 4
-                    </h1>
+                        </h1>
                     </div>
                 );
 

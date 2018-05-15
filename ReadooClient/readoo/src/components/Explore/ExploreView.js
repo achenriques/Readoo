@@ -3,47 +3,16 @@ import { connect } from 'react-redux';
 import { setIsOpenAddLibro, fetchLibros, pasarLibro, controllerLibroDefault } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import { Card, CardActions, CardHeader, CardMedia, CardTitle, CardText } from 'material-ui/Card';
+import {GridList, GridTile} from 'material-ui/GridList';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import IconButton from 'material-ui/IconButton';
 import ArrowLeft from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
 import ArrowRight from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
 import Favorite from 'material-ui/svg-icons/action/favorite';
+import CommentsGrid from '../common/CommentsGrid';
 import { NUM_LIBROS, DISPLAY_NONE } from '../../constants/appConstants';
 import libroDefault from '../../resources/libroDefault.gif';
-
-const styleFavorite = {
-    height: '1em',
-}
-
-const styleCard = {
-    position: 'relative',
-    width: '99%',
-    maxHeight: '500px',
-    minHeight: '100px',
-    textAlign: 'center'
-}
-
-const styleLeftArrow = {
-    position: 'absolute',
-    height: '100%',
-    width: '77px',
-    //top: '50%',
-    left: '20px'
-}
-
-const styleRightArrow = {
-    position: 'absolute',
-    height: '100%',
-    width: '77px',
-    //top: '50%',
-    right: '20px'
-}
-const styleArrows = {
-    position: 'relative',
-    height: '75px',
-    width: '75px',
-    color: 'rgba(150, 150, 150, 0.5)'
-}
+import material_styles from './material_styles';
 
 class ExploreView extends Component {
 
@@ -51,6 +20,7 @@ class ExploreView extends Component {
         estoyLibroAtras: false,
         libroAtras : null,
         libroActual: {
+            idLibro: null,
             titulo: '',
             autor: '',
             portada: null,
@@ -58,7 +28,9 @@ class ExploreView extends Component {
             historia: '',
             likes: 0,
         },
+        meGustaLibro: false,
         errorImgLibro: false,
+        mostrarCorazon: 0,  // 0 no mostrar, 1 red, 2 black
     };
 
     cargarLibroActualFromProps (props) {
@@ -75,6 +47,7 @@ class ExploreView extends Component {
             this.setState({
                 ...this.state,
                 libroActual: {
+                    idLibro: props.librosMostrados[props.indexLibro].idLibro,
                     titulo: props.librosMostrados[props.indexLibro].titulo,
                     autor: props.librosMostrados[props.indexLibro].autor,
                     portada: portada,
@@ -95,7 +68,7 @@ class ExploreView extends Component {
     };
 
     componentDidMount() {
-        this.props.fetchLibros(0, []);
+        this.props.fetchLibros(0, [], true);
     }
 
     componentWillReceiveProps(newProps) {
@@ -127,29 +100,109 @@ class ExploreView extends Component {
                 ...this.state,
                 libroAtras: this.state.libroActual
             }, () => {
-                this.props.pasarLibro();
+                // this.props.pasarLibro();
             });
         }
     }
 
-    render() {        
+    handleDbClickImage(evt) {
+        if (this.state.meGustaLibro) {
+            this.handleUnlike(evt);
+        } else {
+            this.handleLike(evt);
+        }
+    }
+
+    handleLike(evt) {
+        if (!this.state.meGustaLibro) {
+            const cerrarCorazon = () => {
+                setTimeout(()=>{
+                    this.setState(
+                        {
+                            ...this.state,
+                            libroActual: { ...this.state.libroActual, likes: this.state.libroActual.likes +1},
+                            mostrarCorazon: 0,
+                            meGustaLibro: true,
+                        }
+                    )
+                }, 1000);
+            }
+    
+            this.setState(
+                {
+                    ...this.state,
+                    mostrarCorazon: 1
+                }, cerrarCorazon
+            )
+    
+            // TODO: this.props.setLikeLibro(idLibro, true)
+        }
+    }
+
+    handleUnlike(evt) {
+        if (this.state.meGustaLibro) {
+            const cerrarCorazon = () => {
+                setTimeout(()=>{
+                    this.setState(
+                        {
+                            ...this.state,
+                            libroActual: { ...this.state.libroActual, likes: this.state.libroActual.likes -1},
+                            mostrarCorazon: 0,
+                            meGustaLibro: false
+                        }
+                    )
+                }, 1000);
+            }
+    
+            this.setState(
+                {
+                    ...this.state,
+                    mostrarCorazon: 2
+                }, cerrarCorazon
+            )
+            // TODO: this.props.setLikeLibro(idLibro, false)
+        }        
+    }
+
+    // Devuelve el estilo de doble click sobre la imagen
+    tipoDeCorazon = (idTipo) => {
+        switch (idTipo) {
+            case 0:
+                return (DISPLAY_NONE);
+                break;
+        
+            case 1:
+                return ({ ...material_styles.styleCorazon, fill: 'red' });
+                break;
+
+            case 2:
+                return (material_styles.styleCorazon)
+                break;
+                
+            default:
+                break;
+        }
+    }
+
+    render() {  
         return (
             <div>
                 <Card>
-                    <CardMedia style={styleCard}
+                    <CardMedia style={material_styles.styleCard}
                     //overlay={<CardTitle title="Overlay title" subtitle="Overlay subtitle" />}
                     >
                     <div className='imageExplore'>
-                        <IconButton onClick={this.handleBack.bind(this)} iconStyle={(this.state.libroAtras)? styleArrows: DISPLAY_NONE} style={styleLeftArrow} disabled={(this.state.libroAtras)? false: true}>
+                        <IconButton onClick={this.handleBack.bind(this)} iconStyle={(this.state.libroAtras)? material_styles.styleArrows: DISPLAY_NONE} style={material_styles.styleLeftArrow} disabled={(this.state.libroAtras)? false: true}>
                             <ArrowLeft viewBox="7 5 15 15"/>
                         </IconButton>
-                        <IconButton onClick={this.handleForward.bind(this)} iconStyle={(this.props.librosMostrados.length > 1)? styleArrows: DISPLAY_NONE} style={styleRightArrow} disabled={this.props.librosMostrados.length === 1}>
+                        <IconButton onClick={this.handleForward.bind(this)} iconStyle={(this.props.librosMostrados.length > 1)? material_styles.styleArrows: DISPLAY_NONE} style={material_styles.styleRightArrow} disabled={this.props.librosMostrados.length === 1}>
                             <ArrowRight viewBox="7 5 15 15"/>
                         </IconButton >
                         <div style= {(this.state.errorImgLibro.length)? { color: 'red', paddingTop: '1em' }: DISPLAY_NONE}>
                             { this.state.errorImgLibro }
                         </div>
                         <img src={this.state.libroActual.portada} alt="" className="imageExplore"/>
+                        <Favorite style={ this.tipoDeCorazon(this.state.mostrarCorazon) } />
                     </div>
                     </CardMedia>
                     <CardTitle title={this.state.libroActual.titulo} subtitle={this.state.libroActual.autor} />
@@ -162,10 +215,14 @@ class ExploreView extends Component {
                         {this.state.libroActual.opinion}
                     </CardText>
                     <CardText>
-                        Son {this.state.libroActual.likes} los que piensan que este libro mola
-                        <Favorite style={styleFavorite} />
+                        {(this.state.libroActual.idLibro)? (
+                        <div>Son {this.state.libroActual.likes} los que piensan que este libro mola
+                        <Favorite style={material_styles.styleFavorite} /></div>): (<div></div>)
+                    }
                     </CardText>
                 </Card>
+                { /* Grid de comentarios */}
+                <CommentsGrid idLibro={this.state.libroActual.idLibro} />
             </div>
         );
     }
@@ -178,7 +235,7 @@ export default connect(
         success_libro: appState.getLibroSuccess(state),
     }),
     (dispatch) => ({
-        fetchLibros: (idUltimo, categorias) => dispatch(fetchLibros(idUltimo, categorias)),
+        fetchLibros: (idUltimo, categorias, primeraVez) => dispatch(fetchLibros(idUltimo, categorias, primeraVez)),
         pasarLibro:() => dispatch(pasarLibro())
         //openAddLibro: (isOpen) => dispatch(setIsOpenAddLibro(isOpen)),
         //listenedUploadLibro: () => dispatch(controllerLibroDefault())

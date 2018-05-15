@@ -22,7 +22,7 @@ class ShortcutBar extends Component {
 
     render() {
         return (
-            <Paper zDepth={1}>
+            <Paper zDepth={1} style={{position: 'fixed', top: 0, left: 0, width: '100%', height: '60px', overflow: 'visible', zIndex: 1}}>
                 <BottomNavigation selectedIndex={this.props.selectedIndex}>
                     <BottomNavigationItem
                         label="Ver libros"
