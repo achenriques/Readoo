@@ -2,11 +2,15 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchComentarios } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
+import { Grid, Row, Col } from 'react-material-responsive-grid';
 import { GridList, GridTile } from 'material-ui/GridList';
 import IconButton from 'material-ui/IconButton';
 import TextField from 'material-ui/TextField';
+import Send from 'material-ui/svg-icons/content/send';
 import StarBorder from 'material-ui/svg-icons/toggle/star-border';
 import Avatar from 'material-ui/Avatar';
+import Paper from 'material-ui/Paper';
+import Divider from 'material-ui/Divider';
 import material_styles from './material_styles';
 import NUM_COMENTARIOS from '../../constants/appConstants';
 
@@ -109,8 +113,11 @@ class CommentsGrid extends Component {
     mostrarSubComentarios = (comentario) => {
         if (comentario.subComentarios.length) {
             return (
-                <div style={material_styles.styleChildren}>
-                {(comentario.subComentarios.length > 1)? 'Respuestas': 'Respuesta'}
+                <div style={material_styles.styleChildren} >
+                    <Divider style={material_styles.styleCommentSeparator}/>
+                    <div className="respuestaComentario">
+                        {(comentario.subComentarios.length > 1)? 'Respuestas': 'Respuesta'}
+                    </div>
                     <GridList
                         cols={1}
                         cellHeight='auto'
@@ -118,20 +125,21 @@ class CommentsGrid extends Component {
                         style={material_styles.styleChildrenList}
                     >
                     {comentario.subComentarios.map((subComment) => (
-                        <GridTile
-                            key={subComment.idComentario}
-                            title={subComment.usuario}
-                            actionIcon={<IconButton><StarBorder color="white" ><Avatar src="" /></StarBorder></IconButton>}
-                            actionPosition="left"
-                            titlePosition="top"
-                            titleBackground={"linear-gradient(to bottom right, rgba(255,255,255,0.7) 0%, " + this.colorAleatorio() + " 50%,rgba(0,0,0,0) 100%)"}
-                            titleStyle={{color: 'black'}}
-                            style={{borderRadius: '20px', background: 'lightgrey'}}
-                            cols={1}
-                            rows={1}
-                        >
-                            <div className='divComentario'> {subComment.comentario} </div>
-                        </GridTile>
+                        <Paper zDepth={1} >
+                            <GridTile
+                                key={subComment.idComentario}
+                                title={subComment.usuario}
+                                actionIcon={<IconButton><StarBorder color="white" style={{width: '30px', heigth: '30px' }}><Avatar src="" /></StarBorder></IconButton>}
+                                actionPosition="left"
+                                titlePosition="top"
+                                titleBackground={"linear-gradient(to bottom, rgba(255,255,255,0.7) 0%, rgba(0, 0, 0 , 0.3) 50%,rgba(0,0,0,0) 100%)"}
+                                titleStyle={{color: 'black', heigth: '30px'}}
+                                cols={1}
+                                rows={1}
+                            >
+                                <div className='divComentario'> {subComment.comentario} </div>
+                            </GridTile>
+                        </Paper>
                     ))}
                     </GridList>
                 </div>
@@ -152,7 +160,7 @@ class CommentsGrid extends Component {
             default:
             //case 1:
                 return (
-                    <div style={material_styles.styleRoot}>
+                    <div style={material_styles.styleChildren} >
                         <GridList
                             cols={2}
                             rows={1.5}
@@ -161,29 +169,42 @@ class CommentsGrid extends Component {
                             style={material_styles.styleGridList}
                         >
                         {/*this.props.comentarios*/this.comentarios.map((comment) => (
-                            <GridTile
-                                key={comment.idComentario}
-                                title={comment.usuario}
-                                actionIcon={<IconButton><StarBorder color="white" ><Avatar src="" /></StarBorder></IconButton>}
-                                actionPosition="left"
-                                titlePosition="top"
-                                titleStyle={{color: 'black'}}
-                                titleBackground={"linear-gradient(to bottom right, rgba(255,255,255,0.7) 0%, " + this.colorAleatorio() + " 50%,rgba(0,0,0,0) 100%)"}
-                                titleStyle={{color: 'black', borderRadius: '20px'}}
-                                style={{borderRadius: '20px', background: 'lightgrey'}}
-                                cols={1}
-                                rows={1}
-                            >
-                                <div>
-                                    <div className='divComentario'> {comment.comentario} </div>
-                                    {this.mostrarSubComentarios(comment)}
-                                    <TextField
-                                        hintText="Escribe tu respuesta"
-                                        maxLength="140"
-                                        fullWidth={true}
-                                    />
-                                </div>
-                            </GridTile>
+                            <Paper zDepth={4} >
+                                <GridTile
+                                    key={comment.idComentario}
+                                    title={comment.usuario}
+                                    actionIcon={<IconButton><StarBorder color="white" ><Avatar src="" /></StarBorder></IconButton>}
+                                    actionPosition="left"
+                                    titlePosition="top"
+                                    titleBackground={"linear-gradient(to bottom right, rgba(255,255,255,0.7) 0%, rgba(0, 0, 0 , 0.2) 50%,rgba(0,0,0,0) 100%)"}
+                                    titleStyle={{color: 'black' }}
+                                    style={{heigth: '30px'}}
+                                    cols={1}
+                                    rows={1}
+                                >
+                                    <div>
+                                        <div className='divComentario'> {comment.comentario} </div>
+                                        {this.mostrarSubComentarios(comment)}
+                                        <Divider style={material_styles.styleCommentSeparator}/>
+                                        <Grid>
+                                            <Row>
+                                                <Col sm={10}>
+                                                    <TextField
+                                                        hintText="Escribe tu respuesta"
+                                                        maxLength="140"
+                                                        multiLine={true}
+                                                        rows={1}
+                                                        fullWidth={true}
+                                                    />
+                                                </Col>
+                                                <Col sm={2}>
+                                                    <IconButton style={material_styles.styleSendButton}><Send/></IconButton>
+                                                </Col>
+                                            </Row>
+                                        </Grid>
+                                    </div>
+                                </GridTile>
+                            </Paper>
                         ))}
                         </GridList>
                     </div>

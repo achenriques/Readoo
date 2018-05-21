@@ -5,7 +5,6 @@ import * as appState from '../app_state/reducers';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Snackbar from 'material-ui/Snackbar';
-import { Grid, Row, Col } from 'react-material-responsive-grid';
 import ExploreView from './explore/ExploreView';
 import SubirLibroModal from './explore/SubirLibroModal';
 import { REST_SUCCESS, REST_DEFAULT, REST_FAILURE } from '../constants/appConstants';

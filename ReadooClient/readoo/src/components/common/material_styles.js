@@ -4,7 +4,6 @@ export default {
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'space-around',
-        float: 'left',
         width: '100%'
     },
     
@@ -13,10 +12,10 @@ export default {
         flexWrap: 'wrap',
         justifyContent: 'space-around',
         float: 'left',
-        width: '100%',
+        width: 'auto',
         marginTop: '10px',
-        paddingLeft: '25px',
-        textAlign: 'left'
+        textAlign: 'left',
+        float: 'right'
     },
     
     styleGridList: {
@@ -30,5 +29,16 @@ export default {
         width: '100%',
         height: 'auto',
         overflowY: 'auto',
+    },
+
+    styleSendButton: {
+        bottom: '2px',
+        position: 'absolute'
+    },
+
+    styleCommentSeparator: {
+        marginLeft: '10px',
+        marginRight: '10px',
+        marginTop: '5px'
     }
 }
