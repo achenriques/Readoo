@@ -6,5 +6,6 @@ ServerCredentials = {
 }
 
 const uploadDir = '/Upload';
+const maxComentarios = 25;
 
-module.exports = ServerCredentials;
+module.exports = { ServerCredentials, maxComentarios };

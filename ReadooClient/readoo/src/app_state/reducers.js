@@ -6,7 +6,7 @@ import sinRed from '../resources/sinRed.png';
 import {
   // Las actions
   TAB_CHANGE, MODAL_ADD_LIBRO, UPLOAD_LIBRO, UPLOAD_LIBRO_200, FETCH_CATEGORIAS,
-  PASAR_LIBRO, FETCH_LIBROS
+  PASAR_LIBRO, FETCH_LIBROS, FETCH_COMENTARIOS
 } from './actions';
 // Asi puedo tener varios modulos
 
@@ -59,7 +59,7 @@ const initialState = {
     success_fetch: true,
   },
   comentarios: {
-    cargandoComentarios: true,
+    cargandoComentarios: false,
     comentariosLibro: []
   },
   categorias: {
@@ -173,6 +173,28 @@ const libros = (state = initialState.libros, { type, payload, data }) => {
   }
 }
 
+const comentarios = (state = initialState.comentarios, { type, payload, data }) => {
+  switch (type) {
+    case successType(FETCH_COMENTARIOS):
+      console.log(successType(FETCH_COMENTARIOS));
+      return {
+        ...state,
+        cargandoComentarios: false,
+        comentariosLibro: data.data,
+      }
+
+    case failureType(FETCH_COMENTARIOS):
+      console.log(failureType(FETCH_COMENTARIOS));
+      return {
+        ...state,
+        cargandoComentarios: false,
+      }
+
+    default:
+      return state;
+  }
+}
+
 /**
  * Reducer para las categorias a mostrar y operaciones de las mismas
  */
@@ -254,6 +276,7 @@ export default combineReducers({
   tabs,
   dialogs,
   libros,
+  comentarios,
   categorias,
   controllerStatus
 })

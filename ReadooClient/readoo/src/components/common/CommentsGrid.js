@@ -12,7 +12,7 @@ import Avatar from 'material-ui/Avatar';
 import Paper from 'material-ui/Paper';
 import Divider from 'material-ui/Divider';
 import material_styles from './material_styles';
-import NUM_COMENTARIOS from '../../constants/appConstants';
+import { NUM_COMENTARIOS } from '../../constants/appConstants';
 
 class CommentsGrid extends Component {
 
@@ -70,15 +70,18 @@ class CommentsGrid extends Component {
     };
 
     componentWillReceiveProps(newProps) {
-        /*if (newProps.libroActual) {
-            //this.fetchComentarios(newProps.libro, NUM_COMENTARIOS, fechaUltimoComentario) //DOING this
+        if (newProps.idLibro > 0) {
+            let fechaUltimoComentario = new Date();
+            // todo fecha
+            this.props.fetchComentarios(newProps.idLibro, NUM_COMENTARIOS, null)
         }
         if (newProps.comentariosMostrados) {
             this.setState({
                 ...this.state,
-                cargadosComentarios: 1
+                cargadosComentarios: 1,
+                comentarios: newProps.comentariosMostrados
             })
-        }*/ //TODO
+        }
     }
 
     colorAleatorio() {
@@ -233,9 +236,9 @@ class CommentsGrid extends Component {
 
 export default connect(
     (state) => ({
-        //comentariosMostrados: appState.getComentarios(state),
+        comentariosMostrados: appState.getComentarios(state),
     }),
     (dispatch) => ({
-        //fetchComentarios: (libro, numComentarios, fechaUltimo) => dispatch(fetchComentarios(libro, numComentarios, fechaUltimo)),
+        fetchComentarios: (idLibro, numComentarios, fechaUltimo) => dispatch(fetchComentarios(idLibro, numComentarios, fechaUltimo)),
     })
 )(CommentsGrid);

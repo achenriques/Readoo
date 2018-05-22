@@ -78,7 +78,7 @@ class ExploreView extends Component {
     handleBack(evt) {
         this.setState({
             ...this.state,
-            errorImgLibro: (!this.state.libroAtras.coverUrl)? "Oh oh! No se ha cargado la imagen. Que mal!": '',
+            errorImgLibro: (!this.state.libroAtras.portada)? "Oh oh! No se ha cargado la imagen. Que mal!": '',
             libroActual: { ...this.state.libroAtras },
             libroAtras: null,
             estoyLibroAtras: true,
@@ -100,7 +100,7 @@ class ExploreView extends Component {
                 ...this.state,
                 libroAtras: this.state.libroActual
             }, () => {
-                // this.props.pasarLibro();
+                this.props.pasarLibro();
             });
         }
     }
@@ -201,7 +201,7 @@ class ExploreView extends Component {
                         <div style= {(this.state.errorImgLibro.length)? { color: 'red', paddingTop: '1em' }: DISPLAY_NONE}>
                             { this.state.errorImgLibro }
                         </div>
-                        <img src={this.state.libroActual.portada} alt="" className="imageExplore"/>
+                        <img src={this.state.libroActual.portada} alt="" className="imageExplore" onDoubleClick={this.handleDbClickImage.bind(this)}/>
                         <Favorite style={ this.tipoDeCorazon(this.state.mostrarCorazon) } />
                     </div>
                     </CardMedia>

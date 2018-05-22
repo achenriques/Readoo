@@ -13,6 +13,7 @@ export const PASAR_LIBRO = 'PASAR_LIBRO';
 export const ATRAS_LIBRO = 'ATRAS_LIBRO';
 export const FETCH_LIBROS = 'FETCH_LIBROS';
 export const FETCH_MORE_LIBROS = 'FETCH_MORE_LIBROS';
+export const FETCH_COMENTARIOS = 'FETCH_COMENTARIOS';
 
 // Default basic auth
 //axios.defaults.headers.common['Authorization'] = bAuth.bUser;
@@ -120,6 +121,18 @@ export const doLogin = () => ({
     {
       email: 'admin',
       pass: 'admin'
+    }
+  )
+})
+
+export const fetchComentarios = (idLibro, numComentarios, fechaUltimo) => ({
+  type: FETCH_COMENTARIOS,
+  promise: axios.post(
+    `${baseURL}/comentario/fetch`,
+    {
+      idLibro,
+      numComentarios,
+      fechaUltimo
     }
   )
 })
