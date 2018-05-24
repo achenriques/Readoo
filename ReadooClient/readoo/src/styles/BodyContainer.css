@@ -76,3 +76,9 @@ a:hover {
     text-align: center;
     font-style: italic;
 }
+
+.divRespuestaComentario {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+}

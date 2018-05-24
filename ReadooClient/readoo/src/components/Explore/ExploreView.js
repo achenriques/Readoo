@@ -184,6 +184,8 @@ class ExploreView extends Component {
         }
     }
 
+    contador = 0;
+
     render() {  
         return (
             <div>
@@ -221,7 +223,7 @@ class ExploreView extends Component {
                     }
                     </CardText>
                 </Card>
-                { /* Grid de comentarios */}
+                { /* Grid de comentarios */ console.log(this.contador += 1)}
                 <CommentsGrid idLibro={this.state.libroActual.idLibro} />
             </div>
         );

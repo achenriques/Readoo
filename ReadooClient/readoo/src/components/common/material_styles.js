@@ -11,11 +11,13 @@ export default {
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'space-around',
-        float: 'left',
-        width: 'auto',
+        width: '85%',
         marginTop: '10px',
+        marginBottom: '20px',
         textAlign: 'left',
-        float: 'right'
+        maxHeight: '200px',
+        float: 'right',
+        overflowY: 'auto'
     },
     
     styleGridList: {
@@ -28,7 +30,7 @@ export default {
     styleChildrenList: {
         width: '100%',
         height: 'auto',
-        overflowY: 'auto',
+        marginBottom: '10px'
     },
 
     styleSendButton: {
@@ -37,6 +39,7 @@ export default {
     },
 
     styleCommentSeparator: {
+        width: '95%',
         marginLeft: '10px',
         marginRight: '10px',
         marginTop: '5px'

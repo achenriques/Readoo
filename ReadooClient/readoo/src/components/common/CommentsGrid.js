@@ -17,8 +17,37 @@ import { NUM_COMENTARIOS } from '../../constants/appConstants';
 class CommentsGrid extends Component {
 
     initialState = {
-        cargadosComentarios: 0,  // 1 para cargados, -1 para error
+        cargadosComentarios: null,  // 1 para cargados, -1 para error
         comentariosLibros: []
+    }
+
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (nextProps.idLibro > 0 && prevState.cargadosComentarios !== 0) {
+            let fechaUltimoComentario = null;
+            if (prevState.comentariosLibros && prevState.comentariosLibros.length) {
+                fechaUltimoComentario = new Date(Math.max.apply(null, prevState.comentariosLibros.map(function(e) {
+                    return new Date(e.fecha);
+                  })));
+            }
+            // todo fecha
+            (nextProps.fetchComentarios) && nextProps.fetchComentarios(nextProps.idLibro, NUM_COMENTARIOS, fechaUltimoComentario);
+            return ({ ...prevState, cargadosComentarios: 0 });
+        } else
+        if (nextProps.comentariosMostrados == null) {
+            return ({
+                ...prevState,
+                cargadosComentarios: -1,
+                comentariosLibros: null
+            })
+        } else
+        if (nextProps.comentariosMostrados && prevState.cargadosComentarios === 0) {
+            return ({
+                ...prevState.state,
+                cargadosComentarios: 1,
+                comentarios: nextProps.comentariosMostrados
+            })
+        } else
+        return null;
     }
 
     comentarios = [
@@ -62,6 +91,12 @@ class CommentsGrid extends Component {
             comentario: "Ou la la!",
             subComentarios: []
         },
+        {   
+            idComentario: 6,
+            usuario: "Minervo",
+            comentario: "Ou la la!",
+            subComentarios: []
+        },
     ]
 
     constructor(props) {
@@ -69,22 +104,7 @@ class CommentsGrid extends Component {
         this.state = { ...this.initilState };
     };
 
-    componentWillReceiveProps(newProps) {
-        if (newProps.idLibro > 0) {
-            let fechaUltimoComentario = new Date();
-            // todo fecha
-            this.props.fetchComentarios(newProps.idLibro, NUM_COMENTARIOS, null)
-        }
-        if (newProps.comentariosMostrados) {
-            this.setState({
-                ...this.state,
-                cargadosComentarios: 1,
-                comentarios: newProps.comentariosMostrados
-            })
-        }
-    }
-
-    colorAleatorio() {
+    colorAleatorio () {
         let ran = Math.round(Math.random() * 5);
         
         switch (ran) {
@@ -113,38 +133,46 @@ class CommentsGrid extends Component {
         }
     }
 
-    mostrarSubComentarios = (comentario) => {
+    changeNuevoComentario (evt) {
+        (evt) && this.setState({
+            ...this.state,
+            nuevoComentario: evt.currentTarget.value
+        })
+    }
+
+    mostrarSubComentarios (comentario) {
         if (comentario.subComentarios.length) {
             return (
-                <div style={material_styles.styleChildren} >
-                    <Divider style={material_styles.styleCommentSeparator}/>
+                <div>
                     <div className="respuestaComentario">
                         {(comentario.subComentarios.length > 1)? 'Respuestas': 'Respuesta'}
                     </div>
-                    <GridList
-                        cols={1}
-                        cellHeight='auto'
-                        padding={10}
-                        style={material_styles.styleChildrenList}
-                    >
-                    {comentario.subComentarios.map((subComment) => (
-                        <Paper zDepth={1} >
-                            <GridTile
-                                key={subComment.idComentario}
-                                title={subComment.usuario}
-                                actionIcon={<IconButton><StarBorder color="white" style={{width: '30px', heigth: '30px' }}><Avatar src="" /></StarBorder></IconButton>}
-                                actionPosition="left"
-                                titlePosition="top"
-                                titleBackground={"linear-gradient(to bottom, rgba(255,255,255,0.7) 0%, rgba(0, 0, 0 , 0.3) 50%,rgba(0,0,0,0) 100%)"}
-                                titleStyle={{color: 'black', heigth: '30px'}}
-                                cols={1}
-                                rows={1}
-                            >
-                                <div className='divComentario'> {subComment.comentario} </div>
-                            </GridTile>
-                        </Paper>
-                    ))}
-                    </GridList>
+                    <div style={material_styles.styleChildren} >
+                        <GridList
+                            cols={1}
+                            cellHeight='auto'
+                            padding={10}
+                            style={material_styles.styleChildrenList}
+                        >
+                        {comentario.subComentarios.map((subComment) => (
+                            <Paper zDepth={1} >
+                                <GridTile
+                                    key={subComment.idComentario}
+                                    title={subComment.usuario}
+                                    actionIcon={<IconButton><StarBorder color="white" style={{width: '30px', heigth: '30px' }}><Avatar src="" /></StarBorder></IconButton>}
+                                    actionPosition="left"
+                                    titlePosition="top"
+                                    titleBackground={"linear-gradient(to bottom, rgba(255,255,255,0.7) 0%, rgba(0, 0, 0 , 0.3) 50%,rgba(0,0,0,0) 100%)"}
+                                    titleStyle={{color: 'black', heigth: '30px'}}
+                                    cols={1}
+                                    rows={1}
+                                >
+                                    <div className='divComentario'> {subComment.comentario} </div>
+                                </GridTile>
+                            </Paper>
+                        ))}
+                        </GridList>
+                    </div>
                 </div>
             )
         }
@@ -154,82 +182,95 @@ class CommentsGrid extends Component {
         switch (this.state.cargadosComentarios) {
             case 0:
                 return (
-                    <div>
+                    <div className="cargandoComentarios">
                         <h3>Cargando...</h3>
                     </div>
                 )
                 break;
 
-            default:
-            //case 1:
-                return (
-                    <div style={material_styles.styleChildren} >
-                        <GridList
-                            cols={2}
-                            rows={1.5}
-                            cellHeight='auto'
-                            padding={15}
-                            style={material_styles.styleGridList}
-                        >
-                        {/*this.props.comentarios*/this.comentarios.map((comment) => (
-                            <Paper zDepth={4} >
-                                <GridTile
-                                    key={comment.idComentario}
-                                    title={comment.usuario}
-                                    actionIcon={<IconButton><StarBorder color="white" ><Avatar src="" /></StarBorder></IconButton>}
-                                    actionPosition="left"
-                                    titlePosition="top"
-                                    titleBackground={"linear-gradient(to bottom right, rgba(255,255,255,0.7) 0%, rgba(0, 0, 0 , 0.2) 50%,rgba(0,0,0,0) 100%)"}
-                                    titleStyle={{color: 'black' }}
-                                    style={{heigth: '30px'}}
-                                    cols={1}
-                                    rows={1}
-                                >
-                                    <div>
-                                        <div className='divComentario'> {comment.comentario} </div>
-                                        {this.mostrarSubComentarios(comment)}
-                                        <Divider style={material_styles.styleCommentSeparator}/>
-                                        <Grid>
-                                            <Row>
-                                                <Col sm={10}>
-                                                    <TextField
-                                                        hintText="Escribe tu respuesta"
-                                                        maxLength="140"
-                                                        multiLine={true}
-                                                        rows={1}
-                                                        fullWidth={true}
-                                                    />
-                                                </Col>
-                                                <Col sm={2}>
-                                                    <IconButton style={material_styles.styleSendButton}><Send/></IconButton>
-                                                </Col>
-                                            </Row>
-                                        </Grid>
-                                    </div>
-                                </GridTile>
-                            </Paper>
-                        ))}
-                        </GridList>
-                    </div>
-                );
-                break;
-/*
-            case -1:
-                return (
-                    <div>
-                        <h3>Jope, ha ocurrido un error...</h3>
-                    </div>
-                );
-                break;
+            case 1:
+                if (this.state.comentarios.length) {
+                    return (
+                        <div style={material_styles.styleRoot} >
+                            <GridList
+                                cols={2}
+                                rows={1.5}
+                                cellHeight='auto'
+                                padding={15}
+                                style={material_styles.styleGridList}
+                            >
+                            {/*this.props.comentarios*/this.props.comentarios.map((comentario) => (
+                                <Paper zDepth={4} >
+                                    <GridTile
+                                        key={comentario.idComentario}
+                                        title={comentario.usuario}
+                                        actionIcon={<IconButton><StarBorder color="white" ><Avatar src="" /></StarBorder></IconButton>}
+                                        actionPosition="left"
+                                        titlePosition="top"
+                                        titleBackground={"linear-gradient(to bottom right, rgba(255,255,255,0.7) 0%, rgba(0, 0, 0 , 0.2) 50%,rgba(0,0,0,0) 100%)"}
+                                        titleStyle={{color: 'black' }}
+                                        style={{heigth: '30px'}}
+                                        cols={1}
+                                        rows={1}
+                                    >
+                                        <div>
+                                            <div className='divComentario'> {comentario.comentario} </div>
+                                            <Divider style={material_styles.styleCommentSeparator}/>
+                                            {this.mostrarSubComentarios(comentario)}
+                                            <div className="divRespuestaComentario">
+                                                <Grid>
+                                                    <Row>
+                                                        <Col sm={10}>
+                                                            <TextField
+                                                                hintText="Escribe tu respuesta"
+                                                                maxLength="140"
+                                                                multiLine={true}
+                                                                rows={1}
+                                                                fullWidth={true}
+                                                                onChange={this.changeNuevoComentario.bind(this)}
+                                                            />
+                                                        </Col>
+                                                        <Col sm={1}>
+                                                            <IconButton style={material_styles.styleSendButton}><Send/></IconButton>
+                                                        </Col>
+                                                    </Row>
+                                                </Grid>
+                                            </div>
+                                        </div>
+                                    </GridTile>
+                                </Paper>
+                            ))}
+                            </GridList>
+                        </div>
+                    );
+                }
 
             default:
                 return (
                     <div>
-                        <h3>Cargando...</h3>
+                        <h3>No hay ningún comentario. Sé tu el primero en romper el hielo...</h3>
+                        <div className="divRespuestaComentario">
+                            <Grid>
+                                <Row>
+                                    <Col sm={10}>
+                                        <TextField
+                                            hintText="Escribe un comentario digno de un gran lector"
+                                            maxLength="140"
+                                            multiLine={true}
+                                            rows={1}
+                                            fullWidth={true}
+                                            onChange={this.changeNuevoComentario.bind(this)}
+                                        />
+                                    </Col>
+                                    <Col sm={1}>
+                                        <IconButton style={material_styles.styleSendButton}><Send/></IconButton>
+                                    </Col>
+                                </Row>
+                            </Grid>
+                        </div>
                     </div>
                 );  
                 break;
-*/
         }
     }
 }
