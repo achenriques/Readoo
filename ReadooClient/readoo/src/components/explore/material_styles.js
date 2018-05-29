@@ -41,5 +41,17 @@ export default {
         width: '100px',
         top: '50%',
         left: '45%'
+    },
+
+    styleExpandComentarios: {
+         marginLeft: '300px',
+    },
+
+    backgroundTransparent: {
+        marginLeft: 0,
+        padingLeft: 0,
+        '&:hover': {
+            background: 'transparent'
+        }
     }
 }

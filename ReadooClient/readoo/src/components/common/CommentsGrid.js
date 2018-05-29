@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchComentarios } from '../../app_state/actions';
+import { fetchComentarios, enviarComentario } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
-import { Grid, Row, Col } from 'react-material-responsive-grid';
+import Grid from '@material-ui/core/Grid';
+// TODO change GridList
 import { GridList, GridTile } from 'material-ui/GridList';
-import IconButton from 'material-ui/IconButton';
-import TextField from 'material-ui/TextField';
-import Send from 'material-ui/svg-icons/content/send';
+import IconButton from '@material-ui/core/IconButton';
+import TextField from '@material-ui/core/TextField';
+import Send from '@material-ui/icons/Send';
+// FIXME borrar start
 import StarBorder from 'material-ui/svg-icons/toggle/star-border';
-import Avatar from 'material-ui/Avatar';
-import Paper from 'material-ui/Paper';
-import Divider from 'material-ui/Divider';
+import Avatar from '@material-ui/core/Avatar';
+import Paper from '@material-ui/core/Paper';
+import Divider from '@material-ui/core/Divider';
 import material_styles from './material_styles';
 import { NUM_COMENTARIOS } from '../../constants/appConstants';
 
@@ -18,7 +20,8 @@ class CommentsGrid extends Component {
 
     initialState = {
         cargadosComentarios: null,  // 1 para cargados, -1 para error
-        comentariosLibros: []
+        comentariosLibros: [],
+        nuevoComentario: '',
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -140,6 +143,14 @@ class CommentsGrid extends Component {
         })
     }
 
+    enviarComentario (evt, idComentario, idLibro) {
+        if (this.state.nuevoComentario) {
+            let textoComentario = this.state.nuevoComentario.trim();
+
+            this.props.enviarComentario(idComentario, idLibro, 2, /* TODO: usuario*/ textoComentario);
+        }
+    }
+
     mostrarSubComentarios (comentario) {
         if (comentario.subComentarios.length) {
             return (
@@ -155,7 +166,7 @@ class CommentsGrid extends Component {
                             style={material_styles.styleChildrenList}
                         >
                         {comentario.subComentarios.map((subComment) => (
-                            <Paper zDepth={1} >
+                            <Paper elevation={1} >
                                 <GridTile
                                     key={subComment.idComentario}
                                     title={subComment.usuario}
@@ -200,7 +211,7 @@ class CommentsGrid extends Component {
                                 style={material_styles.styleGridList}
                             >
                             {/*this.props.comentarios*/this.props.comentarios.map((comentario) => (
-                                <Paper zDepth={4} >
+                                <Paper elevation={4} >
                                     <GridTile
                                         key={comentario.idComentario}
                                         title={comentario.usuario}
@@ -218,22 +229,22 @@ class CommentsGrid extends Component {
                                             <Divider style={material_styles.styleCommentSeparator}/>
                                             {this.mostrarSubComentarios(comentario)}
                                             <div className="divRespuestaComentario">
-                                                <Grid>
-                                                    <Row>
-                                                        <Col sm={10}>
-                                                            <TextField
-                                                                hintText="Escribe tu respuesta"
-                                                                maxLength="140"
-                                                                multiLine={true}
-                                                                rows={1}
-                                                                fullWidth={true}
-                                                                onChange={this.changeNuevoComentario.bind(this)}
-                                                            />
-                                                        </Col>
-                                                        <Col sm={1}>
-                                                            <IconButton style={material_styles.styleSendButton}><Send/></IconButton>
-                                                        </Col>
-                                                    </Row>
+                                                <Grid container spacing={24}>
+                                                    <Grid item sm={10}>
+                                                        <TextField
+                                                            label="Escribe tu respuesta"
+                                                            maxLength="140"
+                                                            multiline
+                                                            rowsMax="2"
+                                                            fullWidth={true}
+                                                            onChange={this.changeNuevoComentario.bind(this)}
+                                                        />
+                                                    </Grid>
+                                                    <Grid item sm={1}>
+                                                        <IconButton color="primary" onClick={() => {this.enviarComentario(this, null, this.props.idLibro)}} style={material_styles.styleSendButton}>
+                                                            <Send/>
+                                                        </IconButton>
+                                                    </Grid>
                                                 </Grid>
                                             </div>
                                         </div>
@@ -246,30 +257,36 @@ class CommentsGrid extends Component {
                 }
 
             default:
-                return (
-                    <div>
-                        <h3>No hay ningún comentario. Sé tu el primero en romper el hielo...</h3>
-                        <div className="divRespuestaComentario">
-                            <Grid>
-                                <Row>
-                                    <Col sm={10}>
+                if (this.props.idLibro > 0 || true) {
+                    return (
+                        <div>
+                            <h3 className="margenNoComentarios" >No hay ningún comentario. Sé tu el primero en romper el hielo...</h3>
+                            <div className="divRespuestaComentario">
+                                <Grid container spacing={24}>
+                                    <Grid item sm={10}>
                                         <TextField
-                                            hintText="Escribe un comentario digno de un gran lector"
+                                            label="Escribe un comentario digno de un gran lector"
                                             maxLength="140"
-                                            multiLine={true}
-                                            rows={1}
+                                            multiline
+                                            rowsMax="2"
                                             fullWidth={true}
                                             onChange={this.changeNuevoComentario.bind(this)}
                                         />
-                                    </Col>
-                                    <Col sm={1}>
-                                        <IconButton style={material_styles.styleSendButton}><Send/></IconButton>
-                                    </Col>
-                                </Row>
-                            </Grid>
+                                    </Grid>
+                                    <Grid item sm={1} style={{position: 'relative'}}>
+                                        <IconButton color="primary" onClick={() => {this.enviarComentario(this, null, this.props.idLibro)}} style={material_styles.styleSendButton}>
+                                            <Send/>
+                                        </IconButton>
+                                    </Grid>
+                                </Grid>
+                            </div>
                         </div>
-                    </div>
-                );  
+                    );  
+                } else {
+                    return (
+                        <h3 className="margenNoComentarios" >No contrates Jastel!</h3>
+                    )
+                }
                 break;
         }
     }
@@ -281,5 +298,6 @@ export default connect(
     }),
     (dispatch) => ({
         fetchComentarios: (idLibro, numComentarios, fechaUltimo) => dispatch(fetchComentarios(idLibro, numComentarios, fechaUltimo)),
+        enviarComentario: (idComentario, idLibro, idUsuario, comentario) => dispatch(enviarComentario(idComentario, idLibro, idUsuario, comentario))
     })
 )(CommentsGrid);

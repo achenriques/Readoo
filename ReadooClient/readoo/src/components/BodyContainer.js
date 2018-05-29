@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { changeTab, setIsOpenAddLibro, controllerLibroDefault } from '../app_state/actions';
+import { changeTab, setIsOpenAddLibro, 
+    controllerLibroDefault, controllerComentarioDefault } from '../app_state/actions';
 import * as appState from '../app_state/reducers';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
-import Snackbar from 'material-ui/Snackbar';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import AddIcon from '@material-ui/icons/Add';
+import Snackbar from '@material-ui/core/Snackbar';
 import ExploreView from './explore/ExploreView';
 import SubirLibroModal from './explore/SubirLibroModal';
 import { REST_SUCCESS, REST_DEFAULT, REST_FAILURE } from '../constants/appConstants';
@@ -28,39 +30,34 @@ class BodyContainer extends Component {
         this.state = { ...this.initialState };
     };
 
-    // CICLO DE VIDA
-    componentWillReceiveProps(newProps) {
-        if (newProps.uploadLibroSuccess === REST_SUCCESS) {
-            this.handleCloseAddLibro();
-            this.showSubidoFinalizado(REST_SUCCESS);
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if(REST_FAILURE === nextProps.enviarNuevoComentarioSuccess) {
+            nextProps.recibidoEnviarComentario();
+            return({
+                ...prevState,
+                snackBarMsg: 'Error al subir el comentario al servidor',
+                openSnackBar: true,
+            });
         }
-        if (newProps.uploadLibroSuccess === REST_FAILURE) {
-            this.handleCloseAddLibro();
-            this.showSubidoFinalizado(REST_FAILURE);
+        
+        if (REST_SUCCESS === nextProps.uploadLibroSuccess) {
+            nextProps.openAddLibro(false);
+            nextProps.listenedUploadLibro();
+            return ({
+                ...prevState,
+                snackBarMsg: 'Libro subido correctamente',
+                openSnackBar: true,
+            });
         }
-    }
-
-    showSubidoFinalizado (status) {
-        switch (status) {
-            case REST_SUCCESS:
-                this.setState({
-                    ...this.state,
-                    snackBarMsg: 'Libro subido correctamente',
-                    openSnackBar: true,
-                });
-                break;
-
-            case REST_FAILURE:
-                this.setState({
-                    ...this.state,
-                    snackBarMsg: 'Ha fallado la subida del libro',
-                    openSnackBar: true,
-                });
-                break;
-
-            default:
-                break;
+        if (REST_FAILURE === nextProps.uploadLibroSuccess) {
+            nextProps.openAddLibro(false);
+            return ({
+                ...prevState,
+                snackBarMsg: 'Ha fallado la subida del libro',
+                openSnackBar: true,
+            });
         }
+        return null;
     }
 
     handleSnakRequestClose () {
@@ -85,17 +82,21 @@ class BodyContainer extends Component {
                 return (
                     <div className='bodyContainer'>
                         <ExploreView/>
-                        <FloatingActionButton onClick={this.hadleOpenAddLibro.bind(this)} style={styleButton}>
-                            <ContentAdd />
-                        </FloatingActionButton>
+                        <Button variant="fab" color="primary" aria-label="añadir" onClick={this.hadleOpenAddLibro.bind(this)} style={styleButton}>
+                            <AddIcon />
+                        </Button>
                         <SubirLibroModal />
                         <Snackbar
                             open={this.state.openSnackBar}
-                            message={this.state.snackBarMsg}
-                            action="cerrar"
+                            message={this.state.snackBarMsg}                            
                             autoHideDuration={5000 /*ms*/}
-                            onActionClick={this.handleSnakRequestClose}
-                            onRequestClose={this.handleSnakRequestClose}
+                            onActionClick={this.handleSnakRequestClose.bind(this)}
+                            onRequestClose={this.handleSnakRequestClose.bind(this)}
+                            action={[
+                                <Button key="cerrar" color="secondary" size="small" onClick={() => {this.setState({...this.state, openSnackBar: false})}}>
+                                  CERRAR
+                                </Button>
+                              ]}
                         />
                     </div>
                 );
@@ -138,11 +139,13 @@ export default connect(
     (state) => ({
         //isOpenModal: appState.getIsOpenModal(state).isOpenAddLibro,
         selectedIndex: appState.getCurrentTabID(state),
-        uploadLibroSuccess: appState.libroSuccessUpload(state)
+        uploadLibroSuccess: appState.libroSuccessUpload(state),
+        enviarNuevoComentarioSuccess: appState.getComentarioEnviado(state),
     }),
     (dispatch) => ({
         changeTab: (tabID) => dispatch(changeTab(tabID)),
         openAddLibro: (isOpen) => dispatch(setIsOpenAddLibro(isOpen)),
-        listenedUploadLibro: () => dispatch(controllerLibroDefault())
+        listenedUploadLibro: () => dispatch(controllerLibroDefault()),
+        recibidoEnviarComentario: () => dispatch(controllerComentarioDefault())
     })
 )(BodyContainer);

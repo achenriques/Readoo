@@ -1,14 +1,21 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { setIsOpenAddLibro, fetchLibros, pasarLibro, controllerLibroDefault } from '../../app_state/actions';
+import { fetchLibros, pasarLibro } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
-import { Card, CardActions, CardHeader, CardMedia, CardTitle, CardText } from 'material-ui/Card';
-import {GridList, GridTile} from 'material-ui/GridList';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import IconButton from 'material-ui/IconButton';
-import ArrowLeft from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
-import ArrowRight from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
-import Favorite from 'material-ui/svg-icons/action/favorite';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardMedia from '@material-ui/core/CardMedia';
+import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Collapse from '@material-ui/core/Collapse';
+import ArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
+import ArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import Favorite from '@material-ui/icons/Favorite';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import CommentsGrid from '../common/CommentsGrid';
 import { NUM_LIBROS, DISPLAY_NONE } from '../../constants/appConstants';
 import libroDefault from '../../resources/libroDefault.gif';
@@ -31,6 +38,7 @@ class ExploreView extends Component {
         meGustaLibro: false,
         errorImgLibro: false,
         mostrarCorazon: 0,  // 0 no mostrar, 1 red, 2 black
+        expanded: false,
     };
 
     cargarLibroActualFromProps (props) {
@@ -106,10 +114,12 @@ class ExploreView extends Component {
     }
 
     handleDbClickImage(evt) {
-        if (this.state.meGustaLibro) {
-            this.handleUnlike(evt);
-        } else {
-            this.handleLike(evt);
+        if (this.state.libroActual && this.state.libroActual.idLibro > 0) {
+            if (this.state.meGustaLibro) {
+                this.handleUnlike(evt);
+            } else {
+                this.handleLike(evt);
+            }
         }
     }
 
@@ -164,20 +174,24 @@ class ExploreView extends Component {
         }        
     }
 
+    handleCollapse(evt) {
+        this.setState({
+            ...this.state,
+            expanded: !this.state.expanded
+        })
+    }
+
     // Devuelve el estilo de doble click sobre la imagen
     tipoDeCorazon = (idTipo) => {
         switch (idTipo) {
             case 0:
                 return (DISPLAY_NONE);
-                break;
         
             case 1:
                 return ({ ...material_styles.styleCorazon, fill: 'red' });
-                break;
 
             case 2:
                 return (material_styles.styleCorazon)
-                break;
                 
             default:
                 break;
@@ -194,11 +208,11 @@ class ExploreView extends Component {
                     //overlay={<CardTitle title="Overlay title" subtitle="Overlay subtitle" />}
                     >
                     <div className='imageExplore'>
-                        <IconButton onClick={this.handleBack.bind(this)} iconStyle={(this.state.libroAtras)? material_styles.styleArrows: DISPLAY_NONE} style={material_styles.styleLeftArrow} disabled={(this.state.libroAtras)? false: true}>
-                            <ArrowLeft viewBox="7 5 15 15"/>
+                        <IconButton onClick={this.handleBack.bind(this)} style={material_styles.styleLeftArrow} disabled={(this.state.libroAtras)? false: true}>
+                            <ArrowLeft style={(this.state.libroAtras)? material_styles.styleArrows: DISPLAY_NONE} />
                         </IconButton>
-                        <IconButton onClick={this.handleForward.bind(this)} iconStyle={(this.props.librosMostrados.length > 1)? material_styles.styleArrows: DISPLAY_NONE} style={material_styles.styleRightArrow} disabled={this.props.librosMostrados.length === 1}>
-                            <ArrowRight viewBox="7 5 15 15"/>
+                        <IconButton onClick={this.handleForward.bind(this)} style={material_styles.styleRightArrow} disabled={this.props.librosMostrados.length === 1}>
+                            <ArrowRight style={(this.props.librosMostrados.length > 1)? material_styles.styleArrows: DISPLAY_NONE} />
                         </IconButton >
                         <div style= {(this.state.errorImgLibro.length)? { color: 'red', paddingTop: '1em' }: DISPLAY_NONE}>
                             { this.state.errorImgLibro }
@@ -207,24 +221,35 @@ class ExploreView extends Component {
                         <Favorite style={ this.tipoDeCorazon(this.state.mostrarCorazon) } />
                     </div>
                     </CardMedia>
-                    <CardTitle title={this.state.libroActual.titulo} subtitle={this.state.libroActual.autor} />
-                    <CardText>
+                    <CardContent>
+                        <Typography gutterBottom variant='headline'>
+                            {this.state.libroActual.titulo}
+                        </Typography>
+                        <Typography gutterBottom variant='title'>
+                            {this.state.libroActual.autor}
+                        </Typography>
                         <h3 style={(this.state.libroActual.argumento)? { }: {display: 'none'}}>De qué va la cosa...</h3>
                         {this.state.libroActual.argumento}
-                    </CardText>
-                    <CardText>
                         <h4 style={(this.state.libroActual.opinion)? { }: {display: 'none'}}>Qué opina...</h4>
                         {this.state.libroActual.opinion}
-                    </CardText>
-                    <CardText>
-                        {(this.state.libroActual.idLibro)? (
-                        <div>Son {this.state.libroActual.likes} los que piensan que este libro mola
-                        <Favorite style={material_styles.styleFavorite} /></div>): (<div></div>)
-                    }
-                    </CardText>
+                    </CardContent>
+                    <CardActions>
+                        {(this.state.libroActual.idLibro)
+                            ? (<div>Son {this.state.libroActual.likes} los que piensan que este libro mola
+                                <Button size='small' disableRipple disableFocusRipple variant='flat' style={material_styles.backgroundTransparent}> <Favorite style={material_styles.styleFavorite}/></Button></div>)
+                            : (<div></div>)
+                        }
+                        <Button disableRipple size="small" variant='flat' onClick={this.handleCollapse.bind(this)} style={material_styles.styleExpandComentarios}>{(this.state.expanded)? "Ocultar comentarios": "Ver Comentarios"}
+                            {(this.state.expanded)? (<ExpandLessIcon />): (<ExpandMoreIcon />)}
+                        </Button >
+                    </CardActions>
+                    <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
+                        <CardContent>
+                            { /* Grid de comentarios */ }
+                            <CommentsGrid idLibro={this.state.libroActual.idLibro} />
+                        </CardContent>
+                    </Collapse>
                 </Card>
-                { /* Grid de comentarios */ console.log(this.contador += 1)}
-                <CommentsGrid idLibro={this.state.libroActual.idLibro} />
             </div>
         );
     }
@@ -239,7 +264,5 @@ export default connect(
     (dispatch) => ({
         fetchLibros: (idUltimo, categorias, primeraVez) => dispatch(fetchLibros(idUltimo, categorias, primeraVez)),
         pasarLibro:() => dispatch(pasarLibro())
-        //openAddLibro: (isOpen) => dispatch(setIsOpenAddLibro(isOpen)),
-        //listenedUploadLibro: () => dispatch(controllerLibroDefault())
     })
 )(ExploreView);

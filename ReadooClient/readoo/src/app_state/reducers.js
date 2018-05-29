@@ -5,8 +5,8 @@ import sinRed from '../resources/sinRed.png';
 
 import {
   // Las actions
-  TAB_CHANGE, MODAL_ADD_LIBRO, UPLOAD_LIBRO, UPLOAD_LIBRO_200, FETCH_CATEGORIAS,
-  PASAR_LIBRO, FETCH_LIBROS, FETCH_COMENTARIOS
+  TAB_CHANGE, MODAL_ADD_LIBRO, UPLOAD_LIBRO, UPLOAD_LIBRO_200, UPLOAD_COMENTARIO_200, FETCH_CATEGORIAS,
+  PASAR_LIBRO, FETCH_LIBROS, FETCH_COMENTARIOS, ENVIAR_COMENTARIO, SET_ERROR_ENVIAR_COMENTARIO
 } from './actions';
 // Asi puedo tener varios modulos
 
@@ -36,7 +36,7 @@ const initialState = {
   },
   libros: {
     libroDefault: {
-      id: -1,
+      idLibro: -1,
       titulo : 'Has explorados todos los libros de tus deseos.',
       autor: 'Prueba a cambiar tus filtos en tu perfil de usuario.',
       coverUrl: noHayNada,
@@ -45,7 +45,7 @@ const initialState = {
       likes: 0
     },
     libroFailure: {
-      id: -1,
+      idLibro: -1,
       titulo : 'Jope! Se ha producido un error de red...',
       autor: 'Prueba a refrescar la aplicación o espera a que el problema se resuelva.',
       coverUrl: sinRed,
@@ -60,14 +60,15 @@ const initialState = {
   },
   comentarios: {
     cargandoComentarios: false,
-    comentariosLibro: []
+    comentariosLibro: [],
   },
   categorias: {
     todas: [],
     usuario_categorias: []
   },
   controllerStatus: {
-    uploadLibroSuccess: 0
+    uploadLibroSuccess: 0,
+    comentarioEnviado: false,
   },
   filtros: [],
 }
@@ -245,6 +246,20 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
         uploadLibroSuccess: constantes.REST_DEFAULT,
       }
 
+    case failureType(ENVIAR_COMENTARIO):
+      console.log(failureType(ENVIAR_COMENTARIO));
+      return {
+        ...state,
+        comentarioEnviado: constantes.REST_FAILURE,
+      }
+
+    case UPLOAD_COMENTARIO_200:
+      console.log(UPLOAD_COMENTARIO_200);
+      return {
+        ...state,
+        comentarioEnviado: constantes.REST_DEFAULT,
+      }
+
     default:
       return state;
   }
@@ -290,6 +305,7 @@ export const getCurrentTabID = (state) => state.tabs.currentTabID;
 export const getIsOpenModal = (state) => state.dialogs;
 export const getUserId = (state) => state.user.id;
 export const libroSuccessUpload = (state) => state.controllerStatus.uploadLibroSuccess;
+export const getComentarioEnviado = (state) => state.controllerStatus.comentarioEnviado;
 export const allCategorias = (state) => state.categorias.todas;
 export const usuarioCategorias = (state) => state.categorias.usuario_categorias;
 export const getIndiceLibro = (state) => state.libros.libroActual;

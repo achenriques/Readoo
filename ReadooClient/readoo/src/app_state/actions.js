@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { NUM_LIBROS } from '../constants/appConstants';
+import { NUM_LIBROS, NUM_COMENTARIOS, REST_DEFAULT } from '../constants/appConstants';
 const baseURL = 'http://localhost:3030';
 
 //ACTION TYPES
@@ -8,12 +8,15 @@ export const MODAL_ADD_LIBRO = 'MODAL_ADD_LIBRO';
 export const UPLOAD_LIBRO = 'UPLOAD_LIBRO';
 export const DO_LOGIN = 'DO_LOGIN';
 export const UPLOAD_LIBRO_200 = 'UPLOAD_LIBRO_200';
+export const UPLOAD_COMENTARIO_200 = 'UPLOAD_COMENTARIO_200';
 export const FETCH_CATEGORIAS = 'FETCH_CATEGORIAS';
 export const PASAR_LIBRO = 'PASAR_LIBRO';
 export const ATRAS_LIBRO = 'ATRAS_LIBRO';
 export const FETCH_LIBROS = 'FETCH_LIBROS';
 export const FETCH_MORE_LIBROS = 'FETCH_MORE_LIBROS';
 export const FETCH_COMENTARIOS = 'FETCH_COMENTARIOS';
+export const ENVIAR_COMENTARIO = 'ENVIAR_COMENTARIO';
+export const SET_ERROR_ENVIAR_COMENTARIO = 'SET_ERROR_ENVIAR_COMENTARIO';
 
 // Default basic auth
 //axios.defaults.headers.common['Authorization'] = bAuth.bUser;
@@ -63,7 +66,16 @@ export const uploadLibro = (datosLibro) => ({
 export const controllerLibroDefault = () => ({
   type: UPLOAD_LIBRO_200,
   payload: {
-    value: 0
+    value: REST_DEFAULT
+  },
+})
+
+// Setear la carga de datos para la subida de comentarios.
+// Se utiliza para mostrar mensajes de alerta
+export const controllerComentarioDefault = () => ({
+  type: UPLOAD_COMENTARIO_200,
+  payload: {
+    value: REST_DEFAULT
   },
 })
 
@@ -133,6 +145,19 @@ export const fetchComentarios = (idLibro, numComentarios, fechaUltimo) => ({
       idLibro,
       numComentarios,
       fechaUltimo
+    }
+  )
+})
+
+export const enviarComentario = (idComentario, idLibro, idUsuario, comentario) => ({
+  type: ENVIAR_COMENTARIO,
+  promise: axios.post(
+    `${baseURL}/comentario/nuevo`,
+    {
+      idComentario,
+      idLibro,
+      idUsuario,
+      idComentario
     }
   )
 })
