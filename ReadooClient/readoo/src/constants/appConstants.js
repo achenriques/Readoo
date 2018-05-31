@@ -10,3 +10,6 @@ export const NUM_COMENTARIOS = 20;
 export const DISPLAY_NONE = {
     display: 'none'
 }
+
+export const FILAS_POR_PAGINA = 3;
+export const LIBROS_POR_PAGINA = 9;

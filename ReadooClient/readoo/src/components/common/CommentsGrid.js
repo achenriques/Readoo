@@ -257,7 +257,7 @@ class CommentsGrid extends Component {
                 }
 
             default:
-                if (this.props.idLibro > 0 || true) {
+                if (this.props.idLibro > 0) {
                     return (
                         <div>
                             <h3 className="margenNoComentarios" >No hay ningún comentario. Sé tu el primero en romper el hielo...</h3>

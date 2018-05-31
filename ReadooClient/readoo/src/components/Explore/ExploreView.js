@@ -236,12 +236,15 @@ class ExploreView extends Component {
                     <CardActions>
                         {(this.state.libroActual.idLibro)
                             ? (<div>Son {this.state.libroActual.likes} los que piensan que este libro mola
-                                <Button size='small' disableRipple disableFocusRipple variant='flat' style={material_styles.backgroundTransparent}> <Favorite style={material_styles.styleFavorite}/></Button></div>)
+                                <Button size='small' disableRipple disableFocusRipple variant='flat' style={material_styles.backgroundTransparent}>
+                                    <Favorite style={material_styles.styleFavorite}/>
+                                </Button>
+                                <Button disableRipple size="small" variant='flat' onClick={this.handleCollapse.bind(this)} style={material_styles.styleExpandComentarios}>{(this.state.expanded)? "Ocultar comentarios": "Ver Comentarios"}
+                                    {(this.state.expanded)? (<ExpandLessIcon />): (<ExpandMoreIcon />)}
+                                </Button >
+                            </div>)
                             : (<div></div>)
                         }
-                        <Button disableRipple size="small" variant='flat' onClick={this.handleCollapse.bind(this)} style={material_styles.styleExpandComentarios}>{(this.state.expanded)? "Ocultar comentarios": "Ver Comentarios"}
-                            {(this.state.expanded)? (<ExpandLessIcon />): (<ExpandMoreIcon />)}
-                        </Button >
                     </CardActions>
                     <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
                         <CardContent>
