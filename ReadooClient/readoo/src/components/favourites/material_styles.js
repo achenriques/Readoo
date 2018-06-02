@@ -6,21 +6,47 @@ export default {
     
     actionButtons: {
         flexShrink: 0,
-        color: theme.palette.text.secondary,
-        marginLeft: theme.spacing.unit * 2.5,
     },
 
     root: {
         width: '100%',
-        marginTop: theme.spacing.unit * 3,
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'space-around',
+        overflow: 'hidden',
     },
 
-    tabla: {
-        minWidth: 500,
-        width: '90%'
+    gridList: {
+        width: '100%'
     },
 
-    tablaDiv: {
-        overflowX: 'auto',
+    gridLibro: {
+        height: '100%',
+        width: '100%',
+        textAlign: 'center',
+        top: 0,
+        padding: '5px'
+    },
+
+    gridLibroSeleccionado: {
+        height: '100%',
+        width: '100%',
+        textAlign: 'center',
+        top: 0,
+        padding: '3px',
+        border: '2px solid red',
+    },
+
+    imagenesFavoritos: {
+        position: 'relative',
+        width: 'auto',
+        height: 'auto',
+        transform:'none',
+        top:'0%',
+        cursor: 'pointer'
+    },
+
+    imagenesFavoritosTitulo: {
+        textAlign: 'left'
     },
 }

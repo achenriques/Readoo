@@ -18,11 +18,12 @@ import Collapse from '@material-ui/core/Collapse';
 import Favorite from '@material-ui/icons/Favorite';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import { Avatar } from '@material-ui/core';
 import CommentsGrid from '../common/CommentsGrid';
 import * as constantes from '../../constants/appConstants';
 import libroDefault from '../../resources/libroDefault.gif';
 import material_styles from './material_styles';
-import { Avatar } from '@material-ui/core';
+import { color } from '@material-ui/core/colors';
 
 class FavouritesView extends Component {
 
@@ -30,7 +31,7 @@ class FavouritesView extends Component {
         estadoCarga: constantes.REST_DEFAULT,
         expanded: false,
         pagina: 0,
-        total: 0,
+        total: 1,
         filasPorPagina: constantes.FILAS_POR_PAGINA,
         librosPorPagina: constantes.LIBROS_POR_PAGINA,
         librosPorFila: constantes.LIBROS_POR_PAGINA / constantes.FILAS_POR_PAGINA,
@@ -41,13 +42,72 @@ class FavouritesView extends Component {
         this.state = { ...this.initilState };
     };
 
+    librosExample = [
+        {
+            idLibro: 12,
+            autor: "Curro Jimenez",
+            titulo: "Mil y una noches",
+            opinion: "No muy bien",
+            likes: 0, 
+        },
+        {
+            idLibro: 13,
+            autor: "Curro Jimenez",
+            titulo: "Mil y una noches",
+            opinion: "No muy bien",
+            likes: 1, 
+        },
+        {
+            idLibro: 14,
+            autor: "Curro Jimenez",
+            titulo: "Mil y una noches",
+            opinion: "No muy bien",
+            likes: 2, 
+        },
+        {
+            idLibro: 15,
+            autor: "Curro Jimenez",
+            titulo: "Mil y una noches",
+            opinion: "No muy bien",
+            likes: 3, 
+        },
+        {
+            idLibro: 16,
+            autor: "Curro Jimenez",
+            titulo: "Mil y una noches",
+            opinion: "No muy bien",
+            likes: 3, 
+        },
+        {
+            idLibro: 17,
+            autor: "Curro Jimenez",
+            titulo: "Mil y una noches",
+            opinion: "No muy bien",
+            likes: 3, 
+        },
+        {
+            idLibro: 18,
+            autor: "Curro Jimenez",
+            titulo: "Mil y una noches",
+            opinion: "No muy bien",
+            likes: 3, 
+        },
+        {
+            idLibro: 19,
+            autor: "Curro Jimenez",
+            titulo: "Mil y una noches",
+            opinion: "No muy bien",
+            likes: 3, 
+        }
+    ]
+
     // Ciclo de vida de react
     componentDidMount() {
-        this.props.fetchLibros(0, [], true);
+//        this.props.fetchLibros(0, [], true);
     }
 
     componentWillReceiveProps(newProps) {
-        this.cargarLibroActualFromProps (newProps);
+//        this.cargarLibroActualFromProps (newProps);
     }
 
     // Handlers tabla
@@ -77,10 +137,11 @@ class FavouritesView extends Component {
 
     // funcion de carga de pie de tabla
     actionButtonsTabla () {
-        const { count, pagina, filasPorPagina } = this.state;
+        const { total, pagina, filasPorPagina } = this.state;
 
         return (
-          <div className={material_styles.actionButtons}>
+          <div className="paginadoFavoritos">
+            <span>Página: {this.state.pagina + 1} de {Math.floor(this.state.total/this.state.librosPorPagina) + 1} </span>
             <IconButton
               onClick={this.handleFirstPageButtonClick}
               disabled={pagina === 0}
@@ -97,14 +158,14 @@ class FavouritesView extends Component {
             </IconButton>
             <IconButton
               onClick={this.handleNextButtonClick}
-              disabled={pagina >= Math.ceil(count / filasPorPagina) - 1}
+              disabled={pagina >= Math.ceil(total / filasPorPagina) - 1}
               aria-label="Página siguiente"
             >
               <KeyboardArrowRight />
             </IconButton>
             <IconButton
               onClick={this.handleLastPageButtonClick}
-              disabled={pagina >= Math.ceil(count / filasPorPagina) - 1}
+              disabled={pagina >= Math.ceil(total / filasPorPagina) - 1}
               aria-label="Última página"
             >
               <LastPageIcon />
@@ -172,11 +233,25 @@ class FavouritesView extends Component {
         })
     }
 
+    handleClickImagen(evt, numeroRecuadro) {
+        if (numeroRecuadro && !this.state[numeroRecuadro]) {
+            let nextState = {...this.state};
+            nextState[numeroRecuadro] = true;
+            this.setState(nextState);
+        }
+
+        if (numeroRecuadro && this.state[numeroRecuadro]) {
+            let nextState = {...this.state};
+            nextState[numeroRecuadro] = null;
+            this.setState(nextState);
+        }
+    }
+
     // Devuelve el estilo de doble click sobre la imagen
     tipoDeCorazon = (idTipo) => {
         switch (idTipo) {
             case 0:
-                return (DISPLAY_NONE);
+                return (constantes.DISPLAY_NONE);
         
             case 1:
                 return ({ ...material_styles.styleCorazon, fill: 'red' });
@@ -185,7 +260,7 @@ class FavouritesView extends Component {
                 return (material_styles.styleCorazon)
                 
             default:
-                break;
+                return ({ ...material_styles.styleCorazon, fill: 'red', fontSize:'15px' });
         }
     }
 
@@ -193,28 +268,38 @@ class FavouritesView extends Component {
         const {total, filasPorPagina, pagina , librosPorPagina, librosPorFila} = this.state;
         const data = this.props.librosMostrados;
 
-        const filasVacias = filasPorPagina - Math.min(filasPorPagina, data.length - pagina * filasPorPagina);
+        //const filasVacias = filasPorPagina - Math.min(filasPorPagina, data.length - pagina * filasPorPagina);
     
         return (
-            <div className={material_styles.tablaDiv}>
-                <GridList cellHeight={180} className={classes.gridList}>
-                    {this.props.librosMostrados.slice(pagina * librosPorPagina, pagina * librosPorPagina + librosPorPagina).map((libro, index, lista) => {
-                        return (
-                            <GridListTile key={libro.idLibro}>
-                                <img src={this.state.libroActual.portada} alt={libro.titulo} className="" onClick={this.handleClick.bind(this)}/>
-                                <GridListTileBar
-                                title={libro.titulo}
-                                subtitle={<span>Escrito por: {libro.autor}</span>}
-                                actionIcon={
-                                    <IconButton className={classes.icon}>
-                                        <Avatar src={}/>
-                                    </IconButton>
-                                }
-                                />
-                            </GridListTile>
-                        );
-                    })}
-                </GridList>
+            <div>
+                <div className="gridDiv">
+                    <GridList cellHeight={'auto'} cols={3} spacing={0} style={material_styles.gridList}>
+                        {this.librosExample/*props.librosMostrados*/.slice(pagina * librosPorPagina, pagina * librosPorPagina + librosPorPagina).map((libro, index, lista) => {
+                            let indexCelda = 'celda' + index;
+                            return (
+                                <div>
+                                    <GridListTile key={libro.idLibro} style={(!this.state[indexCelda])? material_styles.gridLibro: material_styles.gridLibroSeleccionado}>
+                                        <img style={material_styles.imagenesFavoritos} src={libroDefault} alt={libro.titulo} onClick={(evt) => this.handleClickImagen(evt, indexCelda)}/>
+                                        <GridListTileBar
+                                        title={libro.titulo}
+                                        subtitle={<span>Escrito por: {libro.autor}</span>}
+                                        actionIcon={
+                                            <div>
+                                                <Favorite style={this.tipoDeCorazon(-1)}/>
+                                                <span className="textoBlanco">{" " + libro.likes}</span>
+                                                <IconButton>
+                                                    <Avatar src=""/>
+                                                </IconButton>
+                                            </div>
+                                        }
+                                        style={material_styles.imagenesFavoritosTitulo}
+                                        />
+                                    </GridListTile>
+                                </div>
+                            );
+                        })}
+                    </GridList>
+                </div>
                 {this.actionButtonsTabla()}
             </div>
         )

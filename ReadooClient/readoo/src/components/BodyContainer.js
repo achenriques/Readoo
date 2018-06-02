@@ -11,6 +11,7 @@ import ExploreView from './explore/ExploreView';
 import SubirLibroModal from './explore/SubirLibroModal';
 import { REST_SUCCESS, REST_DEFAULT, REST_FAILURE } from '../constants/appConstants';
 import '../styles/BodyContainer.css';
+import FavouritesView from './favourites/FavouritesView';
 
 const styleButton = {
     position: 'fixed',
@@ -104,9 +105,7 @@ class BodyContainer extends Component {
             case 1:
                 return (
                     <div className='bodyContainer'>
-                        <h1 align="center">
-                            Soy un body 2
-                        </h1>
+                        <FavouritesView/>
                     </div>
                 );
 

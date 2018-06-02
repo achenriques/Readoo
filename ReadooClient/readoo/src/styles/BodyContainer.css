@@ -98,3 +98,30 @@ a:hover {
     background: transparent;
     background-color: transparent;
 }
+
+.gridDiv {
+    position: absolute;
+    width: 75%;
+    height: 85%;
+    overflow-y: auto;
+}
+
+.paginadoFavoritos {
+    text-align: right;
+    width: 75%;
+    position: absolute;
+    top: 92%;
+    padding-right: 30px;
+}
+
+.imagenesFavoritos {
+    position: relative;
+    width: auto;
+    height: auto;
+    top: '0%';
+    z-index: -1;
+}
+
+.textoBlanco {
+    color: white;
+}
