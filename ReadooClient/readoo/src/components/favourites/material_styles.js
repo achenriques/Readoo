@@ -42,7 +42,8 @@ export default {
         width: 'auto',
         height: 'auto',
         transform:'none',
-        top:'0%',
+        top:'unset',
+        left:'unset',
         cursor: 'pointer'
     },
 

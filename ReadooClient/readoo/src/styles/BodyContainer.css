@@ -4,7 +4,8 @@ body {
 }
 
 .bodyContainer {
-    margin-top: 63px;
+    margin-top: 70px;
+    padding-bottom: 30px;
 }
 
 .boton-anadir {
@@ -124,4 +125,10 @@ a:hover {
 
 .textoBlanco {
     color: white;
+}
+
+.escritoPor {
+    font-size: 16px;
+    display: inline-block;
+    padding-right: 1em;
 }

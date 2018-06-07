@@ -3,8 +3,18 @@ export default {
     styleFavorite: {
         height: '1em',
     },
+
+    inlineBlock: {
+        display: 'inline-block'
+    },
+
+    width50: {
+        width: '50%'
+    },
     
     styleCard: {
+        marginTop: '15px',
+        marginBottom: '15px',
         position: 'relative',
         width: '99%',
         maxHeight: '500px',

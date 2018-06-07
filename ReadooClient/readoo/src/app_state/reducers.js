@@ -6,7 +6,7 @@ import sinRed from '../resources/sinRed.png';
 import {
   // Las actions
   TAB_CHANGE, MODAL_ADD_LIBRO, UPLOAD_LIBRO, UPLOAD_LIBRO_200, UPLOAD_COMENTARIO_200, FETCH_CATEGORIAS,
-  PASAR_LIBRO, FETCH_LIBROS, FETCH_COMENTARIOS, ENVIAR_COMENTARIO, SET_ERROR_ENVIAR_COMENTARIO
+  PASAR_LIBRO, FETCH_LIBROS, FETCH_COMENTARIOS, ENVIAR_COMENTARIO, SET_ERROR_ENVIAR_COMENTARIO, ME_GUSTA_LIBRO
 } from './actions';
 // Asi puedo tener varios modulos
 
@@ -69,6 +69,7 @@ const initialState = {
   controllerStatus: {
     uploadLibroSuccess: 0,
     comentarioEnviado: false,
+    enviandoMeGusta: false,
   },
   filtros: [],
 }
@@ -143,6 +144,14 @@ const libros = (state = initialState.libros, { type, payload, data }) => {
         }
       }
       return toRet;
+
+    case successType(ME_GUSTA_LIBRO):
+      console.log(ME_GUSTA_LIBRO);
+      // No necesito hacer nada para mantener el estado visualmente
+      // Si llega a base de datos bien y sino en la proxinma recarga se perderá
+      // en olvido.
+      break;
+      
 
     case successType(FETCH_LIBROS):
       console.log(successType(FETCH_LIBROS));
@@ -260,6 +269,24 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
         comentarioEnviado: constantes.REST_DEFAULT,
       }
 
+    case loadingType(ME_GUSTA_LIBRO):
+      return {
+        ...state,
+        enviandoMeGusta: true
+      }
+    
+    case successType(ME_GUSTA_LIBRO):
+      return {
+        ...state,
+        enviandoMeGusta: false
+      }
+      
+    case failureType(ME_GUSTA_LIBRO):
+      return {
+        ...state,
+        enviandoMeGusta: false
+      }
+      
     default:
       return state;
   }
@@ -312,3 +339,4 @@ export const getIndiceLibro = (state) => state.libros.libroActual;
 export const getLibroSuccess = (state) => state.libros.success_fetch;
 export const getLibros = (state) => state.libros.mostrados;
 export const getComentarios = (state) => state.comentarios.comentariosLibro;
+export const getEnviandoMeGusta = (state) => state.controllerStatus.enviandoMeGusta;

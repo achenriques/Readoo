@@ -12,6 +12,7 @@ export const UPLOAD_COMENTARIO_200 = 'UPLOAD_COMENTARIO_200';
 export const FETCH_CATEGORIAS = 'FETCH_CATEGORIAS';
 export const PASAR_LIBRO = 'PASAR_LIBRO';
 export const ATRAS_LIBRO = 'ATRAS_LIBRO';
+export const ME_GUSTA_LIBRO = 'ME_GUSTA_LIBRO';
 export const FETCH_LIBROS = 'FETCH_LIBROS';
 export const FETCH_MORE_LIBROS = 'FETCH_MORE_LIBROS';
 export const FETCH_COMENTARIOS = 'FETCH_COMENTARIOS';
@@ -95,6 +96,36 @@ export const pasarLibro = () => ({
 export const atrasLibro = () => ({
   type: ATRAS_LIBRO,
   payload: {},
+})
+
+export const enviarMeGusta = (idLibro, idUsuario) => ({
+  type: ME_GUSTA_LIBRO,
+  payload: { meGusta: true},
+  promise: axios.post(
+    `${baseURL}/usuariolikelibro`,
+    {
+      like: {
+        idLibro: idLibro,
+        idUsuario: 2,  // TODO
+      }
+    }
+  )
+})
+
+export const enviarNoMeGusta = (idLibro, idUsuario) => ({
+  type: ME_GUSTA_LIBRO,
+  payload: { idLibro: idLibro, meGusta: false},
+  promise: axios.delete(
+    `${baseURL}/usuariolikelibro`,
+    {
+      data: {
+        like: {
+          idLibro: idLibro,
+          idUsuario: 2,  // TODO
+        }
+      }
+    }
+  )
 })
 
 export const fetchLibros = (idUltimo, categorias, primeraVez) => ({

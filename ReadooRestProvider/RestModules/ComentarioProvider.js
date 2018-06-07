@@ -204,7 +204,7 @@ class ComentarioProvider {
 
       insertOne(app, db)
       {
-        app.post('/comentario', function (req, res) {
+        app.post('/comentario/nuevo', function (req, res) {
             var comentario = req.body.comentario;
             console.log("Estoy insertando comentario " + comentario);     
             if (comentario)

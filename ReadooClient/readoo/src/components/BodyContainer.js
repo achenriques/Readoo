@@ -91,8 +91,7 @@ class BodyContainer extends Component {
                             open={this.state.openSnackBar}
                             message={this.state.snackBarMsg}                            
                             autoHideDuration={5000 /*ms*/}
-                            onActionClick={this.handleSnakRequestClose.bind(this)}
-                            onRequestClose={this.handleSnakRequestClose.bind(this)}
+                            onClose={this.handleSnakRequestClose.bind(this)}
                             action={[
                                 <Button key="cerrar" color="secondary" size="small" onClick={() => {this.setState({...this.state, openSnackBar: false})}}>
                                   CERRAR
