@@ -109,7 +109,7 @@ class UsuarioLikeLibroProvider {
                 }
 
                 var con = db.getConn(db.connect).then(function (response) {
-                    var statement = "INSERT INTO usuario_like_libro VALUES (" + mysql.escape(like.idUsuario) + ", "
+                    var statement = "INSERT IGNORE INTO usuario_like_libro VALUES (" + mysql.escape(like.idUsuario) + ", "
                         + mysql.escape(like.idLibro) + ");";
 
                     response.query(statement, function (err, result) {

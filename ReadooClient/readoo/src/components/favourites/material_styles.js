@@ -3,9 +3,18 @@ export default {
     styleFavorite: {
         height: '1em',
     },
+
+    inlineBlock: {
+        display: 'inline-block'
+    },
     
     actionButtons: {
         flexShrink: 0,
+    },
+
+    inlineConBoton: {
+        display: 'inline-block',
+        width: '88%'
     },
 
     root: {
@@ -18,6 +27,12 @@ export default {
 
     gridList: {
         width: '100%'
+    },
+
+    gridDiv: {
+        height: '85%',
+        maxHeight: '85%',
+        overflowY: 'scroll',
     },
 
     gridLibro: {

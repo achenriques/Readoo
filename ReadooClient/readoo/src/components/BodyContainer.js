@@ -103,7 +103,7 @@ class BodyContainer extends Component {
 
             case 1:
                 return (
-                    <div className='bodyContainer'>
+                    <div className='bodyFavoritos'>
                         <FavouritesView/>
                     </div>
                 );

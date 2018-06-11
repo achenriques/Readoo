@@ -1,11 +1,17 @@
 body {
     margin: 0px;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 .bodyContainer {
     margin-top: 70px;
     padding-bottom: 30px;
+}
+
+.bodyFavoritos {
+    margin-top: 70px;
+    padding-bottom: 30px;
+    overflow: hidden;
 }
 
 .boton-anadir {
@@ -101,17 +107,13 @@ a:hover {
 }
 
 .gridDiv {
-    position: absolute;
-    width: 75%;
-    height: 85%;
+    height: 69%;
+    max-height: 69%;
     overflow-y: auto;
 }
 
 .paginadoFavoritos {
     text-align: right;
-    width: 75%;
-    position: absolute;
-    top: 92%;
     padding-right: 30px;
 }
 

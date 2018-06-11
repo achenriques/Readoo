@@ -5,6 +5,7 @@ import * as appState from '../../app_state/reducers';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import Grid from '@material-ui/core/Grid';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
@@ -18,7 +19,8 @@ import Collapse from '@material-ui/core/Collapse';
 import Favorite from '@material-ui/icons/Favorite';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-import { Avatar } from '@material-ui/core';
+import { Avatar, Divider } from '@material-ui/core';
+import Close from '@material-ui/icons/Close';
 import CommentsGrid from '../common/CommentsGrid';
 import * as constantes from '../../constants/appConstants';
 import libroDefault from '../../resources/libroDefault.gif';
@@ -35,6 +37,8 @@ class FavouritesView extends Component {
         filasPorPagina: constantes.FILAS_POR_PAGINA,
         librosPorPagina: constantes.LIBROS_POR_PAGINA,
         librosPorFila: constantes.LIBROS_POR_PAGINA / constantes.FILAS_POR_PAGINA,
+        celdaLibroSeleccionado: null,
+        libroSeleccionado: null
     };
 
     constructor(props) {
@@ -233,18 +237,30 @@ class FavouritesView extends Component {
         })
     }
 
-    handleClickImagen(evt, numeroRecuadro) {
-        if (numeroRecuadro && !this.state[numeroRecuadro]) {
-            let nextState = {...this.state};
-            nextState[numeroRecuadro] = true;
-            this.setState(nextState);
+    handleClickImagen(evt, numeroRecuadro, idLibro) {
+        let nextState = {
+            ...this.state, 
+            celdaLibroSeleccionado: numeroRecuadro, 
+            libroSeleccionado: idLibro
+        };
+
+        for (let i in nextState) {
+            if (Number.isInteger(+i) && +i >= 0 && +i <= nextState.librosPorPagina) {
+                nextState[i] = null;
+            }
         }
 
-        if (numeroRecuadro && this.state[numeroRecuadro]) {
-            let nextState = {...this.state};
-            nextState[numeroRecuadro] = null;
-            this.setState(nextState);
+        if (numeroRecuadro && idLibro) {
+            if (numeroRecuadro && !this.state[numeroRecuadro]) {
+                nextState[numeroRecuadro] = true;
+            }
+    
+            if (numeroRecuadro && this.state[numeroRecuadro]) {
+                nextState.celdaLibroSeleccionado = null;
+                nextState.libroSeleccionado = null;
+            }
         }
+        this.setState(nextState);        
     }
 
     // Devuelve el estilo de doble click sobre la imagen
@@ -272,35 +288,69 @@ class FavouritesView extends Component {
     
         return (
             <div>
-                <div className="gridDiv">
-                    <GridList cellHeight={'auto'} cols={3} spacing={0} style={material_styles.gridList}>
-                        {this.librosExample/*props.librosMostrados*/.slice(pagina * librosPorPagina, pagina * librosPorPagina + librosPorPagina).map((libro, index, lista) => {
-                            let indexCelda = 'celda' + index;
-                            return (
-                                <div>
-                                    <GridListTile key={libro.idLibro} style={(!this.state[indexCelda])? material_styles.gridLibro: material_styles.gridLibroSeleccionado}>
-                                        <img style={material_styles.imagenesFavoritos} src={libroDefault} alt={libro.titulo} onClick={(evt) => this.handleClickImagen(evt, indexCelda)}/>
-                                        <GridListTileBar
-                                        title={libro.titulo}
-                                        subtitle={<span>Escrito por: {libro.autor}</span>}
-                                        actionIcon={
-                                            <div>
-                                                <Favorite style={this.tipoDeCorazon(-1)}/>
-                                                <span className="textoBlanco">{" " + libro.likes}</span>
-                                                <IconButton>
-                                                    <Avatar src=""/>
-                                                </IconButton>
-                                            </div>
-                                        }
-                                        style={material_styles.imagenesFavoritosTitulo}
-                                        />
-                                    </GridListTile>
-                                </div>
-                            );
-                        })}
-                    </GridList>
-                </div>
-                {this.actionButtonsTabla()}
+                <Grid container spacing={24}>
+                    <Grid item sm={8} xs={12}>
+                        <div className="gridDiv">
+                            <GridList cellHeight={'auto'} cols={3} spacing={0} style={material_styles.gridList}>
+                                {this.librosExample/*props.librosMostrados*/.slice(pagina * librosPorPagina, pagina * librosPorPagina + librosPorPagina).map((libro, index, lista) => {
+                                    return (
+                                        <div>
+                                            <GridListTile key={libro.idLibro} style={(!this.state[index])? material_styles.gridLibro: material_styles.gridLibroSeleccionado}>
+                                                <img style={material_styles.imagenesFavoritos} src={libroDefault} alt={libro.titulo} onClick={(evt) => this.handleClickImagen(evt, index, libro.idLibro)}/>
+                                                <GridListTileBar
+                                                title={libro.titulo}
+                                                subtitle={<span>Escrito por: {libro.autor}</span>}
+                                                actionIcon={
+                                                    <div>
+                                                        <Favorite style={this.tipoDeCorazon(-1)}/>
+                                                            <span className="textoBlanco">{" " + libro.likes}</span>
+                                                        <IconButton>
+                                                            <Avatar src=""/>
+                                                        </IconButton>
+                                                    </div>
+                                                }
+                                                style={material_styles.imagenesFavoritosTitulo}
+                                                />
+                                            </GridListTile>
+                                        </div>
+                                    );
+                                })}
+                            </GridList>
+                        </div>
+                    <Divider/>
+                    {this.actionButtonsTabla()}
+                    </Grid>
+                    <Grid item sm={4} xs={12}>
+                        { (this.state.libroSeleccionado != null)? (
+                            <div>
+                                <Typography gutterBottom variant='headline' style={material_styles.inlineConBoton}>
+                                    {this.librosExample[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].titulo}
+                                </Typography>
+                                <IconButton style={material_styles.inlineBlock} onClick={(evt) => {this.handleClickImagen(evt, null, null)}}>
+                                    <Close/>
+                                </IconButton>
+                                <br/>
+                                <div className="escritoPor">de:  </div><Typography gutterBottom variant='title' style={material_styles.inlineBlock}>
+                                    {this.librosExample[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].autor}
+                                </Typography>
+                                <h3 style={(this.librosExample[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].argumento)? {marginBottom: '5px'}: {display: 'none'}}>De qué va la cosa...</h3>
+                                {this.librosExample[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].argumento}
+                                <br/>
+                                <h4 style={(this.librosExample[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].opinion)? {marginBottom: '5px'}: {display: 'none'}}>Qué opina...</h4>
+                                {this.librosExample[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].opinion}
+                                <Divider/>
+                                <CommentsGrid idLibro={this.state.libroSeleccionado} isFavorite={true}/>    
+                            </div>
+                            ) : (
+                            <div>
+                                <Typography gutterBottom variant='headline'>
+                                    Haz clic sobre una imgen para ver su contenido...
+                                </Typography>
+                            </div>
+                            )
+                        }
+                    </Grid>                  
+                </Grid>
             </div>
         )
     }
