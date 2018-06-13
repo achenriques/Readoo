@@ -17,6 +17,10 @@ export default {
         width: '88%'
     },
 
+    alturaFavoritos: {
+        maxHeight: '850px'
+    },
+
     root: {
         width: '100%',
         display: 'flex',

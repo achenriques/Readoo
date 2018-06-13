@@ -33,7 +33,7 @@ class FavouritesView extends Component {
         estadoCarga: constantes.REST_DEFAULT,
         expanded: false,
         pagina: 0,
-        total: 1,
+        total: 15,
         filasPorPagina: constantes.FILAS_POR_PAGINA,
         librosPorPagina: constantes.LIBROS_POR_PAGINA,
         librosPorFila: constantes.LIBROS_POR_PAGINA / constantes.FILAS_POR_PAGINA,
@@ -102,6 +102,55 @@ class FavouritesView extends Component {
             titulo: "Mil y una noches",
             opinion: "No muy bien",
             likes: 3, 
+        },
+        {
+            idLibro: 22,
+            autor: "Curro Jimenez",
+            titulo: "Mil y una noches",
+            opinion: "No muy bien",
+            likes: 3, 
+        },
+        {
+            idLibro: 33,
+            autor: "Curro Jimenez",
+            titulo: "Mil y una noches",
+            opinion: "No muy bien",
+            likes: 3, 
+        },
+        {
+            idLibro: 34,
+            autor: "Curro Jimenez",
+            titulo: "Mil y una noches",
+            opinion: "No muy bien",
+            likes: 3, 
+        },
+        {
+            idLibro: 35,
+            autor: "Curro Jimenez",
+            titulo: "Mil y una noches",
+            opinion: "No muy bien",
+            likes: 3, 
+        },
+        {
+            idLibro: 36,
+            autor: "Curro Jimenez",
+            titulo: "Mil y una noches",
+            opinion: "No muy bien",
+            likes: 3, 
+        },
+        {
+            idLibro: 44,
+            autor: "Curro Jimenez",
+            titulo: "Mil y una noches",
+            opinion: "No muy bien",
+            likes: 3, 
+        },
+        {
+            idLibro: 54,
+            autor: "Curro Jimenez",
+            titulo: "Mil y una noches",
+            opinion: "No muy bien",
+            likes: 3, 
         }
     ]
 
@@ -116,60 +165,63 @@ class FavouritesView extends Component {
 
     // Handlers tabla
     // Eventos tabla
+    handleFirstPageButtonClick (event) {
+        //this.props.onChangePage(event, this.state.pagina + 1);
+        this.handleChangePagina(event, 0)
+    };
+
     handleBackButtonClick (event) {
-        this.props.onChangePage(event, this.state.pagina - 1);
+        this.handleChangePagina(event, this.state.pagina - 1);
     };
 
     handleNextButtonClick (event) {
-        this.props.onChangePage(event, this.state.pagina + 1);
+        //this.props.onChangePage(event, this.state.pagina + 1);
+        this.handleChangePagina(event, this.state.pagina + 1)
     };
 
     handleLastPageButtonClick (event) {
-    this.props.onChangePage(
+        this.handleChangePagina(event, Math.ceil(this.state.total / this.state.filasPorPagina) - 1);
+        /* this.props.onChangePage(
             event,
             Math.max(0, Math.ceil(this.state.total / this.state.filasPorPagina) - 1),
-        );
+        ); */
     };
 
-    handleChangePage = (event, pagina) => {
-        this.setState({ pagina });
-    };
-    
-    handleChangefilasPorPagina = event => {
-        this.setState({ filasPorPagina: event.target.value });
+    handleChangePagina = (event, pagina) => {
+        this.setState({ ...this.state, pagina: pagina });
     };
 
     // funcion de carga de pie de tabla
     actionButtonsTabla () {
-        const { total, pagina, filasPorPagina } = this.state;
+        const { total, pagina, librosPorPagina } = this.state;
 
         return (
           <div className="paginadoFavoritos">
             <span>Página: {this.state.pagina + 1} de {Math.floor(this.state.total/this.state.librosPorPagina) + 1} </span>
             <IconButton
-              onClick={this.handleFirstPageButtonClick}
+              onClick= {(evt) => {this.handleFirstPageButtonClick(evt)}}
               disabled={pagina === 0}
               aria-label="Primera página"
             >
               <FirstPageIcon />
             </IconButton>
             <IconButton
-              onClick={this.handleBackButtonClick}
+              onClick={(evt) => {this.handleBackButtonClick(evt)}}
               disabled={pagina === 0}
               aria-label="Página anterior"
             >
-              <KeyboardArrowRight />
+              <KeyboardArrowLeft />
             </IconButton>
             <IconButton
-              onClick={this.handleNextButtonClick}
-              disabled={pagina >= Math.ceil(total / filasPorPagina) - 1}
+              onClick={(evt) => {this.handleNextButtonClick(evt)}}
+              disabled={pagina >= Math.ceil(total / librosPorPagina) - 1}
               aria-label="Página siguiente"
             >
               <KeyboardArrowRight />
             </IconButton>
             <IconButton
-              onClick={this.handleLastPageButtonClick}
-              disabled={pagina >= Math.ceil(total / filasPorPagina) - 1}
+              onClick={(evt) => {this.handleLastPageButtonClick(evt)}}
+              disabled={pagina >= Math.ceil(total / librosPorPagina) - 1}
               aria-label="Última página"
             >
               <LastPageIcon />
@@ -282,17 +334,17 @@ class FavouritesView extends Component {
 
     render() {
         const {total, filasPorPagina, pagina , librosPorPagina, librosPorFila} = this.state;
-        const data = this.props.librosMostrados;
+        const data = this.librosExample;
 
         //const filasVacias = filasPorPagina - Math.min(filasPorPagina, data.length - pagina * filasPorPagina);
     
         return (
             <div>
-                <Grid container spacing={24}>
-                    <Grid item sm={8} xs={12}>
+                <Grid container spacing={24} style={material_styles.alturaFavoritos}>
+                    <Grid item sm={8} xs={12} >
                         <div className="gridDiv">
                             <GridList cellHeight={'auto'} cols={3} spacing={0} style={material_styles.gridList}>
-                                {this.librosExample/*props.librosMostrados*/.slice(pagina * librosPorPagina, pagina * librosPorPagina + librosPorPagina).map((libro, index, lista) => {
+                                {data.slice(pagina * librosPorPagina, pagina * librosPorPagina + librosPorPagina).map((libro, index, lista) => {
                                     return (
                                         <div>
                                             <GridListTile key={libro.idLibro} style={(!this.state[index])? material_styles.gridLibro: material_styles.gridLibroSeleccionado}>
@@ -324,20 +376,20 @@ class FavouritesView extends Component {
                         { (this.state.libroSeleccionado != null)? (
                             <div>
                                 <Typography gutterBottom variant='headline' style={material_styles.inlineConBoton}>
-                                    {this.librosExample[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].titulo}
+                                    {data[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].titulo}
                                 </Typography>
                                 <IconButton style={material_styles.inlineBlock} onClick={(evt) => {this.handleClickImagen(evt, null, null)}}>
                                     <Close/>
                                 </IconButton>
                                 <br/>
                                 <div className="escritoPor">de:  </div><Typography gutterBottom variant='title' style={material_styles.inlineBlock}>
-                                    {this.librosExample[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].autor}
+                                    {data[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].autor}
                                 </Typography>
-                                <h3 style={(this.librosExample[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].argumento)? {marginBottom: '5px'}: {display: 'none'}}>De qué va la cosa...</h3>
-                                {this.librosExample[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].argumento}
+                                <h3 style={(data[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].argumento)? {marginBottom: '5px'}: {display: 'none'}}>De qué va la cosa...</h3>
+                                {data[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].argumento}
                                 <br/>
-                                <h4 style={(this.librosExample[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].opinion)? {marginBottom: '5px'}: {display: 'none'}}>Qué opina...</h4>
-                                {this.librosExample[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].opinion}
+                                <h4 style={(data[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].opinion)? {marginBottom: '5px'}: {display: 'none'}}>Qué opina...</h4>
+                                {data[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].opinion}
                                 <Divider/>
                                 <CommentsGrid idLibro={this.state.libroSeleccionado} isFavorite={true}/>    
                             </div>

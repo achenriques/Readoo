@@ -107,8 +107,9 @@ a:hover {
 }
 
 .gridDiv {
-    height: 69%;
-    max-height: 69%;
+    position: relative;
+    height: auto;
+    max-height: 99%;
     overflow-y: auto;
 }
 
