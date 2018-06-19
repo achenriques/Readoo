@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import * as constantes from '../constants/appConstants';
 import noHayNada from '../resources/noHayNada.png';
 import sinRed from '../resources/sinRed.png';
+import { REST_DEFAULT, REST_SUCCESS, REST_FAILURE } from '../constants/appConstants';
 
 import {
   // Las actions
@@ -59,7 +60,6 @@ const initialState = {
     success_fetch: true,
   },
   comentarios: {
-    cargandoComentarios: false,
     comentariosLibro: [],
   },
   categorias: {
@@ -67,7 +67,9 @@ const initialState = {
     usuario_categorias: []
   },
   controllerStatus: {
-    uploadLibroSuccess: 0,
+    uploadLibroSuccess: REST_DEFAULT,
+    cargandoComentarios: false,
+    fetchComentarioSuccess: REST_DEFAULT,
     comentarioEnviado: false,
     enviandoMeGusta: false,
   },
@@ -189,15 +191,7 @@ const comentarios = (state = initialState.comentarios, { type, payload, data }) 
       console.log(successType(FETCH_COMENTARIOS));
       return {
         ...state,
-        cargandoComentarios: false,
         comentariosLibro: data.data,
-      }
-
-    case failureType(FETCH_COMENTARIOS):
-      console.log(failureType(FETCH_COMENTARIOS));
-      return {
-        ...state,
-        cargandoComentarios: false,
       }
 
     default:
@@ -249,13 +243,28 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
       }
 
     case UPLOAD_LIBRO_200:
-      console.log('UPLOAD_LIBRO_200');
+      console.log(UPLOAD_LIBRO_200);
       return {
         ...state,
         uploadLibroSuccess: constantes.REST_DEFAULT,
       }
 
-    case failureType(ENVIAR_COMENTARIO):
+    case successType(FETCH_COMENTARIOS):
+      console.log(successType(FETCH_COMENTARIOS));
+      return {
+        ...state,
+        fetchComentarioSuccess: REST_SUCCESS,
+        comentariosError: false,
+      }
+
+  case failureType(FETCH_COMENTARIOS):
+      console.log(failureType(FETCH_COMENTARIOS));
+      return {
+        ...state,
+        fetchComentarioSuccess: REST_FAILURE
+      }
+
+  case failureType(ENVIAR_COMENTARIO):
       console.log(failureType(ENVIAR_COMENTARIO));
       return {
         ...state,
@@ -267,6 +276,7 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
       return {
         ...state,
         comentarioEnviado: constantes.REST_DEFAULT,
+        fetchComentarioSuccess: constantes.REST_DEFAULT
       }
 
     case loadingType(ME_GUSTA_LIBRO):
@@ -339,4 +349,5 @@ export const getIndiceLibro = (state) => state.libros.libroActual;
 export const getLibroSuccess = (state) => state.libros.success_fetch;
 export const getLibros = (state) => state.libros.mostrados;
 export const getComentarios = (state) => state.comentarios.comentariosLibro;
+export const getfetchComentarioSuccess = (state) => state.controllerStatus.fetchComentarioSuccess;
 export const getEnviandoMeGusta = (state) => state.controllerStatus.enviandoMeGusta;

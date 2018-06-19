@@ -14,7 +14,7 @@ import Avatar from '@material-ui/core/Avatar';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import material_styles from './material_styles';
-import { NUM_COMENTARIOS } from '../../constants/appConstants';
+import { NUM_COMENTARIOS, REST_FAILURE, REST_SUCCESS, REST_DEFAULT } from '../../constants/appConstants';
 
 class CommentsGrid extends Component {
 
@@ -25,7 +25,14 @@ class CommentsGrid extends Component {
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
-        if (nextProps.idLibro > 0 && prevState.cargadosComentarios !== 0) {
+        if(nextProps.getfetchComentarioSuccess && REST_FAILURE === nextProps.getfetchComentarioSuccess) {
+            return ({
+                ...prevState,
+                cargadosComentarios: REST_FAILURE
+            });
+        }
+
+        if (nextProps.idLibro > 0 /*&& prevState.cargadosComentarios !== REST_DEFAULT*/) {
             let fechaUltimoComentario = null;
             if (prevState.comentariosLibros && prevState.comentariosLibros.length) {
                 fechaUltimoComentario = new Date(Math.max.apply(null, prevState.comentariosLibros.map(function(e) {
@@ -34,19 +41,19 @@ class CommentsGrid extends Component {
             }
             // todo fecha
             (nextProps.fetchComentarios) && nextProps.fetchComentarios(nextProps.idLibro, NUM_COMENTARIOS, fechaUltimoComentario);
-            return ({ ...prevState, cargadosComentarios: 0 });
+            return ({ ...prevState, cargadosComentarios: REST_DEFAULT });
         } else
         if (nextProps.comentariosMostrados == null) {
             return ({
                 ...prevState,
-                cargadosComentarios: -1,
+                cargadosComentarios: REST_FAILURE,
                 comentariosLibros: null
             })
         } else
-        if (nextProps.comentariosMostrados && prevState.cargadosComentarios === 0) {
+        if (nextProps.comentariosMostrados && prevState.cargadosComentarios === REST_DEFAULT) {
             return ({
                 ...prevState.state,
-                cargadosComentarios: 1,
+                cargadosComentarios: REST_SUCCESS,
                 comentarios: nextProps.comentariosMostrados
             })
         } else
@@ -191,6 +198,12 @@ class CommentsGrid extends Component {
 
     render() {
         switch (this.state.cargadosComentarios) {
+            case -1:
+                return (
+                    <div className="cargandoComentarios">
+                        <h3>Error en la carga de comentarios puede ser un problema de red o fallo del servidor...</h3>
+                    </div>
+                )
             case 0:
                 return (
                     <div className="cargandoComentarios">
@@ -295,6 +308,7 @@ class CommentsGrid extends Component {
 export default connect(
     (state) => ({
         comentariosMostrados: appState.getComentarios(state),
+        getfetchComentarioSuccess: appState.getfetchComentarioSuccess(state)
     }),
     (dispatch) => ({
         fetchComentarios: (idLibro, numComentarios, fechaUltimo) => dispatch(fetchComentarios(idLibro, numComentarios, fechaUltimo)),

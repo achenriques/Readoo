@@ -4,7 +4,6 @@ import { changeTab, setIsOpenAddLibro,
     controllerLibroDefault, controllerComentarioDefault } from '../app_state/actions';
 import * as appState from '../app_state/reducers';
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
 import AddIcon from '@material-ui/icons/Add';
 import Snackbar from '@material-ui/core/Snackbar';
 import ExploreView from './explore/ExploreView';
@@ -32,7 +31,7 @@ class BodyContainer extends Component {
     };
 
     static getDerivedStateFromProps(nextProps, prevState) {
-        if(REST_FAILURE === nextProps.enviarNuevoComentarioSuccess) {
+        if(nextProps.enviarNuevoComentarioSuccess && REST_FAILURE === nextProps.enviarNuevoComentarioSuccess) {
             nextProps.recibidoEnviarComentario();
             return({
                 ...prevState,
@@ -40,8 +39,8 @@ class BodyContainer extends Component {
                 openSnackBar: true,
             });
         }
-        
-        if (REST_SUCCESS === nextProps.uploadLibroSuccess) {
+
+        if (nextProps.uploadLibroSuccess && REST_SUCCESS === nextProps.uploadLibroSuccess) {
             nextProps.openAddLibro(false);
             nextProps.listenedUploadLibro();
             return ({
@@ -50,11 +49,31 @@ class BodyContainer extends Component {
                 openSnackBar: true,
             });
         }
-        if (REST_FAILURE === nextProps.uploadLibroSuccess) {
+        
+        if (nextProps.uploadLibroSuccess && REST_SUCCESS === nextProps.uploadLibroSuccess) {
+            nextProps.openAddLibro(false);
+            nextProps.listenedUploadLibro();
+            return ({
+                ...prevState,
+                snackBarMsg: 'Libro subido correctamente',
+                openSnackBar: true,
+            });
+        }
+
+        if (nextProps.uploadLibroSuccess && REST_FAILURE === nextProps.uploadLibroSuccess) {
             nextProps.openAddLibro(false);
             return ({
                 ...prevState,
                 snackBarMsg: 'Ha fallado la subida del libro',
+                openSnackBar: true,
+            });
+        }
+
+        if (nextProps.getfetchComentarioSuccess && REST_FAILURE == nextProps.getfetchComentarioSuccess) {
+            nextProps.recibidoFetchComentario();
+            return({
+                ...prevState,
+                snackBarMsg: 'Error al leer los comentarios desde el servidor',
                 openSnackBar: true,
             });
         }
@@ -139,11 +158,13 @@ export default connect(
         selectedIndex: appState.getCurrentTabID(state),
         uploadLibroSuccess: appState.libroSuccessUpload(state),
         enviarNuevoComentarioSuccess: appState.getComentarioEnviado(state),
+        getfetchComentarioSuccess: appState.getfetchComentarioSuccess(state)
     }),
     (dispatch) => ({
         changeTab: (tabID) => dispatch(changeTab(tabID)),
         openAddLibro: (isOpen) => dispatch(setIsOpenAddLibro(isOpen)),
         listenedUploadLibro: () => dispatch(controllerLibroDefault()),
-        recibidoEnviarComentario: () => dispatch(controllerComentarioDefault())
+        recibidoEnviarComentario: () => dispatch(controllerComentarioDefault()),
+        recibidoFetchComentario: () => dispatch(controllerComentarioDefault()),
     })
 )(BodyContainer);
