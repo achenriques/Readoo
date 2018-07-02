@@ -8,9 +8,10 @@ import AddIcon from '@material-ui/icons/Add';
 import Snackbar from '@material-ui/core/Snackbar';
 import ExploreView from './explore/ExploreView';
 import SubirLibroModal from './explore/SubirLibroModal';
-import { REST_SUCCESS, REST_DEFAULT, REST_FAILURE } from '../constants/appConstants';
 import '../styles/BodyContainer.css';
 import FavouritesView from './favourites/FavouritesView';
+import ProfileView from './profile/ProfileView';
+import { REST_SUCCESS, REST_DEFAULT, REST_FAILURE } from '../constants/appConstants';
 
 const styleButton = {
     position: 'fixed',
@@ -70,7 +71,6 @@ class BodyContainer extends Component {
         }
 
         if (nextProps.getfetchComentarioSuccess && REST_FAILURE == nextProps.getfetchComentarioSuccess) {
-            nextProps.recibidoFetchComentario();
             return({
                 ...prevState,
                 snackBarMsg: 'Error al leer los comentarios desde el servidor',
@@ -139,9 +139,9 @@ class BodyContainer extends Component {
             case 3:
                 return (
                     <div className='bodyContainer'>
-                        <h1 align="center">
-                            Soy un body 4
-                        </h1>
+                        <div className='bodyContainer'>
+                            <ProfileView/>
+                        </div>
                     </div>
                 );
 
@@ -165,6 +165,5 @@ export default connect(
         openAddLibro: (isOpen) => dispatch(setIsOpenAddLibro(isOpen)),
         listenedUploadLibro: () => dispatch(controllerLibroDefault()),
         recibidoEnviarComentario: () => dispatch(controllerComentarioDefault()),
-        recibidoFetchComentario: () => dispatch(controllerComentarioDefault()),
     })
 )(BodyContainer);

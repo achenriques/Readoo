@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchComentarios, enviarComentario } from '../../app_state/actions';
+import { fetchComentarios, enviarComentario, controllerComentarioDefault } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Grid from '@material-ui/core/Grid';
 // TODO change GridList
@@ -22,17 +22,19 @@ class CommentsGrid extends Component {
         cargadosComentarios: null,  // 1 para cargados, -1 para error
         comentariosLibros: [],
         nuevoComentario: '',
+        idLibroActual: null
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
         if(nextProps.getfetchComentarioSuccess && REST_FAILURE === nextProps.getfetchComentarioSuccess) {
+            nextProps.recibidoFetchComentario();
             return ({
                 ...prevState,
                 cargadosComentarios: REST_FAILURE
             });
         }
 
-        if (nextProps.idLibro > 0 /*&& prevState.cargadosComentarios !== REST_DEFAULT*/) {
+        if (nextProps.idLibro > 0 && nextProps.idLibro != prevState.idLibroActual/*&& prevState.cargadosComentarios !== REST_DEFAULT*/) {
             let fechaUltimoComentario = null;
             if (prevState.comentariosLibros && prevState.comentariosLibros.length) {
                 fechaUltimoComentario = new Date(Math.max.apply(null, prevState.comentariosLibros.map(function(e) {
@@ -41,7 +43,7 @@ class CommentsGrid extends Component {
             }
             // todo fecha
             (nextProps.fetchComentarios) && nextProps.fetchComentarios(nextProps.idLibro, NUM_COMENTARIOS, fechaUltimoComentario);
-            return ({ ...prevState, cargadosComentarios: REST_DEFAULT });
+            return ({ ...prevState, cargadosComentarios: REST_DEFAULT, idLibroActual: nextProps.idLibro });
         } else
         if (nextProps.comentariosMostrados == null) {
             return ({
@@ -210,7 +212,6 @@ class CommentsGrid extends Component {
                         <h3>Cargando...</h3>
                     </div>
                 )
-                break;
 
             case 1:
                 if (this.state.comentarios.length) {
@@ -312,6 +313,7 @@ export default connect(
     }),
     (dispatch) => ({
         fetchComentarios: (idLibro, numComentarios, fechaUltimo) => dispatch(fetchComentarios(idLibro, numComentarios, fechaUltimo)),
-        enviarComentario: (idComentario, idLibro, idUsuario, comentario) => dispatch(enviarComentario(idComentario, idLibro, idUsuario, comentario))
+        enviarComentario: (idComentario, idLibro, idUsuario, comentario) => dispatch(enviarComentario(idComentario, idLibro, idUsuario, comentario)),
+        recibidoFetchComentario: () => dispatch(controllerComentarioDefault())
     })
 )(CommentsGrid);

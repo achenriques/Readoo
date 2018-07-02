@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchLibros } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from '@material-ui/core/Grid';
 import GridList from '@material-ui/core/GridList';
@@ -25,7 +23,6 @@ import CommentsGrid from '../common/CommentsGrid';
 import * as constantes from '../../constants/appConstants';
 import libroDefault from '../../resources/libroDefault.gif';
 import material_styles from './material_styles';
-import { color } from '@material-ui/core/colors';
 
 class FavouritesView extends Component {
 
