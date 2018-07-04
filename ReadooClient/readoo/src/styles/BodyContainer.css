@@ -135,3 +135,8 @@ a:hover {
     display: inline-block;
     padding-right: 1em;
 }
+
+.columnaAvatarPerfil {
+    height: 100%;
+    width: 80%
+}

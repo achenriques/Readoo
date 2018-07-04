@@ -2,14 +2,22 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { setIsOpenAddLibro, uploadLibro, fetchCategorias } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
-import Dialog from 'material-ui/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
-import TextField from 'material-ui/TextField';
-import Paper from 'material-ui/Paper';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
-import { Grid, Row, Col } from 'react-material-responsive-grid';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Paper from '@material-ui/core/Paper';
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import ListItemText from '@material-ui/core/ListItemText';
+import Select from '@material-ui/core/Select';
+import Checkbox from '@material-ui/core/Checkbox';
+import Grid from '@material-ui/core/Grid';
+import { DISPLAY_NONE } from '../../constants/appConstants';
 
 const COMPLETA_CAMPO = "Debes completar este campo";
 const SELECCIONA_CAMPO = "Debes seleccionar al menos una categoría";
@@ -195,103 +203,139 @@ class SubirLibroModal extends Component {
             <MenuItem key={5} value={5} primaryText="Weekly" />,
         ]; */
 
-        const actions = [
-            <FlatButton
-                label="Cancelar"
-                primary={true}
-                onClick={this.handleClose.bind(this)}
-            />,
-            <FlatButton
-                label="Súbelo"
-                primary={true}
-                disabled={this.state.disabledButton}
-                onClick={this.subirLibro_aceptar.bind(this)}
-            />,
-        ];
-
         return (
             <Dialog
                 title="Subir mi libro"
-                actions={actions}
-                modal={true}
                 open={this.props.isOpenModal}
-                contentStyle={customDialog}
+                //onClose={this.handleClose}
+                aria-labelledby="responsive-dialog-title"
             >
-                <Grid>
-                    <Row>
-                        <Col sm={6}>
-                            <TextField
-                                name="add_libro_titulo"
-                                id="addTituloLibro"
-                                hintText="Título del libro"
-                                fullWidth
-                                maxLength="45"
-                                errorText={this.state.error.add_libro_titulo}
-                                onChange={this.oChangeInput.bind(this)}
-                            /><br />
-                            <TextField
-                                name="add_libro_autor"
-                                id="addAutorLibro"
-                                hintText="Título del libro"
-                                fullWidth
-                                maxLength="45"
-                                errorText={this.state.error.add_libro_autor}
-                                onChange={this.oChangeInput.bind(this)}
-                            /><br />
-                            <TextField
-                                name="add_libro_historia"
-                                id="addDescripcionLibro"
-                                hintText="Describe un poco la historia, no lo cuentes TODO!"
-                                multiLine={true}
-                                rows={2}
-                                rowsMax={4}
-                                fullWidth
-                                maxLength="140"
-                                style={textAlginBottom}
-                                errorText={this.state.error.add_libro_historia}
-                                onChange={this.oChangeInput.bind(this)}
-                            /><br />
-                            <TextField
-                                name="add_libro_opinion"
-                                id="addOpinionLibro"
-                                hintText="Escribe tu opinión personal"
-                                multiLine={true}
-                                rows={2}
-                                rowsMax={4}
-                                fullWidth
-                                maxLength="140"
-                                style={textAlginBottom}
-                                onChange={this.oChangeInput.bind(this)}
-                            /><br />
-                            <SelectField
-                                value={this.state.add_libro_categoria}
-                                onChange={this.handleCategoria}
-                                floatingLabelText="Selecciona una categoria"
-                                errorText={this.state.error.add_libro_categoria}
-                                fullWidth
-                            >
-                                {this.state.categoria_items}
-                            </SelectField>
-                        </Col>
-                        <Col sm={6}>
-                            <Paper zDepth={4} rounded={false} style={portadaPreview}>
-                                <img src={this.state.add_libro_imagen} alt="Necesitas una imagen" className="imagenPortadaPreview" />
-                            </Paper>
-                            <br />
-                            <RaisedButton
-                                label="Elige una imagen de la portada"
-                                labelPosition="before"
-                                containerElement="label"
-                                fullWidth
-                            >
-                                <input type="file" className="imageInput" accept="image/*" onChange={this.cargarImagenPortada.bind(this)} />
-                            </RaisedButton>
-                            <p id="error_add_img" className="errorInput" hidden={!this.state.error.add_libro_imagen}>
-                                Debes añadir una imagen de la portada
-                            </p>
-                        </Col>
-                    </Row>
-                </Grid>
+                <DialogTitle>Subir mi libro</DialogTitle>
+                <DialogContent>
+                    <Grid container>
+                            <Grid item sm={6}>
+                                <TextField
+                                    name="add_libro_titulo"
+                                    id="addTituloLibro"
+                                    label="Título del libro"
+                                    fullWidth
+                                    maxLength="45"
+                                    errorText={this.state.error.add_libro_titulo}
+                                    onChange={this.oChangeInput.bind(this)}
+                                /><br />
+                                <TextField
+                                    name="add_libro_autor"
+                                    id="addAutorLibro"
+                                    label="Título del libro"
+                                    fullWidth
+                                    maxLength="45"
+                                    errorText={this.state.error.add_libro_autor}
+                                    onChange={this.oChangeInput.bind(this)}
+                                /><br />
+                                <TextField
+                                    name="add_libro_historia"
+                                    id="addDescripcionLibro"
+                                    label="Describe un poco la historia, no lo cuentes TODO!"
+                                    multiLine={true}
+                                    rows={2}
+                                    rowsMax={4}
+                                    fullWidth
+                                    maxLength="140"
+                                    style={textAlginBottom}
+                                    errorText={this.state.error.add_libro_historia}
+                                    onChange={this.oChangeInput.bind(this)}
+                                /><br />
+                                <TextField
+                                    name="add_libro_opinion"
+                                    id="addOpinionLibro"
+                                    label="Escribe tu opinión personal"
+                                    multiLine={true}
+                                    rows={2}
+                                    rowsMax={4}
+                                    fullWidth
+                                    maxLength="140"
+                                    style={textAlginBottom}
+                                    onChange={this.oChangeInput.bind(this)}
+                                /><br />
+                                <FormControl className={classes.formControl}>
+                                    <InputLabel htmlFor="selectCategoriasSubir">Selecciona una categoria</InputLabel>
+                                    <Select
+                                        multiple
+                                        value={this.state.add_libro_categoria}
+                                        onChange={this.handleCategoria}
+                                        input={<Input id="selectCategoriasSubir" />}
+                                        renderValue={selected => selected.join(', ')}
+                                        MenuProps={MenuProps}
+                                    >
+                                        {this.state.categoria_items.map(name => (
+                                        <MenuItem key={name} value={name}>
+                                            <Checkbox checked={this.state.name.indexOf(name) > -1} />
+                                            <ListItemText primary={name} />
+                                        </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                                <SelectField
+                                    value={this.state.add_libro_categoria}
+                                    onChange={this.handleCategoria}
+                                    floatingLabelText="Selecciona una categoria"
+                                    errorText={this.state.error.add_libro_categoria}
+                                    fullWidth
+                                >
+                                    {this.state.categoria_items}
+                                </SelectField>
+                            </Grid>
+                            <Grid item sm={6}>
+                                <Paper zDepth={4} rounded={false} style={portadaPreview}>
+                                    <img src={this.state.add_libro_imagen} alt="Necesitas una imagen" className="imagenPortadaPreview" />
+                                </Paper>
+                                <br />
+                                <div className="divBotonSubirAvatar">
+                                    <input
+                                        id="botonSubirLibro"
+                                        accept="image/*"
+                                        type="file"
+                                        style={DISPLAY_NONE} 
+                                        className="imageInput" 
+                                        onChange={this.cargarImagenPortada.bind(this)} 
+                                    />
+                                    <label htmlFor="botonSubirLibro">
+                                    // TODO CLASE BOTON
+                                        <Button variant="contained" component="span" className="" fullWidth>
+                                            AÑADE UNA IMAGEN DE PORTADA
+                                        </Button>
+                                    </label>
+                                </div>
+                                <Button
+                                    label="Elige una imagen de la portada"
+                                    variant="raised"
+                                    labelPosition="before"
+                                    containerElement="label"
+                                    fullWidth
+                                >
+                                    <input type="file" className="imageInput" accept="image/*" onChange={this.cargarImagenPortada.bind(this)} />
+                                </Button>
+                                <p id="error_add_img" className="errorInput" hidden={!this.state.error.add_libro_imagen}>
+                                    Debes añadir una imagen de la portada
+                                </p>
+                            </Grid>
+                    </Grid>
+                </DialogContent>
+                <DialogActions>
+                    <div>
+                        <Button variant="contained" color="primary"
+                            onClick={this.handleClose.bind(this)}
+                        >
+                            CANCELAR
+                        </Button>
+                        <Button variant="contained" color="primary" 
+                            disabled={this.state.disabledButton}
+                            onClick={this.subirLibro_aceptar.bind(this)}
+                        >
+                            SÚBELO
+                        </Button>
+                    </div>
+                </DialogActions>
             </Dialog>
         );
     }
