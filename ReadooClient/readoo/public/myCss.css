@@ -58,3 +58,25 @@
 .inputDatosPerfil {
     margin-top: 15px;
 }
+
+.dialogUploadBook {
+    width: 75%;
+    max-width: 100%;
+}
+
+.uploadBookLeftGrid {
+    padding-right: 10px;
+}
+
+.uploadBookRightGrid {
+    padding-left: 10px;
+}
+
+.paddingTextFields {
+    padding-bottom: 15px;
+}
+
+.saveProfileButton {
+    text-align: right;
+    margin-right: 30px;
+}

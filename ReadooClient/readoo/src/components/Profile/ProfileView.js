@@ -57,9 +57,8 @@ class ProfileView extends Component {
         }, callback);
     }
 
-    cargarImagenAvatar = (evt) => {
+    loadAvatarImage = (evt) => {
         /*
-        FIXME
         const callState = () => {
             if (this.state.error.add_libro_imagen === true) {
                 this.setState({
@@ -77,14 +76,22 @@ class ProfileView extends Component {
                 ...this.state,
                 datosUsuario: {
                     ...this.state.datosUsuario,
-                    avatar: (URL.createObjectURL(evt.target.files[0])) ? URL.createObjectURL(evt.target.files[0]) : avatarDefault,
+                    avatar: (URL.createObjectURL(evt.target.files[0])) ? URL.createObjectURL(evt.target.files[0]) : null,
                 },
-                imagenAvatar: evt.target.files[0] ? evt.target.files[0] : null
+                imagenAvatar: evt.target.files[0] ? evt.target.files[0] : avatarDefault
             }, /*callState*/);
+        } else {
+            this.setState({
+                imagenAvatar: avatarDefault
+            });
         }
     }
 
-    render() {
+    acceptSaveProfile = (evt) => {
+
+    }
+
+    render = () => {
         switch (this.state.cargandoPerfil) {
             case -1:
                 return (
@@ -116,9 +123,10 @@ class ProfileView extends Component {
                                             id="botonSubirAvatar"
                                             multiple
                                             type="file"
+                                            onChange={this.loadAvatarImage.bind(this)} 
                                         />
                                         <label htmlFor="botonSubirAvatar">
-                                            <Button variant="contained" component="span" className="subirAvatarPerfil" fullWidth>
+                                            <Button variant="outlined" component="span" className="subirAvatarPerfil" fullWidth>
                                                 AÑADE UNA IMAGEN DE PORTADA
                                             </Button>
                                         </label>
@@ -131,8 +139,10 @@ class ProfileView extends Component {
                                         id="nickUsuario"
                                         name="nickUsuario"
                                         fullWidth
-                                        maxLength="45"
-                                        value={this.state.datosUsuario.nick}
+                                        inputProps={{
+                                            maxLength: 45,
+                                        }}
+                                        value={this.state.nickUsuario}
                                         onChange={this.oChangeInput.bind(this)}
                                         className="inputDatosPerfil"
                                     />
@@ -142,8 +152,10 @@ class ProfileView extends Component {
                                         id="nombreUsuario"
                                         name="nombreUsuario"
                                         fullWidth
-                                        maxLength="45"
-                                        value={this.state.datosUsuario.nombre}
+                                        inputProps={{
+                                            maxLength: 45,
+                                        }}
+                                        value={this.state.nombreUsuario}
                                         onChange={this.oChangeInput.bind(this)}
                                         className="inputDatosPerfil"
                                     />
@@ -153,8 +165,10 @@ class ProfileView extends Component {
                                         id="apellidoUsuario"
                                         name="apellidoUsuario"
                                         fullWidth
-                                        maxLength="45"
-                                        value={this.state.datosUsuario.apellidos}
+                                        inputProps={{
+                                            maxLength: 45,
+                                        }}
+                                        value={this.state.apellidosUsuario}
                                         onChange={this.oChangeInput.bind(this)}
                                         className="inputDatosPerfil"
                                     />
@@ -164,12 +178,28 @@ class ProfileView extends Component {
                                         id="emailUsuario"
                                         name="emailUsuario"
                                         fullWidth
-                                        maxLength="45"
-                                        value={this.state.datosUsuario.email}
+                                        inputProps={{
+                                            maxLength: 45,
+                                        }}
+                                        value={this.state.emailUsuario}
                                         onChange={this.oChangeInput.bind(this)}
                                         className="inputDatosPerfil"
                                     />
                                     <br/>
+                                    <TextField
+                                        label="Algo sobre tí mismo"
+                                        id="sobreMiPerfil"
+                                        name="sobreMiPerfil"
+                                        multiline
+                                        rowsMax="4"
+                                        fullWidth
+                                        inputProps={{
+                                            maxLength: 140,
+                                        }}
+                                        value={this.state.sobreMi}
+                                        onChange={this.oChangeInput.bind(this)}
+                                        className="inputDatosPerfil"
+                                    />
                                     {(this.state.mostrarAntiguaPass)? (
                                         <div>
                                             <TextField
@@ -178,7 +208,10 @@ class ProfileView extends Component {
                                                 name="viejaPassUsuario"
                                                 fullWidth
                                                 type="password"
-                                                maxLength="20"
+                                                inputProps={{
+                                                    maxLength: 20,
+                                                }}
+                                                value={this.state.viejaPassUsuario}
                                                 onChange={this.oChangeInput.bind(this)}
                                                 className="inputDatosPerfil"
                                             />
@@ -191,13 +224,27 @@ class ProfileView extends Component {
                                         name="passUsuario"
                                         fullWidth
                                         type="password"
-                                        maxLength="20"
+                                        inputProps={{
+                                            maxLength: 20,
+                                        }}
+                                        value={this.state.passUsuario}
                                         onChange={this.oChangeInput.bind(this)}
                                         className="inputDatosPerfil"
                                     />
                                     <br/>
                                 </Paper>
                             </Grid>
+                        </Grid>
+                        <Grid container alignItems="flex-end">
+                        <Grid item sm={12}>
+                            <div className="saveProfileButton">
+                                <Button variant="contained" color="primary" 
+                                    onClick={this.acceptSaveProfile.bind(this)}
+                                >
+                                    GUARDAR
+                                </Button>
+                            </div>
+                        </Grid>
                         </Grid>
                     </div>
                 )

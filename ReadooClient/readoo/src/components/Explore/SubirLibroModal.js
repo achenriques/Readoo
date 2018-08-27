@@ -29,10 +29,6 @@ const customDialog = {
     height: '75%'
 };
 
-const textAlginBottom = {
-    verticalAlign: 'bottom'
-};
-
 const portadaPreview = {
     height: '300px',
     maxHeight: '100%'
@@ -119,7 +115,7 @@ class SubirLibroModal extends Component {
                 add_libro_titulo: (this.state.add_libro_titulo === "") ? COMPLETA_CAMPO : "",
                 add_libro_autor: (this.state.add_libro_autor === "") ? COMPLETA_CAMPO : "",
                 add_libro_historia: (this.state.add_libro_historia === "") ? COMPLETA_CAMPO : "",
-                add_libro_categoria: (this.state.add_libro_categoria === "") ? SELECCIONA_CAMPO : "",
+                add_libro_categoria: this.state.add_libro_categoria === null || this.state.add_libro_categoria === "",
                 add_libro_imagen: (this.state.add_libro_imagen == null) ? true : false,
             }
         });
@@ -209,55 +205,73 @@ class SubirLibroModal extends Component {
                 open={this.props.isOpenModal}
                 //onClose={this.handleClose}
                 aria-labelledby="responsive-dialog-title"
+                classes={{
+                    paper: 'dialogUploadBook'
+                }}
             >
                 <DialogTitle>Subir mi libro</DialogTitle>
-                <DialogContent>
+                <DialogContent fullWidth>
                     <Grid container>
-                            <Grid item sm={6}>
+                            <Grid item sm={6} className="uploadBookLeftGrid">
                                 <TextField
                                     name="add_libro_titulo"
                                     id="addTituloLibro"
                                     label="Título del libro"
                                     fullWidth
-                                    maxLength="45"
+                                    inputProps={{
+                                        maxLength: 45
+                                    }}
+                                    required
+                                    error={this.state.error.add_libro_titulo != ""}
                                     errorText={this.state.error.add_libro_titulo}
                                     onChange={this.oChangeInput.bind(this)}
+                                    className="paddingTextFields"
                                 /><br />
                                 <TextField
                                     name="add_libro_autor"
                                     id="addAutorLibro"
                                     label="Título del libro"
                                     fullWidth
-                                    maxLength="45"
+                                    inputProps={{
+                                        maxLength: 45
+                                    }}
+                                    required
+                                    error={this.state.error.add_libro_autor != ""}
                                     errorText={this.state.error.add_libro_autor}
                                     onChange={this.oChangeInput.bind(this)}
+                                    className="paddingTextFields"
                                 /><br />
                                 <TextField
                                     name="add_libro_historia"
                                     id="addDescripcionLibro"
                                     label="Describe un poco la historia, no lo cuentes TODO!"
-                                    multiLine={true}
-                                    rows={2}
-                                    rowsMax={4}
+                                    multiline
+                                    rowsMax="4"
                                     fullWidth
-                                    maxLength="140"
-                                    style={textAlginBottom}
+                                    inputProps={{
+                                        maxLength: 140,
+                                    }}
+                                    required
+                                    error={this.state.error.add_libro_historia != ""}
                                     errorText={this.state.error.add_libro_historia}
                                     onChange={this.oChangeInput.bind(this)}
+                                    className="paddingTextFields"
                                 /><br />
                                 <TextField
                                     name="add_libro_opinion"
                                     id="addOpinionLibro"
                                     label="Escribe tu opinión personal"
-                                    multiLine={true}
-                                    rows={2}
-                                    rowsMax={4}
+                                    multiline
+                                    rowsMax="4"
                                     fullWidth
-                                    maxLength="140"
-                                    style={textAlginBottom}
+                                    inputProps={{
+                                        maxLength: 140,
+                                    }}
+                                    required
                                     onChange={this.oChangeInput.bind(this)}
+                                    className="paddingTextFields"
                                 /><br />
-                                <FormControl className={classes.formControl}>
+                                <FormControl /*className={classes.formControl}*/>
                                     <InputLabel htmlFor="selectCategoriasSubir">Selecciona una categoria</InputLabel>
                                     <Select
                                         multiple
@@ -265,27 +279,21 @@ class SubirLibroModal extends Component {
                                         onChange={this.handleCategoria}
                                         input={<Input id="selectCategoriasSubir" />}
                                         renderValue={selected => selected.join(', ')}
-                                        MenuProps={MenuProps}
+                                        style={{ width: '100%' }}
                                     >
-                                        {this.state.categoria_items.map(name => (
+                                        {this.state.categoria_items.map((name, index, list) => (
                                         <MenuItem key={name} value={name}>
                                             <Checkbox checked={this.state.name.indexOf(name) > -1} />
                                             <ListItemText primary={name} />
                                         </MenuItem>
                                         ))}
                                     </Select>
+                                    <p id="error_add_category" className="errorInput" hidden={!this.state.error.add_libro_categoria}>
+                                        Debes eligir al menos una categoría
+                                    </p>
                                 </FormControl>
-                                <SelectField
-                                    value={this.state.add_libro_categoria}
-                                    onChange={this.handleCategoria}
-                                    floatingLabelText="Selecciona una categoria"
-                                    errorText={this.state.error.add_libro_categoria}
-                                    fullWidth
-                                >
-                                    {this.state.categoria_items}
-                                </SelectField>
                             </Grid>
-                            <Grid item sm={6}>
+                            <Grid item sm={6} className="uploadBookLeftGrid">
                                 <Paper zDepth={4} rounded={false} style={portadaPreview}>
                                     <img src={this.state.add_libro_imagen} alt="Necesitas una imagen" className="imagenPortadaPreview" />
                                 </Paper>
@@ -300,21 +308,11 @@ class SubirLibroModal extends Component {
                                         onChange={this.cargarImagenPortada.bind(this)} 
                                     />
                                     <label htmlFor="botonSubirLibro">
-                                    // TODO CLASE BOTON
-                                        <Button variant="contained" component="span" className="" fullWidth>
+                                        <Button variant="outlined" component="span" className="" fullWidth>
                                             AÑADE UNA IMAGEN DE PORTADA
                                         </Button>
                                     </label>
                                 </div>
-                                <Button
-                                    label="Elige una imagen de la portada"
-                                    variant="raised"
-                                    labelPosition="before"
-                                    containerElement="label"
-                                    fullWidth
-                                >
-                                    <input type="file" className="imageInput" accept="image/*" onChange={this.cargarImagenPortada.bind(this)} />
-                                </Button>
                                 <p id="error_add_img" className="errorInput" hidden={!this.state.error.add_libro_imagen}>
                                     Debes añadir una imagen de la portada
                                 </p>
