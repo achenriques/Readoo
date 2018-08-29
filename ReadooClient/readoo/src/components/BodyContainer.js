@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { changeTab, setIsOpenAddLibro, 
-    controllerLibroDefault, controllerComentarioDefault } from '../app_state/actions';
+    controllerLibroDefault, controllerComentarioDefault,
+    controllerUserDefault } from '../app_state/actions';
 import * as appState from '../app_state/reducers';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
@@ -32,6 +33,7 @@ class BodyContainer extends Component {
     };
 
     static getDerivedStateFromProps(nextProps, prevState) {
+        console.log("eih");
         if(nextProps.enviarNuevoComentarioSuccess && REST_FAILURE === nextProps.enviarNuevoComentarioSuccess) {
             nextProps.recibidoEnviarComentario();
             return({
@@ -77,6 +79,31 @@ class BodyContainer extends Component {
                 openSnackBar: true,
             });
         }
+
+        if (nextProps.failFetchUserData && REST_FAILURE == nextProps.failFetchUserData) {
+            return({
+                ...prevState,
+                snackBarMsg: 'Error al leer los datos de usuario desde el servidor',
+                openSnackBar: true,
+            });
+        }
+
+        if (nextProps.failSavingUserData) {
+            if ( REST_FAILURE == nextProps.failSavingUserData) {
+                return({
+                    ...prevState,
+                    snackBarMsg: 'Error al escribir los datos de usuario en el servidor',
+                    openSnackBar: true,
+                });
+            } else if ( REST_SUCCESS == nextProps.failSavingUserData) {
+                return({
+                    ...prevState,
+                    snackBarMsg: 'Se han guardado los datos de usuario correctamente',
+                    openSnackBar: true,
+                });
+            }
+        }
+
         return null;
     }
 
@@ -156,12 +183,15 @@ export default connect(
         selectedIndex: appState.getCurrentTabID(state),
         uploadLibroSuccess: appState.libroSuccessUpload(state),
         enviarNuevoComentarioSuccess: appState.getComentarioEnviado(state),
-        getfetchComentarioSuccess: appState.getfetchComentarioSuccess(state)
+        getfetchComentarioSuccess: appState.getfetchComentarioSuccess(state),
+        failSavingUserData: appState.getsaveUserDataSuccess(state),
+        failFetchUserData: appState.getfetchComentarioSuccess(state) === REST_FAILURE
     }),
     (dispatch) => ({
         changeTab: (tabID) => dispatch(changeTab(tabID)),
         openAddLibro: (isOpen) => dispatch(setIsOpenAddLibro(isOpen)),
         listenedUploadLibro: () => dispatch(controllerLibroDefault()),
         recibidoEnviarComentario: () => dispatch(controllerComentarioDefault()),
+        listenedUserData: () => dispatch(controllerUserDefault()),
     })
 )(BodyContainer);

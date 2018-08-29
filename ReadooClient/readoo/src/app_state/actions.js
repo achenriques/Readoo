@@ -9,6 +9,7 @@ export const UPLOAD_LIBRO = 'UPLOAD_LIBRO';
 export const DO_LOGIN = 'DO_LOGIN';
 export const UPLOAD_LIBRO_200 = 'UPLOAD_LIBRO_200';
 export const UPLOAD_COMENTARIO_200 = 'UPLOAD_COMENTARIO_200';
+export const UPLOAD_USER_200 = 'UPLOAD_USER_200';
 export const FETCH_CATEGORIAS = 'FETCH_CATEGORIAS';
 export const PASAR_LIBRO = 'PASAR_LIBRO';
 export const ATRAS_LIBRO = 'ATRAS_LIBRO';
@@ -16,6 +17,8 @@ export const ME_GUSTA_LIBRO = 'ME_GUSTA_LIBRO';
 export const FETCH_LIBROS = 'FETCH_LIBROS';
 export const FETCH_MORE_LIBROS = 'FETCH_MORE_LIBROS';
 export const FETCH_COMENTARIOS = 'FETCH_COMENTARIOS';
+export const FETCH_USER_DATA = 'FETCH_USER_DATA';
+export const SAVE_USER_DATA = 'SAVE_USER_DATA';
 export const ENVIAR_COMENTARIO = 'ENVIAR_COMENTARIO';
 export const SET_ERROR_ENVIAR_COMENTARIO = 'SET_ERROR_ENVIAR_COMENTARIO';
 
@@ -75,6 +78,15 @@ export const controllerLibroDefault = () => ({
 // Se utiliza para mostrar mensajes de alerta
 export const controllerComentarioDefault = () => ({
   type: UPLOAD_COMENTARIO_200,
+  payload: {
+    value: REST_DEFAULT
+  },
+})
+
+// Setear la carga de datos para la subida de datos de usuario.
+// Se utiliza para mostrar mensajes de alerta
+export const controllerUserDefault = () => ({
+  type: UPLOAD_USER_200,
   payload: {
     value: REST_DEFAULT
   },
@@ -176,6 +188,28 @@ export const fetchComentarios = (idLibro, numComentarios, fechaUltimo) => ({
       idLibro,
       numComentarios,
       fechaUltimo
+    }
+  )
+})
+
+export const fetchUserData = (idUsuario) => ({
+  type: FETCH_USER_DATA,
+  promise: axios.get(
+    `${baseURL}/usuario/`,
+    {
+      params: {
+        id: idUsuario
+      }
+    }
+  )
+})
+
+export const saveUserData = (datosUsuario) => ({
+  type: SAVE_USER_DATA,
+  promise: axios.post(
+    `${baseURL}/usuario`,
+    {
+      datosUsuario
     }
   )
 })

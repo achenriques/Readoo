@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { fetchUserData } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import avatarDefault from '../../resources/avatarDefault.svg';
-import { DISPLAY_NONE } from '../../constants/appConstants';
+import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT } from '../../constants/appConstants';
 
 class ProfileView extends Component {
 
@@ -35,6 +36,8 @@ class ProfileView extends Component {
     constructor(props) {
         super(props);
         this.state = { ...this.initialState };
+        // TODO 
+        this.props.fetchUserData(1);
     };
 
     oChangeInput = (evt) => {
@@ -88,7 +91,11 @@ class ProfileView extends Component {
     }
 
     acceptSaveProfile = (evt) => {
+        // TODO
+    }
 
+    acceptDeleteProfile = (evt) => {
+        // TODO
     }
 
     render = () => {
@@ -110,7 +117,7 @@ class ProfileView extends Component {
                 return (
                     <div>
                         <Grid container className="gridPerfil">
-                            <Grid item sm={4} alignContent="center" alignItems="center" className="columnaAvatarPerfil">
+                            <Grid item sm={4} className="columnaAvatarPerfil">
                                     <div style={{ position: "relative"}}>
                                         <Paper elevation={4} className="divAvatarPerfil">
                                             <img src={this.state.datosUsuario.avatar} alt="Imagen de presentación de usuario" className="imgAvatarPerfil"/>
@@ -132,7 +139,7 @@ class ProfileView extends Component {
                                         </label>
                                     </div>
                             </Grid>
-                            <Grid item sm={8} className="columnaDatosPerfil" alignContent="center" alignItems="center">
+                            <Grid item sm={8} className="columnaDatosPerfil">
                                 <Paper elevation={4} className="divDatosPerfil">
                                     <TextField
                                         label="Nick de tu Usuario, es único recuerda"
@@ -238,8 +245,15 @@ class ProfileView extends Component {
                         <Grid container alignItems="flex-end">
                         <Grid item sm={12}>
                             <div className="saveProfileButton">
-                                <Button variant="contained" color="primary" 
+                                <Button variant="flat" color="secondary" 
+                                    onClick={this.acceptDeleteProfile.bind(this)}
+                                    disabled={(this.props.savingUserData !== REST_DEFAULT)}
+                                >
+                                    ELIMINAR MI PERFIL
+                                </Button>
+                                <Button variant="flat" color="primary" 
                                     onClick={this.acceptSaveProfile.bind(this)}
+                                    disabled={(this.props.savingUserData !== REST_DEFAULT)}
                                 >
                                     GUARDAR
                                 </Button>
@@ -254,9 +268,10 @@ class ProfileView extends Component {
 
 export default connect(
     (state) => ({
-        
+        datosUsuario: appState.getUser(state),
+        savingUserData: appState.getsaveUserDataSuccess(state),
     }),
     (dispatch) => ({
-
+        fetchUserData: () => dispatch(fetchUserData())
     })
 )(ProfileView);

@@ -6,8 +6,9 @@ import { REST_DEFAULT, REST_SUCCESS, REST_FAILURE } from '../constants/appConsta
 
 import {
   // Las actions
-  TAB_CHANGE, MODAL_ADD_LIBRO, UPLOAD_LIBRO, UPLOAD_LIBRO_200, UPLOAD_COMENTARIO_200, FETCH_CATEGORIAS,
-  PASAR_LIBRO, FETCH_LIBROS, FETCH_COMENTARIOS, ENVIAR_COMENTARIO, SET_ERROR_ENVIAR_COMENTARIO, ME_GUSTA_LIBRO
+  DO_LOGIN, TAB_CHANGE, MODAL_ADD_LIBRO, UPLOAD_LIBRO, UPLOAD_LIBRO_200, UPLOAD_COMENTARIO_200, UPLOAD_USER_200, FETCH_CATEGORIAS,
+  PASAR_LIBRO, FETCH_LIBROS, FETCH_COMENTARIOS, ENVIAR_COMENTARIO, SET_ERROR_ENVIAR_COMENTARIO, ME_GUSTA_LIBRO,
+  FETCH_USER_DATA, SAVE_USER_DATA
 } from './actions';
 // Asi puedo tener varios modulos
 
@@ -34,6 +35,7 @@ const initialState = {
     apellido: '',
     avatar: '',
     sobreMi: '',
+    pass: '',
   },
   libros: {
     libroDefault: {
@@ -72,6 +74,8 @@ const initialState = {
     fetchComentarioSuccess: REST_DEFAULT,
     comentarioEnviado: false,
     enviandoMeGusta: false,
+    fetchUserDataSuccess: REST_DEFAULT,
+    saveUserDataSuccess: REST_DEFAULT
   },
   filtros: [],
 }
@@ -105,6 +109,38 @@ const dialogs = (state = initialState.dialogs, { type, payload, data }) => {
 
     default:
       return state;
+  }
+}
+
+/**
+ * Reducer para el usuario actual de la aplicación. Responde al login inicial y ofrece los datos del mismo para futuras peticiones y otras
+ * secciones de la aplicacion
+ **/
+const user = (state = initialState.user, { type, payload, data }) => {
+  switch (type) {
+    case successType(DO_LOGIN):
+      console.log(DO_LOGIN);
+      return {
+        ...state,
+        id: data._id,
+        nick: data.nick
+      }
+
+    case successType(FETCH_USER_DATA):
+      console.log(FETCH_USER_DATA)
+      return {
+        ...state,
+        nick: data.nick,
+        email: data.email,
+        nombre: data.nombre,
+        apellido: data.apellido,
+        avatar: data.avatar,
+        sobreMi: data.sobreMi,
+        pass: data.pass
+      }
+
+    default:
+      return state
   }
 }
 
@@ -279,6 +315,35 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
         fetchComentarioSuccess: constantes.REST_DEFAULT
       }
 
+    case UPLOAD_USER_200:
+      console.log(UPLOAD_USER_200);
+      return {
+        ...state,
+        fetchUserDataSuccess: REST_DEFAULT,
+        saveUserDataSuccess: REST_DEFAULT
+      }
+    
+    case failureType(FETCH_USER_DATA):
+      console.log(failureType(FETCH_USER_DATA));
+      return {
+        ...state,
+        fetchUserDataSuccess: REST_FAILURE
+      }
+    
+    case successType(SAVE_USER_DATA):
+      console.log(successType(SAVE_USER_DATA));
+      return {
+        ...state,
+        fetchUserDataSuccess: REST_SUCCESS
+      }
+
+    case failureType(SAVE_USER_DATA):
+      console.log(failureType(SAVE_USER_DATA));
+      return {
+        ...state,
+        fetchUserDataSuccess: REST_FAILURE
+      }
+
     case loadingType(ME_GUSTA_LIBRO):
       return {
         ...state,
@@ -303,25 +368,6 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
 }
 
 /**
- * Reducer para el usuario actual de la aplicación. Responde al login inicial y ofrece los datos del mismo para futuras peticiones y otras
- * secciones de la aplicacion
- 
-const user = (state = initialState.user, { type, payload, data }) => {
-  switch (type) {
-    case successType(DO_LOGIN):
-      console.log(DO_LOGIN);
-      return {
-        ...state,
-        id: data._id,
-        nick: data.nick
-      }
- 
-    default:
-      return state
-  }
-}
- 
-/**
  * El export por defecto se lo lleva redux para hacer su magia, usaremos exports concretos más abajo
  */
 export default combineReducers({
@@ -341,6 +387,7 @@ export default combineReducers({
 export const getCurrentTabID = (state) => state.tabs.currentTabID;
 export const getIsOpenModal = (state) => state.dialogs;
 export const getUserId = (state) => state.user.id;
+export const getUser = (state) => state.user;
 export const libroSuccessUpload = (state) => state.controllerStatus.uploadLibroSuccess;
 export const getComentarioEnviado = (state) => state.controllerStatus.comentarioEnviado;
 export const allCategorias = (state) => state.categorias.todas;
@@ -350,4 +397,6 @@ export const getLibroSuccess = (state) => state.libros.success_fetch;
 export const getLibros = (state) => state.libros.mostrados;
 export const getComentarios = (state) => state.comentarios.comentariosLibro;
 export const getfetchComentarioSuccess = (state) => state.controllerStatus.fetchComentarioSuccess;
+export const getfetchUserDataSuccess = (state) => state.controllerStatus.fetchUserDataSuccess;
+export const getsaveUserDataSuccess = (state) => state.controllerStatus.saveUserDataSuccess;
 export const getEnviandoMeGusta = (state) => state.controllerStatus.enviandoMeGusta;
