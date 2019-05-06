@@ -1,4 +1,5 @@
-const mysql = require('mysql');const constantes = require('../Util/serverOptions');
+const mysql = require('mysql');
+const constantes = require('../Util/serverOptions');
 
 class ComentarioProvider {
     

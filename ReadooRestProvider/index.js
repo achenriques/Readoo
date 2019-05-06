@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 var serverCredentials = require('./Util/serverOptions');
 app.use(basicAuth(serverCredentials)); */
 
-var allowCrossDomain = function(req, res, next) {
+let allowCrossDomain = function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header('Access-Control-Allow-Headers', '*');
@@ -20,39 +20,39 @@ var allowCrossDomain = function(req, res, next) {
 }
 app.use(allowCrossDomain);
 
-var Connection = require('./Util/dbConnection');
-var db = new Connection();
+const Connection = require('./Util/dbConnection');
+const db = new Connection();
 
-var LoginController = require('./LoginController');
-new LoginController(app, db);
+const LoginProvider = require('./restModules/LoginProvider');
+new LoginProvider(app, db);
 
-var LibroProvider = require('./RestModules/LibroProvider')
-new LibroProvider(app, db);
+const BookProvider = require('./restModules/BookProvider')
+new BookProvider(app, db);
 
-var UsuarioProvider = require('./RestModules/UsuarioProvider');
-new UsuarioProvider(app, db);
+const UserProvider = require('./restModules/UserProvider');
+new UserProvider(app, db);
 
-var CategoriaProvider = require('./RestModules/CategoriaProvider');
-new CategoriaProvider(app, db);
+const GenreProvider = require('./restModules/GenreProvider');
+new GenreProvider(app, db);
 
-var UsuarioCategoriaProvider = require('./RestModules/UsuarioCategoriaProvider');
-new UsuarioCategoriaProvider(app, db);
+const UserGenreProvider = require('./restModules/UserGenreProvider');
+new UserGenreProvider(app, db);
 
-var UltimoProvider = require('./RestModules/UltimoProvider');
-new UltimoProvider(app, db);
+const LastBookProvider = require('./restModules/LastBookProvider');
+new LastBookProvider(app, db);
 
-var UsuarioLikeLibroProvider = require('./RestModules/UsuarioLikeLibroProvider');
-new UsuarioLikeLibroProvider(app, db);
+const UserLikesBookProvider = require('./restModules/UserLikesBookProvider');
+new UserLikesBookProvider(app, db);
 
-var ComentarioProvider = require('./RestModules/ComentarioProvider');
-new ComentarioProvider(app, db);
+const CommentProvider = require('./restModules/CommentProvider');
+new CommentProvider(app, db);
 
-var ReporteComentarioProvider = require('./RestModules/ReporteComentarioProvider');
-new ReporteComentarioProvider(app, db);
+const UserReportsCommentProvider = require('./restModules/UserReportsCommentProvider');
+new UserReportsCommentProvider(app, db);
 
-var ReporteLibroProvider = require('./RestModules/ReporteLibroProvider');
-new ReporteLibroProvider(app, db);
+const UserReportsBookProvider = require('./restModules/UserReportsBookProvider');
+new UserReportsBookProvider(app, db);
 
 app.listen(3030, function () {
-  console.log('Example app listening on port 3030!');
+  console.log('App is listening on port 3030!');
 });

@@ -8,7 +8,7 @@ class Connection
       //properties
       host:'localhost',
       user: 'root',
-      password: '1234',
+      password: '4490', // TODO: encriptar
       database: 'readoo_db',
       connectionLimit: 50
     });
