@@ -1,14 +1,14 @@
-class Libro {
-  constructor(idLibro, titulo, autor, descripcion, review, likes, fecha, coverUrl, Usuario_idUsuario, Categoria_idCategoria) {
-    this.idLibro = idLibro;
-    this.titulo = titulo;
-    this.autor = autor;
-    this.descripcion = descripcion;
+class Book {
+  constructor(bookId, title, author, description, review, likes, date, coverUrl, userId, genreId) {
+    this.bookId = bookId;
+    this.title = title;
+    this.author = author;
+    this.description = description;
     this.review = review;
     this.likes = likes;
-    this.fecha = fecha;
+    this.date = date;
     this.coverUrl = coverUrl;
-    this.Usuario_idUsuario = Usuario_idUsuario;
-    this.Categoria_idCategoria = Categoria_idCategoria;
+    this.userId = userId;
+    this.genreId = genreId;
   }
 }

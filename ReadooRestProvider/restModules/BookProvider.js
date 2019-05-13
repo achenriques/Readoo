@@ -1,4 +1,3 @@
-const mysql = require('mysql');
 const multer = require('multer');
 const path = require('path');
 const encoder64 = require('../Util/functions');
@@ -70,7 +69,7 @@ class LibroProvider {
                 //res.json(result);
             } else {
                 // Sql Err
-                let reqError = functions.getRequestError(userData);
+                let reqError = functions.getRequestError(books);
                 res.status(reqError.code)        // HTTP status 204: NotContent
                     .send(reqError.text);
             }
@@ -106,7 +105,7 @@ class LibroProvider {
                 res.setHeader('Content-Type', 'application/json');
                 res.status(200).json(toReturn);
             } else {
-                let reqError = functions.getRequestError(userData);
+                let reqError = functions.getRequestError(bunch);
                 res.status(reqError.code)        // HTTP status 204: NotContent
                     .send(reqError.text);
                 }
@@ -128,7 +127,7 @@ class LibroProvider {
                 res.setHeader('Content-Type', 'application/json');
                 res.status(200).json(newBookId);
             } else {
-                let reqError = functions.getRequestError(userData);
+                let reqError = functions.getRequestError(newBookId);
                 res.status(reqError.code)        // HTTP status 204: NotContent
                     .send(reqError.text);
                 }
@@ -138,7 +137,7 @@ class LibroProvider {
 
     dissableOne(app) {
         app.post('/dissableBook', middleware.verifyToken, function (req, res) {
-        console.log("Estoy insertando libro");
+        console.log("Estoy deshabilitando libro");
 
         let bookId = req.body.id;
         if (bookId) {
@@ -148,26 +147,7 @@ class LibroProvider {
                 res.setHeader('Content-Type', 'application/json');
                 res.status(200).json(oldBookId);
             } else {
-                let reqError = functions.getRequestError(userData);
-                res.status(reqError.code)        // HTTP status 204: NotContent
-                    .send(reqError.text);
-                }
-            }
-        });
-    }
-
-    dissableBook(app) {
-        app.post('/dissableBook', middleware.verifyToken, function (req, res) {
-        console.log("Estoy insertando libro");
-
-        let bookId = req.body.id;
-        if (bookId) {
-            let oldBookId = this.bookDao.deleteOne(bookId);
-            if (Number.isInteger(oldBookId) && oldBookId > 0) {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(200).json(oldBookId);
-            } else {
-                let reqError = functions.getRequestError(userData);
+                let reqError = functions.getRequestError(oldBookId);
                 res.status(reqError.code)        // HTTP status 204: NotContent
                     .send(reqError.text);
                 }
@@ -176,7 +156,7 @@ class LibroProvider {
     }
 
     deleteOne(app, db) {
-        app.delete('/deleteBook', function (req, res) {
+        app.delete('/commentary', function (req, res) {
             console.log("Estoy deleteando " + req.body.id);
             let bookId = req.body.id;
             if (bookId) {
@@ -185,7 +165,7 @@ class LibroProvider {
                     res.setHeader('Content-Type', 'application/json');
                     res.status(200).json(oldBookId);
                 } else {
-                    let reqError = functions.getRequestError(userData);
+                    let reqError = functions.getRequestError(oldBookId);
                     res.status(reqError.code)        // HTTP status 204: NotContent
                         .send(reqError.text);
                 }

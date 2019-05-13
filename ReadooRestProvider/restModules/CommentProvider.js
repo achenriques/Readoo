@@ -1,294 +1,159 @@
-const mysql = require('mysql');
-const constantes = require('../Util/serverOptions');
+const constantes = require('../util/constants');
+const CommentDao = require('../daos/CommentDao');
+const middleware = require('./middlewares');
 
-class ComentarioProvider {
+class CommentProvider {
     
-      constructor(app, db)
-      {
-        this.getAll(app,db);    //Get
-        this.getOne(app, db); //Get
-        this.getSubs(app, db); //Get
-        this.getBunch(app, db); //Post
-        this.deleteOne(app, db);  //Delete
-        this.insertOne(app, db); // Post
-      }
-    
-      getAll(app, db)
-      {
-        app.get('/comentario', function (req, res) {
-          var con = db.getConn(db.connect).then(function(response)
-          {
-            response.query("SELECT * FROM usuario_comenta_libro", function (err, result, fields) {
-              response.release();
-              if (err)
-              {
-                console.log(err);
-                res.status(204)        // HTTP status 204: NotContent
-                  .send('Failed at consult');
-              } else {
-                res.setHeader('Content-Type', 'application/json');
-                res.send(JSON.stringify(result));
-                //res.json(result);
-              }
-            });
-          }, function (error)
-          {
-            console.log(error);
-            res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
-              .send('Not DB connection');
-          });
-        });
-      }
+    commentDao = null;
 
-      getOne(app, db)
-      {
-        app.get('/comentario/:id', function (req, res) 
-        {
-            var idLibro = req.params.id;
-            console.log("Estoy getteando " + idLibro);     
-            if (idLibro)
-            {
-                var con = db.getConn(db.connect).then(function(response)
-                {
-                    var statement = "SELECT * FROM usuario_comenta_libro WHERE libro_idLibro =" + mysql.escape(idLibro) + ";";
-
-                    response.query(statement, function (err, result, fields) {
-                    response.release();
-                    if (err)
-                    {
-                        console.log(err);
-                        res.status(204)        // HTTP status 204: NotContent
-                        .send('Failed at consult');
-                    } else {
-                        res.setHeader('Content-Type', 'application/json');
-                        res.send(JSON.stringify(result));
-                        //res.json(result);
-                    }
-                    });
-                }, function (error)
-                {
-                    console.log(error);
-                    res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
-                      .send('Not DB connection');
-                });
-            } else
-            {
-                res.status(404)        // HTTP status 400: BadRequest
-                .send('Missed Id');
-            }
-        });
-      }
-
-      getSubs(app, db)
-      {
-        app.get('/comentario/:id/:idComentario', function (req, res) 
-        {
-            var idLibro = req.params.id;
-            var idFromComentario= req.params.idComentario
-            console.log("Estoy getteando " + idLibro);     
-            if (idLibro && idFromComentario)
-            {
-                var con = db.getConn(db.connect).then(function(response)
-                {
-                    var statement = "SELECT * FROM usuario_comenta_libro WHERE libro_idLibro = " + 
-                    mysql.escape(idLibro) + " AND idComentarioPadre = " + mysql.escape(idFromComentario) + ";";
-
-                    response.query(statement, function (err, result, fields) {
-                        response.release();
-                        if (err)
-                        {
-                            console.log(err);
-                            res.status(204)        // HTTP status 204: NotContent
-                            .send('Failed at consult');
-                        } else {
-                            res.setHeader('Content-Type', 'application/json');
-                            res.send(JSON.stringify(result));
-                            //res.json(result);
-                        }
-                    });
-                }, function (error)
-                {
-                    console.log(error);
-                    res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
-                      .send('Not DB connection');
-                });
-            } else
-            {
-                res.status(404)        // HTTP status 400: BadRequest
-                .send('Missed Id');
-            }
-        });
-      }
-
-      getBunch(app, db) {
-        app.post('/comentario/fetch', function (req, res) {
-            var idLibro = req.body.idLibro;
-            var numComentarios = req.body.numComentarios;
-            var fechaUltimo = req.body.fechaUltimo;
-
-            console.log("Estoy cogiendo comentario " + idLibro);     
-            if (idLibro)
-            {     
-                var con = db.getConn(db.connect).then(function(response)
-                {
-                    var statement = "SELECT c.idComentario, c.usuario_idUsuario, c.libro_idLibro, c.fecha,c.comentario, " +
-                    "c.idComentarioPadre, u.avatarUrl FROM usuario_comenta_libro c INNER JOIN usuario u " +
-                    "ON c.usuario_idUsuario = u.idUsuario WHERE libro_idLibro = " + 
-                    mysql.escape(idLibro) + " AND idComentarioPadre = NULL ";
-                    if (fechaUltimo) {
-                        statement += "AND fecha < " + mysql.escape(fechaUltimo) + " ";
-                    }
-                    statement += " ORDER BY fecha DESC LIMIT " + constantes.maxComentarios;
-
-                    response.query(statement, function (err, result, fields) {
-                        response.release();
-                        if (err)
-                        {
-                            console.log(err);
-                            res.status(204)        // HTTP status 204: NotContent
-                            .send('Failed at consult');
-                        } else {
-                            var comentarios = result.slice();
-                            var toRet = [];
-                            if (result && result.lenght) {
-                                var arr = result.map( function(el) { return el.idComentario; });
-
-                                var statement2 = "SELECT c.idComentario, c.usuario_idUsuario, c.libro_idLibro, c.fecha,c.comentario, " +
-                                "c.idComentarioPadre, u.avatarUrl FROM usuario_comenta_libro c INNER JOIN usuario u " +
-                                "ON c.usuario_idUsuario = u.idUsuario WHERE libro_idLibro = " + 
-                                mysql.escape(idLibro) + "AND idComentarioPadre IS NOT NULL AND idComentarioPadre IN " + arr ;
-                                if (fechaUltimo) {
-                                    statement2 += "AND fecha < " + mysql.escape(fechaUltimo) + " ";
-                                }
-                                statement2 += " ORDER BY fecha DESC LIMIT " + constantes.maxComentarios * 2;
-
-                                response.query(statement2, function (err2, result2, fields2) {
-                                    response.release();
-                                    if (err2)
-                                    {
-                                        console.log(err);
-                                        res.status(204)        // HTTP status 204: NotContent
-                                        .send('Failed at consult');
-                                    } else {
-                                        if (result2 && result2.lenght) {
-                                            toRet = comentarios.map(function (o) {
-                                                return {
-                                                    ...o,
-                                                    subComentarios: result2.filter(function (elemet) {
-                                                        return +elemen.idComentarioPadre === +o.idComentario;
-                                                    })
-                                                }
-                                            });
-                                        }
-                                    }
-                                });
-                            } else {
-                                toRet = comentarios;
-                            }
-                            res.setHeader('Content-Type', 'application/json');
-                            res.send(JSON.stringify(toRet));
-                            //res.json(result);
-                        }
-                    });
-                }, function (error)
-                {
-                    console.log(error);
-                    res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
-                      .send('Not DB connection');
-                });
-            } else {
-                res.status(204)        // HTTP status 204: NotContent
-                .send('Failed at consult. No ID for search');
-            }
-       });
-      }
-
-      insertOne(app, db)
-      {
-        app.post('/comentario/nuevo', function (req, res) {
-            var comentario = req.body.comentario;
-            console.log("Estoy insertando comentario " + comentario);     
-            if (comentario)
-            {
-                console.log("Estoy insertando comentario " + comentario); 
-                for (var i in comentario) {
-                    console.log(comentario[i]);
-                }
-        
-                var con = db.getConn(db.connect).then(function(response)
-                {
-                    var statement = "INSERT INTO usuario_comenta_libro VALUES (" + 0 + ", " + 
-                    mysql.escape(comentario.idUsuario) + ", " + mysql.escape(comentario.idLibro) + ", current_timestamp(), "+ 
-                    mysql.escape(comentario.comentario) + ", ";
-
-                    if (comentario.idComentarioPadre) 
-                        statement += mysql.escape(comentario.idComentarioPadre) + ");";
-                    else
-                    statement += "null);";
-
-                    + comentario.idComentarioPadre + ");";
-        
-                    response.query(statement, function (err, result) {
-                        response.release();
-                        if (err)
-                        {
-                            if (err.code == 'ER_DUP_ENTRY')
-                            {   
-                                console.log(err);
-                                res.status(206)        // HTTP status 206: Duplicated entry
-                                    .send('Duplicated Entry');
-                            } else
-                            {
-                                console.log(err);
-                                res.status(204)        // HTTP status 204: NotContent
-                                .send('Failed at consult');
-                            }
-                        } else {
-                            res.setHeader('Content-Type', 'application/json');
-                            res.status(200).json(result.affectedRows);
-                        }
-                });
-                }, function (error)
-                {
-                    console.log(error);
-                    res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
-                      .send('Not DB connection');
-                });
-            }
-       });
-      }
-    
-      deleteOne(app, db)
-      {
-        app.delete('/comentario', function (req, res) {
-          var idToDelte = req.body.id;
-          console.log("Estoy deleteando " + idToDelte);
-          var con = db.getConn(db.connect).then(function(response)
-          {
-            var statement = "DELETE FROM usuario_comenta_libro WHERE idComentario = " + mysql.escape(idToDelte) + ";";
-            
-            response.query(statement, function (err, result) {
-              response.release();
-              if (err)
-              {
-                console.log(err);
-                res.status(204)        // HTTP status 204: NotContent
-                  .send('Failed at consult');
-              } else {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(200).json(result.affectedRows);
-              }
-            });
-          }, function (error)
-          {
-            console.log(error);
-            res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
-              .send('Not DB connection');
-          });
-       });
-     };
-    
+    constructor(app, db)
+    {
+        this.commentDao = new CommentDao(db);
+        this.getAll(app);       //Get
+        this.getOne(app);       //Get
+        this.getSubs(app);      //Get
+        this.getBunch(app);     //Post
+        this.deleteOne(app);    //Delete
+        this.dissableOne(app);  //Post
+        this.insertOne(app);    //Post
     }
     
-    module.exports = ComentarioProvider;
+    getAll(app)
+    {
+        app.get('/commentary', function (req, res) {
+            let commentaries = this.bookDao.getAllBook();
+            if (Number.isNaN(commentaries)) {
+                res.setHeader('Content-Type', 'application/json');
+                res.send(JSON.stringify(commentaries));
+                //res.json(commentaries);
+            } else {
+                // Sql Err
+                let reqError = functions.getRequestError(commentaries);
+                res.status(reqError.code)        // HTTP status 204: NotContent
+                    .send(reqError.text);
+            }
+        });
+    }
+
+    getOne(app)
+    {
+        app.get('/commentary/:id', middleware.verifyToken, function (req, res) 
+        {
+            let bookId = req.params.id;
+            console.log("Estoy getteando " + bookId);     
+            if (bookId) {
+                let commentaries = this.commentDao.getCommentaryById(+bookId);
+                if (Number.isNaN(commentaries)) {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.status(200).json(newBookId);
+                } else {
+                    let reqError = functions.getRequestError(commentaries);
+                    res.status(reqError.code)        // HTTP status 204: NotContent
+                        .send(reqError.text);
+                }
+            }
+            
+        });
+    }
+
+    getSubs(app)
+    {
+        app.get('/commentary/:id/:commentId', middleware.verifyToken, function (req, res) 
+        {
+            let bookId = req.params.id;
+            let fatherCommentId = req.params.commentId;
+            console.log("Estoy getteando " + bookId);     
+            if (bookId && fatherCommentId) {
+                let commentaries = this.commentDao.getSubCommentaries(+bookId, +fatherCommentId);
+                if (Number.isNaN(commentaries)) {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.status(200).json(commentaries);
+                } else {
+                    let reqError = functions.getRequestError(commentaries);
+                    res.status(reqError.code)        // HTTP status 204: NotContent
+                        .send(reqError.text);
+                }
+            }
+        });
+    }
+
+    getBunch(app) {
+        app.post('/commentary/fetch', middleware.verifyToken, function (req, res) {
+            let bookId = req.body.bookId;
+            let numberOfCommentaries = req.body.numberOfCommentaries;
+            let lastDate = req.body.lastDate;
+            console.log("Estoy cogiendo comentario " + bookId);     
+            if (bookId) {
+                let commentaries = this.commentDao.bunchOfCommentaries(+bookId, lastDate, constantes.maxComentarios)     
+                if (Number.isNaN(commentaries)) {
+                    
+                    res.setHeader('Content-Type', 'application/json');
+                    res.status(200).json(toRet);
+                } else {
+                    let reqError = functions.getRequestError(commentaries);
+                    res.status(reqError.code)        // HTTP status 204: NotContent
+                        .send(reqError.text);
+                }
+            }
+        });
+    }
+
+    insertOne(app, db) {
+        app.post('/commentary/new', middleware.verifyToken, function (req, res) {
+            let commentary = req.body.comentario;
+            console.log("Estoy insertando comentario " + commentary);     
+            if (commentary && commentary.userId && commentary.bookId && commentary.commentary) {
+                let newCommentId = this.commentDao.newCommentary(+commentary.userId, +commentary.bookId, 
+                        commentary.commentary, +commentary.commentFatherId);
+                if (Number.isInteger(newCommentId) && newCommentId > 0) {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.status(200).json(newCommentId);
+                } else {
+                    let reqError = functions.getRequestError(newCommentId);
+                    res.status(reqError.code)        // HTTP status 204: NotContent
+                        .send(reqError.text);
+                }
+            }
+       });
+    }
+    
+    dissableOne(app) {
+        app.post('/dissableCommentary', middleware.verifyToken, function (req, res) {
+        console.log("Estoy deshabilitando libro");
+        let commentaryId = req.body.id;
+        if (commentaryId) {
+            let oldCommentaryId = this.commentDao.dissableCommentary(+oldCommentaryId);
+            if (Number.isInteger(oldCommentaryId) && oldCommentaryId > 0) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200).json(oldCommentaryId);
+            } else {
+                let reqError = functions.getRequestError(oldCommentaryId);
+                res.status(reqError.code)        // HTTP status 204: NotContent
+                    .send(reqError.text);
+                }
+            }
+        });
+    }
+
+    deleteOne(app, db) {
+        app.delete('/commentary', middleware.verifyToken, function (req, res) {
+            console.log("Estoy deleteando " + req.body.id);
+            let commentaryId = req.body.id;
+            if (commentaryId) {
+                let oldCommentary = this.commentDao.deleteOne(+commentaryId);
+                if (Number.isInteger(oldCommentary) && oldCommentary > 0) {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.status(200).json(oldCommentary);
+                } else {
+                    let reqError = functions.getRequestError(oldCommentary);
+                    res.status(reqError.code)        // HTTP status 204: NotContent
+                        .send(reqError.text);
+                }
+            }
+        });
+    };
+    
+}
+
+module.exports = CommentProvider;
     
