@@ -1,158 +1,103 @@
-//IF NEDED...   const mysql = require('mysql');
+const middleware = require('./middlewares');
+const LastBookDao = require('../daos/LastBookDao');
 
-class UtimoProvider {
+class LastBookProvider {
     
-      constructor(app, db)
-      {
-        this.getAll(app,db);    //Get
-        this.getOne(app, db); //Get
-        this.deleteOne(app, db);  //Delete
-        this.insertOne(app, db); // Post
-      }
+    lastBookDao = null;
+
+    constructor(app, db)
+    {
+        this.lastBookDao = new LastBookDao(db);
+        this.getAll(app);       //Get
+        this.getOne(app);       //Get
+        this.deleteOne(app);    //Delete
+        this.insertOrUpdateOne(app);    // Post
+    }
     
-      getAll(app, db)
-      {
-        app.get('/ultimo', function (req, res) {
-          var con = db.getConn(db.connect).then(function(response)
-          {
-            response.query("SELECT * FROM ultimo", function (err, result, fields) {
-              response.release();
-              if (err)
-              {
-                console.log(err);
-                res.status(204)        // HTTP status 204: NotContent
-                  .send('Failed at consult');
-              } else {
+    getAll(app) {
+        app.get('/lastBook', function (req, res) {
+            let lastBooks = this.lastBookDao.getAllLastBooks();
+            if (Number.isNaN(lastBooks)) {
                 res.setHeader('Content-Type', 'application/json');
-                res.send(JSON.stringify(result));
-                //res.json(result);
-              }
-            });
-          }, function (error)
-          {
-            console.log(error);
-            res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
-              .send('Not DB connection');
-          });
+                res.send(JSON.stringify(lastBooks));
+                //res.json(lastBooks);
+            } else {
+                // Sql Err
+                let reqError = functions.getRequestError(lastBooks);
+                res.status(reqError.code)
+                    .send(reqError.text);
+            }
         });
-      }
+    }
 
-      getOne(app, db)
-      {
-        app.get('/ultimo/:id', function (req, res) 
+    getOne(app) {
+        app.get('/lastBook/:id', middleware.verifyToken, function (req, res) 
         {
-            var idusuario = req.params.id;
-            console.log("Estoy getteando " + idusuario);     
-            if (idusuario)
+            let userId = req.params.id;
+            console.log("Estoy getteando " + userId);     
+            if (userId)
             {
-                var con = db.getConn(db.connect).then(function(response)
-                {
-                    response.query("SELECT * FROM ultimo WHERE Usuario_idUsuario =" + db.escape(idusuario) + ";", 
-                    function (err, result, fields) {
-                    response.release();
-                    if (err)
-                    {
-                        console.log(err);
-                        res.status(204)        // HTTP status 204: NotContent
-                        .send('Failed at consult');
-                    } else {
-                        res.setHeader('Content-Type', 'application/json');
-                        res.send(JSON.stringify(result));
-                        //res.json(result);
-                    }
-                    });
-                }, function (error)
-                {
-                    console.log(error);
-                    res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
-                      .send('Not DB connection');
-                });
-            } else
-            {
-                res.status(404)        // HTTP status 400: BadRequest
+                let lastUsersBook = this.lastBookDao.getLastBook(+userId);
+                if (Number.isNaN(lastUsersBook)) {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.send(JSON.stringify(lastUsersBook));
+                    //res.json(lastUsersBook);
+                } else {
+                    // Sql Err
+                    let reqError = functions.getRequestError(lastUsersBook);
+                    res.status(reqError.code)
+                        .send(reqError.text);
+                }
+            } else {
+                res.status(400)        // HTTP status 400: BadRequest
                 .send('Missed Id');
             }
         });
-      }
+    }
 
-      insertOne(app, db)
-      {
-        app.post('/ultimo', function (req, res) {
-            var ultimo = req.body.ultimo;
-            console.log("Estoy insertando categoria de usuario" + ultimo);     
-            if (ultimo)
-            {
-                console.log("Estoy insertando categoria de usuario" + ultimo); 
-                for (var i in ultimo) {
-                    console.log(ultimo[i]);
+    insertOrUpdateOne(app) {
+        app.post('/lastBook', middleware.verifyToken, function (req, res) {
+            let lastBook = req.body.lastBook;
+            console.log("Estoy insertando lastBook de usuario" + lastBook);     
+            if (lastBook && lastBook.userId && lastBook.bookId) {
+                let newlastBookId = this.lastBookDao.addOrUpdateBook(+lastBook.userId, +lastBook.bookId);
+                if (Number.isInteger(newlastBookId) && newlastBookId > 0) {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.status(200).json(newlastBookId);
+                } else {
+                    let reqError = functions.getRequestError(newlastBookId);
+                    res.status(reqError.code)        
+                        .send(reqError.text);
                 }
-        
-                var con = db.getConn(db.connect).then(function(response)
-                {
-                    var statement = "INSERT INTO ultimo VALUES (" + db.escape(ultimo.idUsuario) + ", " + 
-                    db.escape(ultimo.idLibro) + ", current_timestamp());";
-        
-                    response.query(statement, function (err, result) {
-                        response.release();
-                        if (err)
-                        {
-                            if (err.code == 'ER_DUP_ENTRY')
-                            {   
-                                console.log(err);
-                                res.status(206)        // HTTP status 206: Duplicated entry
-                                    .send('Duplicated Entry');
-                            } else
-                            {
-                                console.log(err);
-                                res.status(204)        // HTTP status 204: NotContent
-                                .send('Failed at consult');
-                            }
-                        } else {
-                            res.setHeader('Content-Type', 'application/json');
-                            res.status(200).json(result.affectedRows);
-                        }
-                });
-                }, function (error)
-                {
-                    console.log(error);
-                    res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
-                      .send('Not DB connection');
-                });
+            } else {
+                res.status(400)        // HTTP status 400: BadRequest
+                    .send('Missed Data');
             }
        });
-      }
-    
-      deleteOne(app, db)
-      {
-        app.delete('/ultimo', function (req, res) {
-          var idToDelte = req.body.id;
-          console.log("Estoy deleteando " + idToDelte);
-          var con = db.getConn(db.connect).then(function(response)
-          {
-            var statement = "DELETE FROM ultimo WHERE Usuario_idUsuario = " + db.escape(idToDelte) + ";";
-            
-            response.query(statement, function (err, result) {
-              response.release();
-              if (err)
-              {
-                console.log(err);
-                res.status(204)        // HTTP status 204: NotContent
-                  .send('Failed at consult');
-              } else {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(200).json(result.affectedRows);
-              }
-            });
-          }, function (error)
-          {
-            console.log(error);
-            res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
-              .send('Not DB connection');
-          });
-       });
-     };
-    
     }
     
-    module.exports = UtimoProvider;
+    deleteOne(app) {
+        app.delete('/lastBook', function (req, res) {
+            let lastBookId = req.body.id;
+            console.log("Estoy deleteando " + lastBookId);
+            if (lastBookId) {
+                let oldLastBookId = this.bookDao.deleteLastBook(+lastBookId);
+                if (Number.isInteger(oldLastBookId) && oldLastBookId > 0) {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.status(200).json(oldLastBookId);
+                } else {
+                    let reqError = functions.getRequestError(oldLastBookId);
+                    res.status(reqError.code)        // HTTP status 204: NotContent
+                        .send(reqError.text);
+                }
+            } else {
+                res.status(400)        // HTTP status 400: BadRequest
+                    .send('Missed Data');
+            }
+        });
+    };
+    
+}
+    
+module.exports = LastBookProvider;
     

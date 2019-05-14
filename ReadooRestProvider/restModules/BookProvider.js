@@ -41,10 +41,10 @@ class LibroProvider {
 
     getBookCover(app) {
         app.get('/book/cover/:cover', function (req, res) {
-            var coverName = req.params.cover;
+            let coverName = req.params.cover;
             console.log("Estoy getteando Portada" + nombrePortada);
             if (!coverName) {
-            var coverFile = path.resolve('./ReadooRestProvider/Uploads/coverPages/' + coverName);
+            let coverFile = path.resolve('./ReadooRestProvider/Uploads/coverPages/' + coverName);
             if (coverFile) {
                 res.sendfile(coverFile);
             }
@@ -54,7 +54,7 @@ class LibroProvider {
                 .send('No archive found!');
             }
             } else {
-            res.status(404)        // HTTP status 400: BadRequest
+            res.status(400)        // HTTP status 400: BadRequest
                 .send('Missed Id!');
             }
         });
@@ -65,22 +65,23 @@ class LibroProvider {
             let books = this.bookDao.getAllBook();
             if (Number.isNaN(books)) {
                 res.setHeader('Content-Type', 'application/json');
-                res.send(JSON.stringify(result));
-                //res.json(result);
+                res.send(JSON.stringify(books));
+                //res.json(books);
             } else {
                 // Sql Err
                 let reqError = functions.getRequestError(books);
-                res.status(reqError.code)        // HTTP status 204: NotContent
+                res.status(reqError.code)
                     .send(reqError.text);
             }
         });
-  }
+    }
 
     getBunch(app) {
         app.post('/book', middleware.verifyToken, function (req, res) {
             let lastOne = req.body.last;
             console.log("Deberia cojer n libros " + ultlastOneimo);
-        if (lastOne) {
+        if (lastOne && lastOne.userId && lastOne.lastBookId && lastOne.genres
+                && lastOne.lastDate && lastOne.nBooks) {
             let userId = lastOne.userId;
             let lastBookId = lastOne.lastBookId;
             let genres = lastOne.genres;
@@ -106,31 +107,36 @@ class LibroProvider {
                 res.status(200).json(toReturn);
             } else {
                 let reqError = functions.getRequestError(bunch);
-                res.status(reqError.code)        // HTTP status 204: NotContent
+                res.status(reqError.code) 
                     .send(reqError.text);
                 }
+            } else {
+                res.status(400)        // HTTP status 400: BadRequest
+                    .send('Missed Id');
             }
         });
     }
 
     insertOne(app) {
         app.post('/newBook', [middleware.verifyToken, upload.single('portada')], function (req, res) { // TODO: have a look to multiple middleware
-        console.log("Estoy insertando libro");
+            console.log("Estoy insertando libro");
+            let bookInfo = req.body;
+            if (bookInfo && bookInfo.bookTitle && bookInfo.bookAuthor && bookInfo.bookDescription && bookInfo.bookReview
+                    && bookInfo.bookCoverUrl && bookInfo.userId && bookInfo.genreId) {
+                let newBookId = this.bookDao.addBook(bookInfo.bookTitle, bookInfo.bookAuthor, bookInfo.bookDescription, bookInfo.bookReview,
+                    bookInfo.bookCoverUrl, bookInfo.userId, bookInfo.genreId);
 
-        let bookInfo = req.body;
-        if (bookInfo && bookInfo.bookTitle && bookInfo.bookAuthor && bookInfo.bookDescription && bookInfo.bookReview
-                && bookInfo.bookCoverUrl && bookInfo.userId && bookInfo.genreId) {
-            let newBookId = this.bookDao.addBook(bookInfo.bookTitle, bookInfo.bookAuthor, bookInfo.bookDescription, bookInfo.bookReview,
-                bookInfo.bookCoverUrl, bookInfo.userId, bookInfo.genreId);
-
-            if (Number.isInteger(newBookId) && newBookId > 0) {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(200).json(newBookId);
-            } else {
-                let reqError = functions.getRequestError(newBookId);
-                res.status(reqError.code)        // HTTP status 204: NotContent
-                    .send(reqError.text);
+                if (Number.isInteger(newBookId) && newBookId > 0) {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.status(200).json(newBookId);
+                } else {
+                    let reqError = functions.getRequestError(newBookId);
+                    res.status(reqError.code)        
+                        .send(reqError.text);
                 }
+            } else {
+                res.status(400)        // HTTP status 400: BadRequest
+                    .send('Missed Id');
             }
         });
     }
@@ -142,20 +148,22 @@ class LibroProvider {
         let bookId = req.body.id;
         if (bookId) {
             let oldBookId = this.bookDao.dissableBook(bookId);
-
             if (Number.isInteger(oldBookId) && oldBookId > 0) {
                 res.setHeader('Content-Type', 'application/json');
                 res.status(200).json(oldBookId);
             } else {
                 let reqError = functions.getRequestError(oldBookId);
-                res.status(reqError.code)        // HTTP status 204: NotContent
+                res.status(reqError.code) 
                     .send(reqError.text);
                 }
+            } else {
+                res.status(400)
+                    .send('Missed Id');
             }
         });
     }
 
-    deleteOne(app, db) {
+    deleteOne(app) {
         app.delete('/commentary', function (req, res) {
             console.log("Estoy deleteando " + req.body.id);
             let bookId = req.body.id;
@@ -166,9 +174,12 @@ class LibroProvider {
                     res.status(200).json(oldBookId);
                 } else {
                     let reqError = functions.getRequestError(oldBookId);
-                    res.status(reqError.code)        // HTTP status 204: NotContent
+                    res.status(reqError.code)
                         .send(reqError.text);
                 }
+            } else {
+                res.status(400)        // HTTP status 400: BadRequest
+                    .send('Missed Id');
             }
         });
     };

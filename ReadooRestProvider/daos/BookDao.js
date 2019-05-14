@@ -1,7 +1,7 @@
 const queries = require('../queries/bookQueries');
 const DaoManager = require('./DaoManager');
 
-class BookDao extends DaoManager{
+class BookDao extends DaoManager {
     
     constructor(db) {
         super(db);

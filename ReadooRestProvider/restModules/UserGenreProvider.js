@@ -1,161 +1,100 @@
-//IF NEDED...   const mysql = require('mysql');
+const middleware = require('./middlewares');
+const UserGenreDao = require('../daos/UserGenreDao');
 
-class UsuarioCategoriaProvider {
-    
-      constructor(app, db)
-      {
-        this.getAll(app,db);    //Get
-        this.getOne(app, db); //Get
-        this.deleteOne(app, db);  //Delete
-        this.insertOne(app, db); // Post
-      }
-    
-      getAll(app, db)
-      {
-        app.get('/usuariocategoria', function (req, res) {
-          var con = db.getConn(db.connect).then(function(response)
-          {
-            response.query("SELECT * FROM usuario_categoria", function (err, result, fields) {
-              response.release();
-              if (err)
-              {
-                console.log(err);
-                res.status(204)        // HTTP status 204: NotContent
-                  .send('Failed at consult');
-              } else {
+class UserGenreProvider {
+
+    userGenreDao = null;
+
+    constructor(app, db) {
+        this.userGenreDao = new UserGenreDao(db);
+        this.getAll(app);           //Get
+        this.getOne(app);           //Get
+        this.deleteOne(app);        //Delete
+        this.insertOrUpdate(app);   // Post
+    }
+
+    getAll(app) {
+        app.get('/userGenre', function (req, res) {
+            let userGenres = this.userGenreDao.getAllUserGenre();
+            if (Number.isNaN(userGenres)) {
                 res.setHeader('Content-Type', 'application/json');
-                res.send(JSON.stringify(result));
-                //res.json(result);
-              }
-            });
-          }, function (error)
-          {
-            console.log(error);
-            res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
-              .send('Not DB connection');
-          });
+                res.send(JSON.stringify(userGenres));
+                //res.json(userGenres);
+            } else {
+                // Sql Err
+                let reqError = functions.getRequestError(userGenres);
+                res.status(reqError.code)
+                    .send(reqError.text);
+            }
         });
-      }
+    }
 
-      getOne(app, db)
-      {
-        app.get('/usuariocategoria/:id', function (req, res) 
-        {
-            var idusuario = req.params.id;
-            console.log("Estoy getteando " + idusuario);     
-            if (idusuario)
+    getOne(app) {
+        app.get('/userGenre/:id', middleware.verifyToken, function (req, res) {
+            let userId = req.params.id;
+            console.log("Estoy getteando " + userId);
+            if (userId)
             {
-                var con = db.getConn(db.connect).then(function(response)
-                {
-                    response.query("SELECT * FROM usuario_categoria WHERE Usuario_idUsuario =" + db.escape(idusuario) + ";", function (err, result, fields) {
-                    response.release();
-                    if (err)
-                    {
-                        console.log(err);
-                        res.status(204)        // HTTP status 204: NotContent
-                        .send('Failed at consult');
-                    } else {
-                        res.setHeader('Content-Type', 'application/json');
-                        res.send(JSON.stringify(result));
-                        //res.json(result);
-                    }
-                    });
-                }, function (error)
-                {
-                    console.log(error);
-                    res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
-                      .send('Not DB connection');
-                });
-            } else
-            {
-                res.status(404)        // HTTP status 400: BadRequest
+                let usersGenres = this.userGenreDao.oneUsersGenres(+userId);
+                if (Number.isNaN(usersGenres)) {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.send(JSON.stringify(usersGenres));
+                    //res.json(usersGenres);
+                } else {
+                    // Sql Err
+                    let reqError = functions.getRequestError(usersGenres);
+                    res.status(reqError.code)
+                        .send(reqError.text);
+                }
+            } else {
+                res.status(400)        // HTTP status 400: BadRequest
                 .send('Missed Id');
             }
         });
-      }
-
-      insertOne(app, db)
-      {
-        app.post('/usuariocategoria', function (req, res) {
-            var usuariocategoria = req.body.usuariocategoria;
-            console.log("Estoy insertando categoria de usuario" + usuariocategoria);     
-            if (usuariocategoria)
-            {
-                console.log("Estoy insertando categoria de usuario" + usuariocategoria); 
-                for (var i in usuariocategoria) {
-                    console.log(usuariocategoria[i]);
-                }
-        
-                usuariocategoria.idCategoria.forEach(idsCategoria => {
-                var con = db.getConn(db.connect).then(function(response)
-                {
-                    var statement = "INSERT INTO usuario_categoria VALUES (" + db.escape(usuariocategoria.idUsuario) + ", " + 
-                    db.escape(idsCategoria) + ");";
-        
-                    response.query(statement, function (err, result) {
-                        response.release();
-                        if (err)
-                        {
-                            if (err.code == 'ER_DUP_ENTRY')
-                            {   
-                                console.log(err);
-                                res.status(206)        // HTTP status 206: Duplicated entry
-                                    .send('Duplicated Entry');
-                            } else
-                            {
-                                console.log(err);
-                                res.status(204)        // HTTP status 204: NotContent
-                                .send('Failed at consult');
-                            }
-                        } else {
-                            res.setHeader('Content-Type', 'application/json');
-                            res.status(200).json(result.affectedRows);
-                        }
-                });
-                }, function (error)
-                {
-                    console.log(error);
-                    res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
-                      .send('Not DB connection');
-                });
-              });
-            }
-       });
-      }
-    
-      deleteOne(app, db)
-      {
-        app.delete('/usuariocategoria', function (req, res) {
-          var usuariocategoria = req.body.usuariocategoria;
-          console.log("Estoy deleteando " + usuariocategoria);
-          var con = db.getConn(db.connect).then(function(response)
-          {
-            var statement = "DELETE FROM usuario_categoria WHERE Usuario_idUsuario = " + 
-            db.escape(usuariocategoria.idUsuario) /*+ " AND Categoria_idCategoria = " + 
-            usuariocategoria.idCategoria */+ ";";
-
-            response.query(statement, function (err, result) {
-              response.release();
-              if (err)
-              {
-                console.log(err);
-                res.status(204)        // HTTP status 204: NotContent
-                  .send('Failed at consult');
-              } else {
-                res.setHeader('Content-Type', 'application/json');
-                res.status(200).json(result.affectedRows);
-              }
-            });
-          }, function (error)
-          {
-            console.log(error);
-            res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
-              .send('Not DB connection');
-          });
-       });
-     };
-    
     }
-    
-    module.exports = UsuarioCategoriaProvider;
-    
+
+    insertOrUpdate(app) {
+        app.post('/userGenre', middleware.verifyToken, function (req, res) {
+            let userGenre = req.body.userGenre;
+            console.log("Estoy insertando categoria de usuario" + userGenre);
+            if (userGenre && userGenre.userId && userGenre.genreIds) {
+                let newUserGenreId = this.userGenreDao.updateGenres(+userGenre.userId, userGenre.genreIds);
+                if (Number.isInteger(newUserGenreId) && newUserGenreId > 0) {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.status(200).json(newUserGenreId);
+                } else {
+                    let reqError = functions.getRequestError(newUserGenreId);
+                    res.status(reqError.code)        
+                        .send(reqError.text);
+                }
+            } else {
+                res.status(400)        // HTTP status 400: BadRequest
+                    .send('Missed Id');
+            }
+        });
+    }
+
+    deleteOne(app, db) {
+        app.delete('/userGenre', middleware.verifyToken, function (req, res) {
+            let userId = req.body.userId;
+            console.log("Estoy deleteando " + userId);
+            if (userId) {
+                let oldUserGenreId = this.userGenreDao.deleteUserGenres(+userId);
+                if (Number.isInteger(oldUserGenreId) && oldUserGenreId > 0) {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.status(200).json(oldUserGenreId);
+                } else {
+                    let reqError = functions.getRequestError(oldUserGenreId);
+                    res.status(reqError.code)
+                        .send(reqError.text);
+                }
+            } else {
+                res.status(400)        // HTTP status 400: BadRequest
+                    .send('Missed Id');
+            }
+        });
+    }
+
+}
+
+module.exports = UserGenreProvider;
