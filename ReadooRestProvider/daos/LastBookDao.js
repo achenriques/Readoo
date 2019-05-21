@@ -1,4 +1,4 @@
-const queries = require('../queries/bookQueries');
+const queries = require('../queries/lastBookQueries');
 const DaoManager = require('./DaoManager');
 
 class LastBookDao extends DaoManager {

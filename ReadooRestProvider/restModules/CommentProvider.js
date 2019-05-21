@@ -21,7 +21,7 @@ class CommentProvider {
     getAll(app)
     {
         app.get('/commentary', function (req, res) {
-            let commentaries = this.bookDao.getAllBook();
+            let commentaries = this.commentDao.getAllCommentary();
             if (Number.isNaN(commentaries)) {
                 res.setHeader('Content-Type', 'application/json');
                 res.send(JSON.stringify(commentaries));
@@ -35,10 +35,8 @@ class CommentProvider {
         });
     }
 
-    getOne(app)
-    {
-        app.get('/commentary/:id', middleware.verifyToken, function (req, res) 
-        {
+    getOne(app) {
+        app.get('/commentary/:id', middleware.verifyToken, function (req, res) {
             let bookId = req.params.id;
             console.log("Estoy getteando " + bookId);     
             if (bookId) {
@@ -56,10 +54,8 @@ class CommentProvider {
         });
     }
 
-    getSubs(app)
-    {
-        app.get('/commentary/:id/:commentId', middleware.verifyToken, function (req, res) 
-        {
+    getSubs(app) {
+        app.get('/commentary/:id/:commentId', middleware.verifyToken, function (req, res) {
             let bookId = req.params.id;
             let fatherCommentId = req.params.commentId;
             console.log("Estoy getteando " + bookId);     

@@ -1,22 +1,22 @@
 const middleware = require('./middlewares');
-const UserReportsBookDao = require('../daos/UserReportsBookDao');
+const UserReportsCommentDao = require('../daos/UserReportsCommentaryDao');
 
-class UserReportsBookProvider {
+class UserReportsCommentaryProvider {
     
-    userReportsBookDao = null;
+    userReportsCommentDao = null
 
     constructor(app, db)
     {
-        this.userReportsBookDao = new UserReportsBookDao(db);
-        this.getAll(app);        //Get
+        this.userReportsCommentDao = new UserReportsCommentDao(db);
+        this.getAll(app);       //Get
         this.getOne(app);       //Get
         this.deleteOne(app);    //Delete
         this.insertOne(app);    // Post
     }
 
     getAll(app) {
-        app.get('/userReportsBook', function (req, res) {
-            let reports = this.userReportsBookDao.getAllReports();
+        app.get('/userReportsCommentary', function (req, res) {
+            let reports = this.userReportsCommentDao.getAllReports();
             if (Number.isNaN(reports)) {
                 res.setHeader('Content-Type', 'application/json');
                 res.send(JSON.stringify(reports));
@@ -31,11 +31,11 @@ class UserReportsBookProvider {
     }
 
     getOne(app) {
-        app.get('/userReportsBook/:id', function (req, res) {
+        app.get('/userReportsCommentary/:id', function (req, res) {
             let reportId = req.params.id;
             console.log("Estoy getteando " + reportId);     
             if (reportId) {
-                let report = this.userReportsBookDao.getOneReport(+reportId);
+                let report = this.userReportsCommentDao.getOneReport(+reportId);
                 if (Number.isNaN(report)) {
                     res.setHeader('Content-Type', 'application/json');
                     res.send(JSON.stringify(report));
@@ -54,11 +54,11 @@ class UserReportsBookProvider {
     }
 
     insertOne(app) {
-        app.post('/userReportsBook', middleware.verifyToken, function (req, res) {
+        app.post('/userReportsCommentary', function (req, res) {
             let report = req.body.report;
             console.log("Estoy insertando reporte " + report);     
-            if (report && report.userId && report.bookId && report.reportText) {   
-                let newReportId = this.userReportsBookDao.addOneReport(+report.userId, +report.bookId, report.reportText.trim());
+            if (report && report.userId && report.commentId && report.reportText) {   
+                let newReportId = this.userReportsCommentDao.addOneReport(+report.userId, +report.commentId, report.reportText.trim());
                 if (Number.isInteger(newReportId) && newReportId > 0) {
                     res.setHeader('Content-Type', 'application/json');
                     res.status(200).json(newReportId);
@@ -75,12 +75,12 @@ class UserReportsBookProvider {
     }
 
     deleteOne(app) {
-        app.delete('/userReportsBook', middleware.verifyToken, function (req, res) {
-        let idToDeleteUser = req.body.userId;
-        let idToDeleteBook = req.body.bookId;          
-        console.log("Estoy deleteando " + idToDeleteUser + " - " + idToDeleteBook);
-        if (idToDeleteUser && idToDeleteBook) {
-            let oldReportId = this.userReportsBookDao.deleteOneReport(+idToDeleteUser, +idToDeleteBook);
+        app.delete('/userReportsCommentary', middleware.verifyToken, function (req, res) {
+            let idToDeleteUser = req.body.userId;
+            let idToDeleteCommentary = req.body.commentId;          
+            console.log("Estoy deleteando " + idToDeleteUser + " - " + idToDeleteCommentary);
+            if (idToDeleteUser && idToDeleteCommentary) {
+                let oldReportId = this.userReportsCommentDao.deleteOneReport(+idToDeleteUser, +idToDeleteCommentary);
                 if (Number.isInteger(oldReportId) && oldReportId > 0) {
                     res.setHeader('Content-Type', 'application/json');
                     res.status(200).json(oldReportId);
@@ -94,7 +94,8 @@ class UserReportsBookProvider {
                     .send('Missed data');
             }
         });
-    }
+    };
 }
 
-module.exports = UserReportsBookProvider;
+module.exports = UserReportsCommentaryProvider;
+    

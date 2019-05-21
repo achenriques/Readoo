@@ -8,7 +8,7 @@ class UserLikesBookProvider {
     constructor(app, db) {
         this.userLikesBookDao = new UserLikesBookDao(db);
         this.getAll(app);           //Get
-        this.getOneUser(app);       //Get
+        this.getOne(app);       //Get
         this.getOneLike(app);       //Get
         this.modifyOne(app);        //Put Probablemente inutil. Solo borrado o insert
         this.insertOrUpdate(app);   // Post

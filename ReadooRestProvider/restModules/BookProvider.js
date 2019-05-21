@@ -3,17 +3,17 @@ const path = require('path');
 const encoder64 = require('../Util/functions');
 const functions = require('../util/functions');
 const middleware = require('./middlewares');
-const BookDao = require('../daos/LoginDao');
+const BookDao = require('../daos/BookDao');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './ReadooRestProvider/Uploads/Portadas')
     },
     filename: function (req, file, cb) {
-        var fileType = file.mimetype.split('/');
+        let fileType = file.mimetype.split('/');
         if (fileType && fileType[0] === 'image' &&
             (fileType[1] === 'jpg' || fileType[1] === 'jpeg' || fileType[1] === 'png' || fileType[1] === 'svg')) {
-            var fileName = 'User' + '-' + Date.now() + '.' + fileType[1];
+            let fileName = 'User' + '-' + Date.now() + '.' + fileType[1];
             cb(null, fileName) //TODO: cambiar por usuario actual
             req.body.coverUrl = fileName;
         } else {
@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
     }
 })
 
-var upload = multer({ storage: storage });
+const upload = multer({ storage: storage });
 
 class LibroProvider {
 
@@ -96,7 +96,7 @@ class LibroProvider {
             if (Number.isNaN(bunch)) {
                 let toRet = bunch.map(function (lib) {
                     if (lib.coverUrl.length != 0) {
-                        var archivo = path.resolve('./ReadooRestProvider/Uploads/coverPages/' + lib.coverUrl);
+                        let archivo = path.resolve('./ReadooRestProvider/Uploads/coverPages/' + lib.coverUrl);
                         if (archivo) {
                             lib.coverUrl = encoder64(archivo);
                         }
@@ -123,8 +123,8 @@ class LibroProvider {
             let bookInfo = req.body;
             if (bookInfo && bookInfo.bookTitle && bookInfo.bookAuthor && bookInfo.bookDescription && bookInfo.bookReview
                     && bookInfo.bookCoverUrl && bookInfo.userId && bookInfo.genreId) {
-                let newBookId = this.bookDao.addBook(bookInfo.bookTitle, bookInfo.bookAuthor, bookInfo.bookDescription, bookInfo.bookReview,
-                    bookInfo.bookCoverUrl, bookInfo.userId, bookInfo.genreId);
+                let newBookId = this.bookDao.addBook(bookInfo.bookTitle.trim(), bookInfo.bookAuthor.trim(), bookInfo.bookDescription.trim(), bookInfo.bookReview.trim(),
+                    bookInfo.bookCoverUrl.trim(), +bookInfo.userId, +bookInfo.genreId);
 
                 if (Number.isInteger(newBookId) && newBookId > 0) {
                     res.setHeader('Content-Type', 'application/json');

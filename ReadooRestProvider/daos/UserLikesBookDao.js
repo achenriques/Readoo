@@ -18,7 +18,7 @@ class UserLikesBookDao extends DaoManager{
     }
 
     oneUserBookLike(userId, bookId) {
-        let statement = queries.insertGenre;
+        let statement = queries.oneUserBookLike;
         return this.executeStatment(statement, [userId, bookId])
     }
 
@@ -32,8 +32,8 @@ class UserLikesBookDao extends DaoManager{
         return this.executeStatment(statement, [userId, bookId, likeBoolean]);
     }
 
-    deleteUserLikes(genreId, bookId) {
-        let statement = queries.deleteGenre;
+    deleteUserLikes(userId, bookId) {
+        let statement = queries.deleteUserLikes;
         return this.executeStatment(statement, [userId, bookId]);
     }        
 }
