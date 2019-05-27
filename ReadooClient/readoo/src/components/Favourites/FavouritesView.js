@@ -31,9 +31,9 @@ class FavouritesView extends Component {
         expanded: false,
         pagina: 0,
         total: 15,
-        filasPorPagina: constantes.FILAS_POR_PAGINA,
-        librosPorPagina: constantes.LIBROS_POR_PAGINA,
-        librosPorFila: constantes.LIBROS_POR_PAGINA / constantes.FILAS_POR_PAGINA,
+        filasPorPagina: constantes.ROWS_PER_PAGE,
+        librosPorPagina: constantes.BOOKS_PER_PAGE,
+        librosPorFila: constantes.BOOKS_PER_PAGE / constantes.ROWS_PER_PAGE,
         celdaLibroSeleccionado: null,
         libroSeleccionado: null
     };
@@ -45,105 +45,105 @@ class FavouritesView extends Component {
 
     librosExample = [
         {
-            idLibro: 12,
+            bookId: 12,
             autor: "Curro Jimenez",
             titulo: "Mil y una noches",
             opinion: "No muy bien",
             likes: 0, 
         },
         {
-            idLibro: 13,
+            bookId: 13,
             autor: "Curro Jimenez",
             titulo: "Mil y una noches",
             opinion: "No muy bien",
             likes: 1, 
         },
         {
-            idLibro: 14,
+            bookId: 14,
             autor: "Curro Jimenez",
             titulo: "Mil y una noches",
             opinion: "No muy bien",
             likes: 2, 
         },
         {
-            idLibro: 15,
+            bookId: 15,
             autor: "Curro Jimenez",
             titulo: "Mil y una noches",
             opinion: "No muy bien",
             likes: 3, 
         },
         {
-            idLibro: 16,
+            bookId: 16,
             autor: "Curro Jimenez",
             titulo: "Mil y una noches",
             opinion: "No muy bien",
             likes: 3, 
         },
         {
-            idLibro: 17,
+            bookId: 17,
             autor: "Curro Jimenez",
             titulo: "Mil y una noches",
             opinion: "No muy bien",
             likes: 3, 
         },
         {
-            idLibro: 18,
+            bookId: 18,
             autor: "Curro Jimenez",
             titulo: "Mil y una noches",
             opinion: "No muy bien",
             likes: 3, 
         },
         {
-            idLibro: 19,
+            bookId: 19,
             autor: "Curro Jimenez",
             titulo: "Mil y una noches",
             opinion: "No muy bien",
             likes: 3, 
         },
         {
-            idLibro: 22,
+            bookId: 22,
             autor: "Curro Jimenez",
             titulo: "Mil y una noches",
             opinion: "No muy bien",
             likes: 3, 
         },
         {
-            idLibro: 33,
+            bookId: 33,
             autor: "Curro Jimenez",
             titulo: "Mil y una noches",
             opinion: "No muy bien",
             likes: 3, 
         },
         {
-            idLibro: 34,
+            bookId: 34,
             autor: "Curro Jimenez",
             titulo: "Mil y una noches",
             opinion: "No muy bien",
             likes: 3, 
         },
         {
-            idLibro: 35,
+            bookId: 35,
             autor: "Curro Jimenez",
             titulo: "Mil y una noches",
             opinion: "No muy bien",
             likes: 3, 
         },
         {
-            idLibro: 36,
+            bookId: 36,
             autor: "Curro Jimenez",
             titulo: "Mil y una noches",
             opinion: "No muy bien",
             likes: 3, 
         },
         {
-            idLibro: 44,
+            bookId: 44,
             autor: "Curro Jimenez",
             titulo: "Mil y una noches",
             opinion: "No muy bien",
             likes: 3, 
         },
         {
-            idLibro: 54,
+            bookId: 54,
             autor: "Curro Jimenez",
             titulo: "Mil y una noches",
             opinion: "No muy bien",
@@ -153,7 +153,7 @@ class FavouritesView extends Component {
 
     // Ciclo de vida de react
     componentDidMount() {
-//        this.props.fetchLibros(0, [], true);
+//        this.props.fetchBooks(0, [], true);
     }
 
     componentWillReceiveProps(newProps) {
@@ -229,7 +229,7 @@ class FavouritesView extends Component {
 
     // likes sobre los libros
     handleLike(evt) {
-        if (!this.state.meGustaLibro) {
+        if (!this.state.likeLibro) {
             const cerrarCorazon = () => {
                 setTimeout(()=>{
                     this.setState(
@@ -237,7 +237,7 @@ class FavouritesView extends Component {
                             ...this.state,
                             libroActual: { ...this.state.libroActual, likes: this.state.libroActual.likes +1},
                             mostrarCorazon: 0,
-                            meGustaLibro: true,
+                            likeLibro: true,
                         }
                     )
                 }, 1000);
@@ -250,12 +250,12 @@ class FavouritesView extends Component {
                 }, cerrarCorazon
             )
     
-            // TODO: this.props.setLikeLibro(idLibro, true)
+            // TODO: this.props.setLikeLibro(bookId, true)
         }
     }
 
     handleUnlike(evt) {
-        if (this.state.meGustaLibro) {
+        if (this.state.likeLibro) {
             const cerrarCorazon = () => {
                 setTimeout(()=>{
                     this.setState(
@@ -263,7 +263,7 @@ class FavouritesView extends Component {
                             ...this.state,
                             libroActual: { ...this.state.libroActual, likes: this.state.libroActual.likes -1},
                             mostrarCorazon: 0,
-                            meGustaLibro: false
+                            likeLibro: false
                         }
                     )
                 }, 1000);
@@ -275,7 +275,7 @@ class FavouritesView extends Component {
                     mostrarCorazon: 2
                 }, cerrarCorazon
             )
-            // TODO: this.props.setLikeLibro(idLibro, false)
+            // TODO: this.props.setLikeLibro(bookId, false)
         }        
     }
 
@@ -286,11 +286,11 @@ class FavouritesView extends Component {
         })
     }
 
-    handleClickImagen(evt, numeroRecuadro, idLibro) {
+    handleClickImagen(evt, numeroRecuadro, bookId) {
         let nextState = {
             ...this.state, 
             celdaLibroSeleccionado: numeroRecuadro, 
-            libroSeleccionado: idLibro
+            libroSeleccionado: bookId
         };
 
         for (let i in nextState) {
@@ -299,7 +299,7 @@ class FavouritesView extends Component {
             }
         }
 
-        if (numeroRecuadro && idLibro) {
+        if (numeroRecuadro && bookId) {
             if (numeroRecuadro && !this.state[numeroRecuadro]) {
                 nextState[numeroRecuadro] = true;
             }
@@ -344,8 +344,8 @@ class FavouritesView extends Component {
                                 {data.slice(pagina * librosPorPagina, pagina * librosPorPagina + librosPorPagina).map((libro, index, lista) => {
                                     return (
                                         <div>
-                                            <GridListTile key={libro.idLibro} style={(!this.state[index])? material_styles.gridLibro: material_styles.gridLibroSeleccionado}>
-                                                <img style={material_styles.imagenesFavoritos} src={libroDefault} alt={libro.titulo} onClick={(evt) => this.handleClickImagen(evt, index, libro.idLibro)}/>
+                                            <GridListTile key={libro.bookId} style={(!this.state[index])? material_styles.grbookId: material_styles.grbookIdSeleccionado}>
+                                                <img style={material_styles.imagenesFavoritos} src={libroDefault} alt={libro.titulo} onClick={(evt) => this.handleClickImagen(evt, index, libro.bookId)}/>
                                                 <GridListTileBar
                                                 title={libro.titulo}
                                                 subtitle={<span>Escrito por: {libro.autor}</span>}
@@ -388,7 +388,7 @@ class FavouritesView extends Component {
                                 <h4 style={(data[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].opinion)? {marginBottom: '5px'}: {display: 'none'}}>Qué opina...</h4>
                                 {data[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].opinion}
                                 <Divider/>
-                                <CommentsGrid idLibro={this.state.libroSeleccionado} isFavorite={true}/>    
+                                <CommentsGrid bookId={this.state.libroSeleccionado} isFavorite={true}/>    
                             </div>
                             ) : (
                             <div>
@@ -411,7 +411,7 @@ export default connect(
         success_libro: appState.getLibroSuccess(state),
     }),
     (dispatch) => ({
-        //fetchLibrosPorGusto: (idUltimo, primeraVez) => dispatch(fetchLibrosPorGusto(idUltimo, primeraVez)),
-        //fetchLibrosPropios: (idUltimo, primeraVez) => dispatch(fetchLibrosPorGusto(idUltimo, primeraVez)),
+        //fetchBooksPorGusto: (lastBookId, primeraVez) => dispatch(fetchBooksPorGusto(lastBookId, primeraVez)),
+        //fetchBooksPropios: (lastBookId, primeraVez) => dispatch(fetchBooksPorGusto(lastBookId, primeraVez)),
     })
 )(FavouritesView);

@@ -2,12 +2,12 @@ import { combineReducers } from 'redux';
 import * as constantes from '../constants/appConstants';
 import noHayNada from '../resources/noHayNada.png';
 import sinRed from '../resources/sinRed.png';
-import { REST_DEFAULT, REST_SUCCESS, REST_FAILURE } from '../constants/appConstants';
+import { REST_DEFAULT, REST_SUCCESS, REST_FAILURE, LANGUAGE_ENGLISH, LANGUAGE_SPANISH } from '../constants/appConstants';
 
 import {
   // Las actions
-  DO_LOGIN, TAB_CHANGE, MODAL_ADD_LIBRO, UPLOAD_LIBRO, UPLOAD_LIBRO_200, UPLOAD_COMENTARIO_200, UPLOAD_USER_200, FETCH_CATEGORIAS,
-  PASAR_LIBRO, FETCH_LIBROS, FETCH_COMENTARIOS, ENVIAR_COMENTARIO, SET_ERROR_ENVIAR_COMENTARIO, ME_GUSTA_LIBRO,
+  DO_LOGIN, TAB_CHANGE, CHANGE_LANGUAGE, MODAL_ADD_BOOK, UPLOAD_BOOK, UPLOAD_BOOK_200, UPLOAD_COMMENT_200, UPLOAD_USER_200, FETCH_GENRES,
+  NEXT_BOOK, FETCH_LIBROS, FETCH_COMMENTARIES, ENVIAR_COMENTARIO, SET_ERROR_ENVIAR_COMENTARIO, I_LIKE_BOOK,
   FETCH_USER_DATA, SAVE_USER_DATA
 } from './actions';
 // Asi puedo tener varios modulos
@@ -21,69 +21,68 @@ const successType = (actionType) => `${actionType}_SUCCESS`;
  * crasheo de frontend a falta de la respuesta asíncrona de backend
  */
 const initialState = {
-  tabs: {
-    currentTabID: 0
-  },
-  dialogs: {
-    isOpenAddLibro: false,
-  },
-  user: {
-    id: '',
-    nick: '',
-    email: '',
-    nombre: '',
-    apellido: '',
-    avatar: '',
-    sobreMi: '',
-    pass: '',
-  },
-  libros: {
-    libroDefault: {
-      idLibro: -1,
-      titulo : 'Has explorados todos los libros de tus deseos.',
-      autor: 'Prueba a cambiar tus filtos en tu perfil de usuario.',
-      coverUrl: noHayNada,
-      descripcion: '',
-      review: '',
-      likes: 0
+    tabs: {
+        currentTabID: 0
     },
-    libroFailure: {
-      idLibro: -1,
-      titulo : 'Jope! Se ha producido un error de red...',
-      autor: 'Prueba a refrescar la aplicación o espera a que el problema se resuelva.',
-      coverUrl: sinRed,
-      descripcion: '',
-      review: '',
-      likes: 0
+    dialogs: {
+        isOpenAddLibro: false,
     },
-    libroActual: 0,
-    mostrados: [],
-    cargados: [],
-    success_fetch: true,
-  },
-  comentarios: {
-    comentariosLibro: [],
-  },
-  categorias: {
-    todas: [],
-    usuario_categorias: []
-  },
-  controllerStatus: {
-    uploadLibroSuccess: REST_DEFAULT,
-    cargandoComentarios: false,
-    fetchComentarioSuccess: REST_DEFAULT,
-    comentarioEnviado: false,
-    enviandoMeGusta: false,
-    fetchUserDataSuccess: REST_DEFAULT,
-    saveUserDataSuccess: REST_DEFAULT
-  },
-  filtros: [],
+    appLanguage: LANGUAGE_ENGLISH,
+    userIsLogged : false,
+    user: {
+        id: '',
+        nick: '',
+        email: '',
+        nombre: '',
+        apellido: '',
+        avatar: '',
+        sobreMi: '',
+        pass: '',
+        preferedLanguage: null
+    },
+    libros: {
+        libroDefault: {
+            bookId: -1,
+            titulo : 'Has explorados todos los libros de tus deseos.',
+            autor: 'Prueba a cambiar tus filtos en tu perfil de usuario.',
+            coverUrl: noHayNada,
+            descripcion: '',
+            review: '',
+            likes: 0
+        },
+        libroFailure: {
+            bookId: -1,
+            titulo : 'Jope! Se ha producido un error de red...',
+            autor: 'Prueba a refrescar la aplicación o espera a que el problema se resuelva.',
+            coverUrl: sinRed,
+            descripcion: '',
+            review: '',
+            likes: 0
+        },
+        libroActual: 0,
+        mostrados: [],
+        cargados: [],
+        success_fetch: true,
+    },
+    comentarios: {
+        comentariosLibro: [],
+    },
+    genres: {
+        todas: [],
+        usuario_categorias: []
+    },
+    controllerStatus: {
+        uploadLibroSuccess: REST_DEFAULT,
+        cargandoComentarios: false,
+        fetchComentarioSuccess: REST_DEFAULT,
+        comentarioEnviado: false,
+        enviandoMeGusta: false,
+        fetchUserDataSuccess: REST_DEFAULT,
+        saveUserDataSuccess: REST_DEFAULT
+    },
+    filtros: [],
 }
 
-/**
- * El reducer de pestañas concierne a estas mismas de manera que se encarga entre otras cosas de recibir los datos de éstas desde backend
- * y de gestionar la navegación entre ellas
- */
 const tabs = (state = initialState.tabs, { type, payload, data }) => {
   switch (type) {
     case TAB_CHANGE:
@@ -98,18 +97,32 @@ const tabs = (state = initialState.tabs, { type, payload, data }) => {
   }
 }
 
-const dialogs = (state = initialState.dialogs, { type, payload, data }) => {
-  switch (type) {
-    case MODAL_ADD_LIBRO:
-      console.log('abro modal: ' + payload.isOpen)
-      return {
-        ...state,
-        isOpenAddLibro: payload.isOpen,
-      }
+const language = (state = initialState, { type, payload, data }) => {
+    switch (type) {
+        case CHANGE_LANGUAGE:
+            console.log('CHANGE_LANGUAGE');
+            return {
+                ...state,
+                appLanguage: payload.languageCode
+            };
+  
+      default:
+        return state;
+    }
+}
 
-    default:
-      return state;
-  }
+const dialogs = (state = initialState.dialogs, { type, payload, data }) => {
+    switch (type) {
+        case MODAL_ADD_BOOK:
+        console.log('abro modal: ' + payload.isOpen)
+        return {
+            ...state,
+            isOpenAddLibro: payload.isOpen,
+        }
+
+        default:
+        return state;
+    }
 }
 
 /**
@@ -117,31 +130,31 @@ const dialogs = (state = initialState.dialogs, { type, payload, data }) => {
  * secciones de la aplicacion
  **/
 const user = (state = initialState.user, { type, payload, data }) => {
-  switch (type) {
-    case successType(DO_LOGIN):
-      console.log(DO_LOGIN);
-      return {
-        ...state,
-        id: data._id,
-        nick: data.nick
-      }
+    switch (type) {
+        case successType(DO_LOGIN):
+            console.log(DO_LOGIN);
+            return {
+                ...state,
+                id: data._id,
+                nick: data.nick
+            }
 
-    case successType(FETCH_USER_DATA):
-      console.log(FETCH_USER_DATA)
-      return {
-        ...state,
-        nick: data.nick,
-        email: data.email,
-        nombre: data.nombre,
-        apellido: data.apellido,
-        avatar: data.avatar,
-        sobreMi: data.sobreMi,
-        pass: data.pass
-      }
+        case successType(FETCH_USER_DATA):
+            console.log(FETCH_USER_DATA)
+            return {
+                ...state,
+                nick: data.nick,
+                email: data.email,
+                nombre: data.nombre,
+                apellido: data.apellido,
+                avatar: data.avatar,
+                sobreMi: data.sobreMi,
+                pass: data.pass
+            }
 
-    default:
-      return state
-  }
+        default:
+            return state;
+    }
 }
 
 /**
@@ -149,8 +162,8 @@ const user = (state = initialState.user, { type, payload, data }) => {
  */
 const libros = (state = initialState.libros, { type, payload, data }) => {
   switch (type) {
-    case PASAR_LIBRO:
-      console.log(PASAR_LIBRO + ': ' + state.libroActual + '- m:' + state.mostrados.length + '- c' + state.cargados.length);
+    case NEXT_BOOK:
+      console.log(NEXT_BOOK + ': ' + state.libroActual + '- m:' + state.mostrados.length + '- c' + state.cargados.length);
       console.log(state.mostrados);
       console.log(state.cargados);
 
@@ -163,7 +176,7 @@ const libros = (state = initialState.libros, { type, payload, data }) => {
       }
 
       if (state.libroActual + 1 === state.mostrados.length
-        && state.mostrados.length === constantes.NUM_LIBROS) 
+        && state.mostrados.length === constantes.NUM_OF_BOOKS) 
       {
         toRet = {
           ...state,
@@ -173,7 +186,7 @@ const libros = (state = initialState.libros, { type, payload, data }) => {
       }
 
       if (state.libroActual + 1 === state.mostrados.length
-        && state.mostrados.length < constantes.NUM_LIBROS) 
+        && state.mostrados.length < constantes.NUM_OF_BOOKS) 
       {
         toRet = {
           ...state,
@@ -183,8 +196,8 @@ const libros = (state = initialState.libros, { type, payload, data }) => {
       }
       return toRet;
 
-    case successType(ME_GUSTA_LIBRO):
-      console.log(ME_GUSTA_LIBRO);
+    case successType(I_LIKE_BOOK):
+      console.log(I_LIKE_BOOK);
       // No necesito hacer nada para mantener el estado visualmente
       // Si llega a base de datos bien y sino en la proxinma recarga se perderá
       // en olvido.
@@ -223,8 +236,8 @@ const libros = (state = initialState.libros, { type, payload, data }) => {
 
 const comentarios = (state = initialState.comentarios, { type, payload, data }) => {
   switch (type) {
-    case successType(FETCH_COMENTARIOS):
-      console.log(successType(FETCH_COMENTARIOS));
+    case successType(FETCH_COMMENTARIES):
+      console.log(successType(FETCH_COMMENTARIES));
       return {
         ...state,
         comentariosLibro: data.data,
@@ -236,19 +249,19 @@ const comentarios = (state = initialState.comentarios, { type, payload, data }) 
 }
 
 /**
- * Reducer para las categorias a mostrar y operaciones de las mismas
+ * Reducer para las genres a mostrar y operaciones de las mismas
  */
-const categorias = (state = initialState.libros, { type, payload, data }) => {
+const genres = (state = initialState.libros, { type, payload, data }) => {
   switch (type) {
-    case successType(FETCH_CATEGORIAS):
-      console.log(successType(FETCH_CATEGORIAS));
+    case successType(FETCH_GENRES):
+      console.log(successType(FETCH_GENRES));
       return {
         ...state,
         todas: data.data,
       }
 
-    case failureType(FETCH_CATEGORIAS):
-      console.log(failureType(FETCH_CATEGORIAS));
+    case failureType(FETCH_GENRES):
+      console.log(failureType(FETCH_GENRES));
       return {
         ...state,
         todas: null,
@@ -264,37 +277,37 @@ const categorias = (state = initialState.libros, { type, payload, data }) => {
  */
 const controllerStatus = (state = initialState.controllerStatus, { type, payload, data }) => {
   switch (type) {
-    case successType(UPLOAD_LIBRO):
-      console.log(successType(UPLOAD_LIBRO));
+    case successType(UPLOAD_BOOK):
+      console.log(successType(UPLOAD_BOOK));
       return {
         ...state,
         uploadLibroSuccess: constantes.REST_SUCCESS,
       }
 
-    case failureType(UPLOAD_LIBRO):
-      console.log(failureType(UPLOAD_LIBRO));
+    case failureType(UPLOAD_BOOK):
+      console.log(failureType(UPLOAD_BOOK));
       return {
         ...state,
         uploadLibroSuccess: constantes.REST_FAILURE,
       }
 
-    case UPLOAD_LIBRO_200:
-      console.log(UPLOAD_LIBRO_200);
+    case UPLOAD_BOOK_200:
+      console.log(UPLOAD_BOOK_200);
       return {
         ...state,
         uploadLibroSuccess: constantes.REST_DEFAULT,
       }
 
-    case successType(FETCH_COMENTARIOS):
-      console.log(successType(FETCH_COMENTARIOS));
+    case successType(FETCH_COMMENTARIES):
+      console.log(successType(FETCH_COMMENTARIES));
       return {
         ...state,
         fetchComentarioSuccess: REST_SUCCESS,
         comentariosError: false,
       }
 
-  case failureType(FETCH_COMENTARIOS):
-      console.log(failureType(FETCH_COMENTARIOS));
+  case failureType(FETCH_COMMENTARIES):
+      console.log(failureType(FETCH_COMMENTARIES));
       return {
         ...state,
         fetchComentarioSuccess: REST_FAILURE
@@ -307,8 +320,8 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
         comentarioEnviado: constantes.REST_FAILURE,
       }
 
-    case UPLOAD_COMENTARIO_200:
-      console.log(UPLOAD_COMENTARIO_200);
+    case UPLOAD_COMMENT_200:
+      console.log(UPLOAD_COMMENT_200);
       return {
         ...state,
         comentarioEnviado: constantes.REST_DEFAULT,
@@ -344,19 +357,19 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
         fetchUserDataSuccess: REST_FAILURE
       }
 
-    case loadingType(ME_GUSTA_LIBRO):
+    case loadingType(I_LIKE_BOOK):
       return {
         ...state,
         enviandoMeGusta: true
       }
     
-    case successType(ME_GUSTA_LIBRO):
+    case successType(I_LIKE_BOOK):
       return {
         ...state,
         enviandoMeGusta: false
       }
       
-    case failureType(ME_GUSTA_LIBRO):
+    case failureType(I_LIKE_BOOK):
       return {
         ...state,
         enviandoMeGusta: false
@@ -372,10 +385,11 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
  */
 export default combineReducers({
   tabs,
+  language,
   dialogs,
   libros,
   comentarios,
-  categorias,
+  genres,
   controllerStatus
 })
 
@@ -384,14 +398,17 @@ export default combineReducers({
  * Es de extrema importancia cercionarse de que aquellas funciones que fueran a retornar arrays u objetos cuyos atributos fueran a ser
  * accedidos devuelvan valores por defecto para evitar crashes que no vengan a cuento. Curémonos en salud
  */
+export const getUserIsLogged = (state) => state.userIsLogged;
+export const getAppLanguage = (state) => state.appLanguage;
+export const getUserLanguage = (state) => state.user.preferedLanguage;
 export const getCurrentTabID = (state) => state.tabs.currentTabID;
 export const getIsOpenModal = (state) => state.dialogs;
 export const getUserId = (state) => state.user.id;
 export const getUser = (state) => state.user;
 export const libroSuccessUpload = (state) => state.controllerStatus.uploadLibroSuccess;
 export const getComentarioEnviado = (state) => state.controllerStatus.comentarioEnviado;
-export const allCategorias = (state) => state.categorias.todas;
-export const usuarioCategorias = (state) => state.categorias.usuario_categorias;
+export const allCategorias = (state) => state.genres.todas;
+export const usuarioCategorias = (state) => state.genres.usuario_categorias;
 export const getIndiceLibro = (state) => state.libros.libroActual;
 export const getLibroSuccess = (state) => state.libros.success_fetch;
 export const getLibros = (state) => state.libros.mostrados;

@@ -1,5 +1,5 @@
 const middleware = require('./middlewares');
-const UserDao = require('../daos/LoginDao');
+const UserDao = require('../daos/UserDao');
 
 class UserProvider {
     

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { setIsOpenAddLibro, uploadLibro, fetchCategorias } from '../../app_state/actions';
+import { setIsOpenAddBook, uploadLibro, fetchGenres } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -62,7 +62,7 @@ class SubirLibroModal extends Component {
     constructor(props) {
         super(props);
         this.state = { ...this.initialState };
-        props.fetchCategorias();
+        props.fetchGenres();
     };
 
     // CICLO DE VIDA
@@ -74,8 +74,8 @@ class SubirLibroModal extends Component {
             })
         }
 
-        if (nextProps.categorias) {
-            let menuItems = nextProps.categorias.map((i) => {
+        if (nextProps.genres) {
+            let menuItems = nextProps.genres.map((i) => {
                 return <MenuItem key={i.idCategoria} value={i.idCategoria} primaryText={i.tipo} />;
             });
             this.categoria_items = menuItems;
@@ -344,11 +344,11 @@ export default connect(
         isOpenModal: appState.getIsOpenModal(state).isOpenAddLibro,
         selectedIndex: appState.getCurrentTabID(state),
         uploadLibroSuccess: appState.libroSuccessUpload(state),
-        categorias: appState.allCategorias(state)
+        genres: appState.allCategorias(state)
     }),
     (dispatch) => ({
-        openAddLibro: (isOpen) => dispatch(setIsOpenAddLibro(isOpen)),
+        openAddLibro: (isOpen) => dispatch(setIsOpenAddBook(isOpen)),
         uploadLibro: (datosLibro) => dispatch(uploadLibro(datosLibro)),
-        fetchCategorias: () => dispatch(fetchCategorias())
+        fetchGenres: () => dispatch(fetchGenres())
     })
 )(SubirLibroModal);

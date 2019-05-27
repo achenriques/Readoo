@@ -1,228 +1,190 @@
 import axios from 'axios';
-import { NUM_LIBROS, NUM_COMENTARIOS, REST_DEFAULT } from '../constants/appConstants';
+import { NUM_OF_BOOKS, NUM_OF_COMENTARIES, REST_DEFAULT } from '../constants/appConstants';
+import loginApi from '../api/loginApi';
+import bookApi from '../api/bookApi';
+import userApi from '../api/userApi';
 const baseURL = 'http://localhost:3030';
 
 //ACTION TYPES
-export const TAB_CHANGE = 'TAB_CHANGE';
-export const MODAL_ADD_LIBRO = 'MODAL_ADD_LIBRO';
-export const UPLOAD_LIBRO = 'UPLOAD_LIBRO';
-export const DO_LOGIN = 'DO_LOGIN';
-export const UPLOAD_LIBRO_200 = 'UPLOAD_LIBRO_200';
-export const UPLOAD_COMENTARIO_200 = 'UPLOAD_COMENTARIO_200';
-export const UPLOAD_USER_200 = 'UPLOAD_USER_200';
-export const FETCH_CATEGORIAS = 'FETCH_CATEGORIAS';
-export const PASAR_LIBRO = 'PASAR_LIBRO';
-export const ATRAS_LIBRO = 'ATRAS_LIBRO';
-export const ME_GUSTA_LIBRO = 'ME_GUSTA_LIBRO';
-export const FETCH_LIBROS = 'FETCH_LIBROS';
-export const FETCH_MORE_LIBROS = 'FETCH_MORE_LIBROS';
-export const FETCH_COMENTARIOS = 'FETCH_COMENTARIOS';
-export const FETCH_USER_DATA = 'FETCH_USER_DATA';
-export const SAVE_USER_DATA = 'SAVE_USER_DATA';
-export const ENVIAR_COMENTARIO = 'ENVIAR_COMENTARIO';
-export const SET_ERROR_ENVIAR_COMENTARIO = 'SET_ERROR_ENVIAR_COMENTARIO';
+const actionTypes = {
+    TAB_CHANGE: 'TAB_CHANGE',
+    CHANGE_LANGUAGE: 'CHANGE_LANGUAGE',
+    CHECK_TOKEN: 'CHECK_TOKEN',
+    MODAL_ADD_BOOK: 'MODAL_ADD_BOOK',
+    UPLOAD_BOOK: 'UPLOAD_BOOK',
+    DO_LOGIN: 'DO_LOGIN',
+    UPLOAD_BOOK_200: 'UPLOAD_BOOK_200',
+    UPLOAD_COMMENT_200: 'UPLOAD_COMMENT_200',
+    UPLOAD_USER_200: 'UPLOAD_USER_200',
+    FETCH_GENRES: 'FETCH_GENRES',
+    NEXT_BOOK: 'NEXT_BOOK',
+    BEFORE_BOOK: 'BEFORE_BOOK',
+    I_LIKE_BOOK: 'I_LIKE_BOOK',
+    FETCH_LIBROS: 'FETCH_LIBROS',
+    FETCH_MORE_BOOKS: 'FETCH_MORE_BOOKS',
+    FETCH_COMMENTARIES: 'FETCH_COMMENTARIES',
+    FETCH_USER_DATA: 'FETCH_USER_DATA',
+    SAVE_USER_DATA: 'SAVE_USER_DATA',
+    ENVIAR_COMENTARIO: 'ENVIAR_COMENTARIO',
+    SET_ERROR_ENVIAR_COMENTARIO: 'SET_ERROR_ENVIAR_COMENTARIO'
+}
 
 // Default basic auth
 //axios.defaults.headers.common['Authorization'] = bAuth.bUser;
 
 /* //ACTION CREATORS
-export const fetchTabsInicial = (idUsuario) => ({
+fetchTabsInicial = (userId) => ({
   type: FETCH_TABS_INICIAL,
   promise: axios.post(
     `${baseURL}/tabs`,
     {
-      id: idUsuario
+      id: userId
     }
   )
 }) */
 
-// Cambio de pestana en la APP
-export const changeTab = (newTabID) => ({
-  type: TAB_CHANGE,
-  payload: {
-    newTabID: newTabID
-  }
-})
-
-// Abrir / Cerrar modal de anadir libro
-export const setIsOpenAddLibro = (isOpen) => ({
-  type: MODAL_ADD_LIBRO,
-  payload: {
-    isOpen: isOpen
-  }
-})
-
-// Accion de subir un libro a BD
-export const uploadLibro = (datosLibro) => ({
-  type: UPLOAD_LIBRO,
-  //payload: {},
-  promise: axios.post(
-    `${baseURL}/newLibro`,
-    datosLibro.form,
-    {
-      headers: { 'Content-Type': 'multipart/form-data' }
+// Change TAB in web
+const changeTab = (newTabID) => ({
+    type: TAB_CHANGE,
+    payload: {
+        newTabID: newTabID
     }
-  )
 })
 
-// Setear la carga de datos para la subida de libros.
-// Se utiliza para mostrar mensajes de alerta
-export const controllerLibroDefault = () => ({
-  type: UPLOAD_LIBRO_200,
-  payload: {
-    value: REST_DEFAULT
-  },
+const changeLanguage = (languageCode) => ({
+    type: CHANGE_LANGUAGE,
+    payload: {
+        languageCode: languageCode
+    }
 })
 
-// Setear la carga de datos para la subida de comentarios.
-// Se utiliza para mostrar mensajes de alerta
-export const controllerComentarioDefault = () => ({
-  type: UPLOAD_COMENTARIO_200,
-  payload: {
-    value: REST_DEFAULT
-  },
+// check user token using JWT
+const checkToken = () => ({
+    type: CHECK_TOKEN,
+    promise: loginApi.checkToken()
+})
+
+// Open and close Modal Of Add Book
+const setIsOpenAddBook = (isOpen) => ({
+    type: MODAL_ADD_BOOK,
+    payload: {
+        isOpen: isOpen
+    }
+})
+
+// Action of upload a new Book
+const uploadBook = (bookData) => ({
+    type: UPLOAD_BOOK,
+    //payload: {},
+    promise: bookApi.uploadBook(bookData)
+})
+
+// Sets a flag to send alert messages in case of Failure
+const setBookControllerDefault = () => ({
+    type: UPLOAD_BOOK_200,
+    payload: {
+        value: REST_DEFAULT
+    },
+})
+
+// Sets a flag to send alert messages in case of Failure
+const setControllerCommentDefault = () => ({
+    type: UPLOAD_COMMENT_200,
+    payload: {
+        value: REST_DEFAULT
+    },
 })
 
 // Setear la carga de datos para la subida de datos de usuario.
 // Se utiliza para mostrar mensajes de alerta
-export const controllerUserDefault = () => ({
-  type: UPLOAD_USER_200,
-  payload: {
-    value: REST_DEFAULT
-  },
+const setControllerUserDefault = () => ({
+    type: UPLOAD_USER_200,
+    payload: {
+        value: REST_DEFAULT
+    },
 })
 
-export const fetchCategorias = () => ({
-  type: FETCH_CATEGORIAS,
-  promise: axios.get(
-    `${baseURL}/categoria`,
-    {}
-  )
+const fetchGenres = () => ({
+    type: FETCH_GENRES,
+    promise: bookApi.fetchGenres
 })
 
-export const pasarLibro = () => ({
-  type: PASAR_LIBRO,
-  payload: {},
+const nextBook = () => ({
+    type: NEXT_BOOK,
 })
 
-export const atrasLibro = () => ({
-  type: ATRAS_LIBRO,
-  payload: {},
+const beforeBook = () => ({
+    type: BEFORE_BOOK,
 })
 
-export const enviarMeGusta = (idLibro, idUsuario) => ({
-  type: ME_GUSTA_LIBRO,
-  payload: { meGusta: true},
-  promise: axios.post(
-    `${baseURL}/usuariolikelibro`,
-    {
-      like: {
-        idLibro: idLibro,
-        idUsuario: 2,  // TODO
-      }
-    }
-  )
+const doLikeBook = (bookId, userId) => ({
+    type: I_LIKE_BOOK,
+    payload: { like: true},
+    promise: userApi.doLikeBook(bookId, userId)
 })
 
-export const enviarNoMeGusta = (idLibro, idUsuario) => ({
-  type: ME_GUSTA_LIBRO,
-  payload: { idLibro: idLibro, meGusta: false},
-  promise: axios.delete(
-    `${baseURL}/usuariolikelibro`,
-    {
-      data: {
-        like: {
-          idLibro: idLibro,
-          idUsuario: 2,  // TODO
-        }
-      }
-    }
-  )
+const doDislikeBook = (bookId, userId) => ({
+    type: I_LIKE_BOOK,
+    payload: { bookId: bookId, like: false},
+    promise: userApi.doDislikeBook(bookId, userId)
 })
 
-export const fetchLibros = (idUltimo, categorias, primeraVez) => ({
-  type: FETCH_LIBROS,
-  payload: { primeraVez: primeraVez },
-  promise: axios.post(
-    `${baseURL}/libro`,
-    {
-      ultimo: {
-        idUsuario: 2,  // TODO
-        idUltimoLibro: idUltimo,
-        numeroLibros: NUM_LIBROS
-      }
-    }
-  )
+const fetchBooks = (lastBookId, genres, firstTime) => ({
+    type: FETCH_LIBROS,
+    payload: { firstTime: firstTime },
+    promise: bookApi.fetchBooks(lastBookId, genres, NUM_OF_BOOKS)
 })
 
-export const fetchMoreLibros = (idUltimo, categorias) => ({
-  type: FETCH_MORE_LIBROS,
-  promise: axios.post(
-    `${baseURL}/libro`,
-    {
-      ultimo: {
-        idUsuario: 2,  // TODO
-        idUltimoLibro: idUltimo,
-        numeroLibros: NUM_LIBROS
-      }
-    }
-  )
+const fetchMoreBooks = (lastBookId, genres) => ({
+    type: FETCH_MORE_BOOKS,
+    promise: bookApi.fetchMoreBooks(lastBookId,genres, NUM_OF_BOOKS)
 })
 
-export const doLogin = () => ({
-  type: DO_LOGIN,
-  promise: axios.post(
-    `${baseURL}/login`,
-    {
-      email: 'admin',
-      pass: 'admin'
-    }
-  )
+const doLogin = () => ({
+    type: DO_LOGIN,
+    promise: loginApi.doLogin(nickEmail, pass)
 })
 
-export const fetchComentarios = (idLibro, numComentarios, fechaUltimo) => ({
-  type: FETCH_COMENTARIOS,
-  promise: axios.post(
-    `${baseURL}/comentario/fetch`,
-    {
-      idLibro,
-      numComentarios,
-      fechaUltimo
-    }
-  )
+const fetchCommentaries = (bookId, nCommentaries, lastDate) => ({
+    type: FETCH_COMMENTARIES,
+    promise: bookApi.fetchCommentaries(bookId, nCommentaries, lastDate)
 })
 
-export const fetchUserData = (idUsuario) => ({
-  type: FETCH_USER_DATA,
-  promise: axios.get(
-    `${baseURL}/usuario/`,
-    {
-      params: {
-        id: idUsuario
-      }
-    }
-  )
+const fetchUserData = (userId) => ({
+    type: FETCH_USER_DATA,
+    promise: userApi.fetchUserData(userId)
 })
 
-export const saveUserData = (datosUsuario) => ({
-  type: SAVE_USER_DATA,
-  promise: axios.post(
-    `${baseURL}/usuario`,
-    {
-      datosUsuario
-    }
-  )
+const saveUserData = (userData) => ({
+    type: SAVE_USER_DATA,
+    promise: userApi.saveUserData(userData)
 })
 
-export const enviarComentario = (idComentario, idLibro, idUsuario, comentario) => ({
-  type: ENVIAR_COMENTARIO,
-  promise: axios.post(
-    `${baseURL}/comentario/nuevo`,
-    {
-      idComentario,
-      idLibro,
-      idUsuario,
-      idComentario
-    }
-  )
+const sendComment = (commentId, bookId, userId, comentText, commentFatherId) => ({
+    type: ENVIAR_COMENTARIO,
+    promise: bookApi.sendComment(commentId, bookId, userId, comentText, commentFatherId)
 })
+
+export default {
+    changeTab,
+    changeLanguage,
+    checkToken,
+    doLogin,
+    setIsOpenAddBook,
+    uploadBook,
+    setBookControllerDefault,
+    setControllerUserDefault,
+    setControllerCommentDefault,
+    fetchGenres,
+    nextBook,
+    beforeBook,
+    doLikeBook,
+    doDislikeBook,
+    fetchBooks,
+    fetchCommentaries,
+    fetchGenres,
+    fetchMoreBooks,
+    fetchUserData,
+    sendComment,
+    saveUserData
+}

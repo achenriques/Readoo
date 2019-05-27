@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchComentarios, enviarComentario, controllerComentarioDefault } from '../../app_state/actions';
+import { fetchCommentaries, sendComment, setControllerCommentDefault } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Grid from '@material-ui/core/Grid';
 // TODO change GridList
@@ -14,7 +14,7 @@ import Avatar from '@material-ui/core/Avatar';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import material_styles from './material_styles';
-import { NUM_COMENTARIOS, REST_FAILURE, REST_SUCCESS, REST_DEFAULT } from '../../constants/appConstants';
+import { NUM_OF_COMENTARIES, REST_FAILURE, REST_SUCCESS, REST_DEFAULT } from '../../constants/appConstants';
 
 class CommentsGrid extends Component {
 
@@ -22,7 +22,7 @@ class CommentsGrid extends Component {
         cargadosComentarios: null,  // 1 para cargados, -1 para error
         comentariosLibros: [],
         nuevoComentario: '',
-        idLibroActual: null
+        bookIdActual: null
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -34,7 +34,7 @@ class CommentsGrid extends Component {
             });
         }
 
-        if (nextProps.idLibro > 0 && nextProps.idLibro != prevState.idLibroActual/*&& prevState.cargadosComentarios !== REST_DEFAULT*/) {
+        if (nextProps.bookId > 0 && nextProps.bookId != prevState.bookIdActual/*&& prevState.cargadosComentarios !== REST_DEFAULT*/) {
             let fechaUltimoComentario = null;
             if (prevState.comentariosLibros && prevState.comentariosLibros.length) {
                 fechaUltimoComentario = new Date(Math.max.apply(null, prevState.comentariosLibros.map(function(e) {
@@ -42,8 +42,8 @@ class CommentsGrid extends Component {
                   })));
             }
             // todo fecha
-            (nextProps.fetchComentarios) && nextProps.fetchComentarios(nextProps.idLibro, NUM_COMENTARIOS, fechaUltimoComentario);
-            return ({ ...prevState, cargadosComentarios: REST_DEFAULT, idLibroActual: nextProps.idLibro });
+            (nextProps.fetchCommentaries) && nextProps.fetchCommentaries(nextProps.bookId, NUM_OF_COMENTARIES, fechaUltimoComentario);
+            return ({ ...prevState, cargadosComentarios: REST_DEFAULT, bookIdActual: nextProps.bookId });
         } else
         if (nextProps.comentariosMostrados == null) {
             return ({
@@ -64,47 +64,47 @@ class CommentsGrid extends Component {
 
     comentarios = [
         {   
-            idComentario: 1,
+            commentId: 1,
             usuario: "Minervo",
             comentario: "Ou la la!",
             subComentarios: []
         },
         {   
-            idComentario: 2,
+            commentId: 2,
             usuario: "Minervo",
             comentario: "Ou la la!",
             subComentarios: []
         },
         {   
-            idComentario: 3,
+            commentId: 3,
             usuario: "Minervo",
             comentario: "Ou la lelo!",
             subComentarios: [ 
                 {
-                    idComentario: 13,
+                    commentId: 13,
                     usuario: "Minervo",
                     comentario: "Me gusta lo que has dicho",
                 },  {
-                    idComentario: 14,
+                    commentId: 14,
                     usuario: "Minerv1",
                     comentario: "Adios vella",
                 } 
             ]
         },
         {   
-            idComentario: 4,
+            commentId: 4,
             usuario: "Minervo",
             comentario: "Ou la la!",
             subComentarios: []
         },
         {   
-            idComentario: 5,
+            commentId: 5,
             usuario: "Minervo",
             comentario: "Ou la la!",
             subComentarios: []
         },
         {   
-            idComentario: 6,
+            commentId: 6,
             usuario: "Minervo",
             comentario: "Ou la la!",
             subComentarios: []
@@ -152,11 +152,11 @@ class CommentsGrid extends Component {
         })
     }
 
-    enviarComentario (evt, idComentario, idLibro) {
+    sendComment (evt, commentId, bookId) {
         if (this.state.nuevoComentario) {
             let textoComentario = this.state.nuevoComentario.trim();
 
-            this.props.enviarComentario(idComentario, idLibro, 2, /* TODO: usuario*/ textoComentario);
+            this.props.sendComment(commentId, bookId, 2, /* TODO: usuario*/ textoComentario);
         }
     }
 
@@ -177,7 +177,7 @@ class CommentsGrid extends Component {
                         {comentario.subComentarios.map((subComment) => (
                             <Paper elevation={1} >
                                 <GridTile
-                                    key={subComment.idComentario}
+                                    key={subComment.commentId}
                                     title={subComment.usuario}
                                     actionIcon={<IconButton><StarBorder color="white" style={{width: '30px', heigth: '30px' }}><Avatar src="" /></StarBorder></IconButton>}
                                     actionPosition="left"
@@ -227,7 +227,7 @@ class CommentsGrid extends Component {
                             {/*this.props.comentarios*/this.props.comentarios.map((comentario) => (
                                 <Paper elevation={4} >
                                     <GridTile
-                                        key={comentario.idComentario}
+                                        key={comentario.commentId}
                                         title={comentario.usuario}
                                         actionIcon={<IconButton><StarBorder color="white" ><Avatar src="" /></StarBorder></IconButton>}
                                         actionPosition="left"
@@ -255,7 +255,7 @@ class CommentsGrid extends Component {
                                                         />
                                                     </Grid>
                                                     <Grid item sm={1}>
-                                                        <IconButton color="primary" onClick={() => {this.enviarComentario(this, null, this.props.idLibro)}} style={material_styles.styleSendButton}>
+                                                        <IconButton color="primary" onClick={() => {this.sendComment(this, null, this.props.bookId)}} style={material_styles.styleSendButton}>
                                                             <Send/>
                                                         </IconButton>
                                                     </Grid>
@@ -271,7 +271,7 @@ class CommentsGrid extends Component {
                 }
 
             default:
-                if (this.props.idLibro > 0) {
+                if (this.props.bookId > 0) {
                     return (
                         <div>
                             <h3 className="margenNoComentarios" >No hay ningún comentario. Sé tu el primero en romper el hielo...</h3>
@@ -288,7 +288,7 @@ class CommentsGrid extends Component {
                                         />
                                     </Grid>
                                     <Grid item sm={1} style={{position: 'relative'}}>
-                                        <IconButton color="primary" onClick={() => {this.enviarComentario(this, null, this.props.idLibro)}} style={material_styles.styleSendButton}>
+                                        <IconButton color="primary" onClick={() => {this.sendComment(this, null, this.props.bookId)}} style={material_styles.styleSendButton}>
                                             <Send/>
                                         </IconButton>
                                     </Grid>
@@ -312,8 +312,8 @@ export default connect(
         getfetchComentarioSuccess: appState.getfetchComentarioSuccess(state)
     }),
     (dispatch) => ({
-        fetchComentarios: (idLibro, numComentarios, fechaUltimo) => dispatch(fetchComentarios(idLibro, numComentarios, fechaUltimo)),
-        enviarComentario: (idComentario, idLibro, idUsuario, comentario) => dispatch(enviarComentario(idComentario, idLibro, idUsuario, comentario)),
-        recibidoFetchComentario: () => dispatch(controllerComentarioDefault())
+        fetchCommentaries: (bookId, nCommentaries, fechaUltimo) => dispatch(fetchCommentaries(bookId, nCommentaries, fechaUltimo)),
+        sendComment: (commentId, bookId, userId, comentario) => dispatch(sendComment(commentId, bookId, userId, comentario)),
+        recibidoFetchComentario: () => dispatch(setControllerCommentDefault())
     })
 )(CommentsGrid);

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { changeTab, setIsOpenAddLibro, 
-    controllerLibroDefault, controllerComentarioDefault,
-    controllerUserDefault } from '../app_state/actions';
+import { changeTab, setIsOpenAddBook, 
+    setBookControllerDefault, setControllerCommentDefault,
+    setControllerUserDefault } from '../app_state/actions';
 import * as appState from '../app_state/reducers';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
@@ -189,9 +189,9 @@ export default connect(
     }),
     (dispatch) => ({
         changeTab: (tabID) => dispatch(changeTab(tabID)),
-        openAddLibro: (isOpen) => dispatch(setIsOpenAddLibro(isOpen)),
-        listenedUploadLibro: () => dispatch(controllerLibroDefault()),
-        recibidoEnviarComentario: () => dispatch(controllerComentarioDefault()),
-        listenedUserData: () => dispatch(controllerUserDefault()),
+        openAddLibro: (isOpen) => dispatch(setIsOpenAddBook(isOpen)),
+        listenedUploadLibro: () => dispatch(setBookControllerDefault()),
+        recibidoEnviarComentario: () => dispatch(setControllerCommentDefault()),
+        listenedUserData: () => dispatch(setControllerUserDefault()),
     })
 )(BodyContainer);

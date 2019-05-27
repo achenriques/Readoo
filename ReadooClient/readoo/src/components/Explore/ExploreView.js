@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchLibros, pasarLibro, enviarMeGusta, enviarNoMeGusta } from '../../app_state/actions';
+import { fetchBooks, nextBook, doLikeBook, doDislikeBook } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -18,7 +18,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import Divider from '@material-ui/core/Divider';
 import CommentsGrid from '../common/CommentsGrid';
-import { NUM_LIBROS, DISPLAY_NONE } from '../../constants/appConstants';
+import { NUM_OF_BOOKS, DISPLAY_NONE } from '../../constants/appConstants';
 import libroDefault from '../../resources/libroDefault.gif';
 import material_styles from './material_styles';
 
@@ -28,7 +28,7 @@ class ExploreView extends Component {
         estoyLibroAtras: false,
         libroAtras : null,
         libroActual: {
-            idLibro: null,
+            bookId: null,
             titulo: '',
             autor: '',
             portada: null,
@@ -36,7 +36,7 @@ class ExploreView extends Component {
             historia: '',
             likes: 0,
         },
-        meGustaLibro: false,
+        likeLibro: false,
         errorImgLibro: false,
         mostrarCorazon: 0,  // 0 no mostrar, 1 red, 2 black
         expanded: false,
@@ -56,7 +56,7 @@ class ExploreView extends Component {
             this.setState({
                 ...this.state,
                 libroActual: {
-                    idLibro: props.librosMostrados[props.indexLibro].idLibro,
+                    bookId: props.librosMostrados[props.indexLibro].bookId,
                     titulo: props.librosMostrados[props.indexLibro].titulo,
                     autor: props.librosMostrados[props.indexLibro].autor,
                     portada: portada,
@@ -77,7 +77,7 @@ class ExploreView extends Component {
     };
 
     componentDidMount() {
-        this.props.fetchLibros(0, [], true);
+        this.props.fetchBooks(0, [], true);
     }
 
     componentWillReceiveProps(newProps) {
@@ -95,9 +95,9 @@ class ExploreView extends Component {
     }
 
     handleForward(evt) {
-        if (this.props.indexLibro === NUM_LIBROS / 2) {
-            this.props.fetchLibros(0, []);
-            this.props.pasarLibro();
+        if (this.props.indexLibro === NUM_OF_BOOKS / 2) {
+            this.props.fetchBooks(0, []);
+            this.props.nextBook();
         }
         else if (this.state.estoyLibroAtras) {
             this.setState({
@@ -109,14 +109,14 @@ class ExploreView extends Component {
                 ...this.state,
                 libroAtras: this.state.libroActual
             }, () => {
-                this.props.pasarLibro();
+                this.props.nextBook();
             });
         }
     }
 
     handleDbClickImage(evt) {
-        if (this.state.libroActual && this.state.libroActual.idLibro > 0) {
-            if (this.state.meGustaLibro) {
+        if (this.state.libroActual && this.state.libroActual.bookId > 0) {
+            if (this.state.likeLibro) {
                 this.handleUnlike(evt);
             } else {
                 this.handleLike(evt);
@@ -125,7 +125,7 @@ class ExploreView extends Component {
     }
 
     handleLike(evt) {
-        if (!this.state.meGustaLibro) {
+        if (!this.state.likeLibro) {
             const cerrarCorazon = () => {
                 setTimeout(()=>{
                     this.setState(
@@ -133,13 +133,13 @@ class ExploreView extends Component {
                             ...this.state,
                             libroActual: { ...this.state.libroActual, likes: this.state.libroActual.likes +1},
                             mostrarCorazon: 0,
-                            meGustaLibro: true,
+                            likeLibro: true,
                         }
                     )
                 }, 1000);
             }
 
-            (this.props.enviandoMegusta === false) && this.props.enviarMeGusta(this.state.libroActual.idLibro, 2); //FIXME TODO usuarios
+            (this.props.enviandoMegusta === false) && this.props.doLikeBook(this.state.libroActual.bookId, 2); //FIXME TODO usuarios
             this.setState(
                 {
                     ...this.state,
@@ -150,7 +150,7 @@ class ExploreView extends Component {
     }
 
     handleUnlike(evt) {
-        if (this.state.meGustaLibro) {
+        if (this.state.likeLibro) {
             const cerrarCorazon = () => {
                 setTimeout(()=>{
                     this.setState(
@@ -158,13 +158,13 @@ class ExploreView extends Component {
                             ...this.state,
                             libroActual: { ...this.state.libroActual, likes: this.state.libroActual.likes -1},
                             mostrarCorazon: 0,
-                            meGustaLibro: false
+                            likeLibro: false
                         }
                     )
                 }, 1000);
             }
             
-            (this.props.enviandoMegusta === false) && this.props.enviarNoMeGusta(this.state.libroActual.idLibro, 2); //FIXME TODO usuarios
+            (this.props.enviandoMegusta === false) && this.props.doDislikeBook(this.state.libroActual.bookId, 2); //FIXME TODO usuarios
             this.setState(
                 {
                     ...this.state,
@@ -238,10 +238,10 @@ class ExploreView extends Component {
                         {this.state.libroActual.opinion}
                     </CardContent>
                     <CardActions>
-                        {(this.state.libroActual.idLibro)
+                        {(this.state.libroActual.bookId)
                             ? (<div>Son {this.state.libroActual.likes} los que piensan que este libro mola
                                 <Button size='small' disableRipple disableFocusRipple variant='flat' onClick={this.handleDbClickImage.bind(this)} style={material_styles.backgroundTransparent}>
-                                    <Favorite style={{...material_styles.styleFavorite, fill: (this.state.meGustaLibro)? 'red': ''}} />
+                                    <Favorite style={{...material_styles.styleFavorite, fill: (this.state.likeLibro)? 'red': ''}} />
                                 </Button>
                                 <Button disableRipple size="small" variant='flat' onClick={this.handleCollapse.bind(this)} style={material_styles.styleExpandComentarios}>{(this.state.expanded)? "Ocultar comentarios": "Ver Comentarios"}
                                     {(this.state.expanded)? (<ExpandLessIcon />): (<ExpandMoreIcon />)}
@@ -253,7 +253,7 @@ class ExploreView extends Component {
                     <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
                         <CardContent>
                             { /* Grid de comentarios */ }
-                            <CommentsGrid idLibro={this.state.libroActual.idLibro} />
+                            <CommentsGrid bookId={this.state.libroActual.bookId} />
                         </CardContent>
                     </Collapse>
                 </Card>
@@ -270,9 +270,9 @@ export default connect(
         enviandoMegusta: appState.getEnviandoMeGusta(state)
     }),
     (dispatch) => ({
-        fetchLibros: (idUltimo, categorias, primeraVez) => dispatch(fetchLibros(idUltimo, categorias, primeraVez)),
-        pasarLibro: () => dispatch(pasarLibro()),
-        enviarMeGusta: (idLibro, idUsuario) => dispatch(enviarMeGusta(idLibro, idUsuario)),
-        enviarNoMeGusta: (idLibro, idUsuario) => dispatch(enviarNoMeGusta(idLibro, idUsuario)),
+        fetchBooks: (lastBookId, genres, primeraVez) => dispatch(fetchBooks(lastBookId, genres, primeraVez)),
+        nextBook: () => dispatch(nextBook()),
+        doLikeBook: (bookId, userId) => dispatch(doLikeBook(bookId, userId)),
+        doDislikeBook: (bookId, userId) => dispatch(doDislikeBook(bookId, userId)),
     })
 )(ExploreView);

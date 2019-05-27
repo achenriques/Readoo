@@ -1,19 +1,47 @@
 import React, { Component } from 'react';
+import 'bootstrap';
 import ShortcutBar from './components/ShortcutBar';
 import BodyContainer from './components/BodyContainer';
 import Footer from './components/Footer';
-import 'bootstrap';
+import { connect } from 'react-redux';
+import { fetchUserData } from '../../app_state/actions';
+import * as appState from '../../app_state/reducers';
+
 
 class App extends Component {
-  render() {
-    return (
-      <div>
-        <ShortcutBar/>
-        <BodyContainer/>
-        <Footer/>
-      </div>
-    );
-  }
+
+    initialState = {
+        userIsLogged: false
+    }
+
+    constructor(props) {
+        super(props);
+        // this.state = {};
+    };
+
+    componentWillMount(){
+        if (!this.props.userIsLogged) {
+          this.props.checkToken();
+        }
+    }
+
+    render() {
+        return (
+            <div>
+                <ShortcutBar/>
+                {(this.props.userIsLogged) ? <BodyContainer/> : <Login/> }
+                <Footer/>
+            </div>
+        );
+    }
 }
 
-export default App;
+export default connect(
+    (state) => ({
+        userIsLogged: appState.userIsLogged(state),
+    }),
+    (dispatch) => ({
+        fetchUserData: () => dispatch(fetchUserData()),
+        checkToken: () => dispatch(checkToken()),
+    })
+)(App);

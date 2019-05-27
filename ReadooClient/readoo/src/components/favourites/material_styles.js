@@ -39,7 +39,7 @@ export default {
         overflowY: 'scroll',
     },
 
-    gridLibro: {
+    grbookId: {
         height: '100%',
         width: '100%',
         textAlign: 'center',
@@ -47,7 +47,7 @@ export default {
         padding: '5px'
     },
 
-    gridLibroSeleccionado: {
+    grbookIdSeleccionado: {
         height: '100%',
         width: '100%',
         textAlign: 'center',
