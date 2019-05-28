@@ -179,7 +179,7 @@ class BodyContainer extends Component {
 
 export default connect(
     (state) => ({
-        //isOpenModal: appState.getIsOpenModal(state).isOpenAddLibro,
+        //isOpenModal: appState.getIsOpenModal(state).isOpenAddBook,
         selectedIndex: appState.getCurrentTabID(state),
         uploadLibroSuccess: appState.libroSuccessUpload(state),
         enviarNuevoComentarioSuccess: appState.getComentarioEnviado(state),

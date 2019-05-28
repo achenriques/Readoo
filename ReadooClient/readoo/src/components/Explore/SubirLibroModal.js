@@ -341,7 +341,7 @@ class SubirLibroModal extends Component {
 
 export default connect(
     (state) => ({
-        isOpenModal: appState.getIsOpenModal(state).isOpenAddLibro,
+        isOpenModal: appState.getIsOpenModal(state).isOpenAddBook,
         selectedIndex: appState.getCurrentTabID(state),
         uploadLibroSuccess: appState.libroSuccessUpload(state),
         genres: appState.allCategorias(state)

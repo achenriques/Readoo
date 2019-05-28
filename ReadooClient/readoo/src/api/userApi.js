@@ -2,6 +2,12 @@ import axios from 'axios';
 import {} from '../constants/appConstants';
 const baseURL = 'http://localhost:3030';
 
+// Setted for evict cross-sitting error
+axios.defaults.withCredentials = true;
+
+// Default basic auth
+//axios.defaults.headers.common['Authorization'] = bAuth.bUser;
+
 const fetchUserData = (userId) => axios.get(
     `${baseURL}/user`,
     {

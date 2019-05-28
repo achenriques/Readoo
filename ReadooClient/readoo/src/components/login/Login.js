@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchUserData } from '../../app_state/actions';
+import { fetchUserData, doLogin, doRegister } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
+import LS from '../LanguageSelector';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
@@ -20,8 +21,9 @@ class ProfileView extends Component {
             userPass: "",
             userRepeatPass: ""
         },
-        showRepeatPass: false
-        
+        acceptDisabled: false,
+        showRepeatPass: false,
+        repeatPassError: false
     };
 
     constructor(props) {
@@ -33,23 +35,29 @@ class ProfileView extends Component {
         const value = evt.target.value;
         const name = evt.target.name;
 
-        let callback = () => {};
-        if (name === "userPass" && !this.state.showRepeatPass) {
-            callback = () => {
-                this.setState({
-                    ...this.state,
-                    showRepeatPass: true
-                });
+        let repeatPassError = false;
+        if (this.state.showRepeatPass && (name === "userPass" || name === "userRepeatPass")) {
+            if ((name === "userPass" && value != this.state.userData.userRepeatPass)
+                    || (name === "userRepeatPass" && value != this.state.userData.userPass)) {
+                repeatPassError: true;
             }
         }
+
+        let acceptDisabled = false;
+        if (!this.state.userData.userNickEmail.trim().length || !this.state.userData.userPass.length) {
+            acceptDisabled = true;
+        }
+
         // ver impletar errores en el alta de libros
         this.setState({
             ...this.state,
+            acceptDisabled: acceptDisabled,
             userData: {
                 ...this.state.userData,
                 [name]: value
-            }
-        }, callback);
+            },
+            repeatPassError: repeatPassError
+        });
     }
 
     loadAvatarImage = (evt) => {
@@ -83,28 +91,41 @@ class ProfileView extends Component {
     }
 
     acceptLoggin = (evt) => {
-        // TODO
+        if(this.state.isARegister){
+            this.setState({
+                ...this.state,
+                isARegister: false,
+                showRepeatPass: false
+            })
+        } else {
+            let logName = this.state.userData.userNickEmail.trim();
+            let logPass = this.state.userData.userPass;
+            this.props.doLogin(logName, logPass, this.props.getAppLanguage());
+        }
     }
 
-    goRegister = (evt) => {
+    acceptRegister = (evt) => {
         if(!this.state.isARegister){
             this.setState({
-                ...state,
+                ...this.state,
                 isARegister: true,
                 showRepeatPass: true
             })
+        } else {
+            let logName = this.state.userData.userNickEmail.trim();
+            let logPass = this.state.userData.userPass;
+            this.props.doRegister(logName, logPass, this.props.getAppLanguage());
         }
     }
 
     render = () => {
-        
         return (
             <div>
                 <Grid container className="gridLogin">
                     <Grid item sm={8} className="columnaDatosPerfil">
                         <Paper elevation={4} className="divDatosPerfil">
                             <TextField
-                                label="Nick de tu Usuario, es único recuerda"
+                                label= {<LS msgId='unique.user'/>}
                                 id="loginNickEmail"
                                 name="userNickEmail"
                                 fullWidth
@@ -117,80 +138,9 @@ class ProfileView extends Component {
                             />
                             <br/>
                             <TextField
-                                label="Nombre de usuario"
-                                id="nombreUsuario"
-                                name="nombreUsuario"
-                                fullWidth
-                                inputProps={{
-                                    maxLength: 45,
-                                }}
-                                value={this.state.nombreUsuario}
-                                onChange={this.oChangeInput.bind(this)}
-                                className="inputLoginData"
-                            />
-                            <br/>
-                            <TextField
-                                label="Tus apellidos"
-                                id="apellidoUsuario"
-                                name="apellidoUsuario"
-                                fullWidth
-                                inputProps={{
-                                    maxLength: 45,
-                                }}
-                                value={this.state.apellidosUsuario}
-                                onChange={this.oChangeInput.bind(this)}
-                                className="inputDatosPerfil"
-                            />
-                            <br/>
-                            <TextField
-                                label="Tu E-mail"
-                                id="emailUsuario"
-                                name="emailUsuario"
-                                fullWidth
-                                inputProps={{
-                                    maxLength: 45,
-                                }}
-                                value={this.state.emailUsuario}
-                                onChange={this.oChangeInput.bind(this)}
-                                className="inputDatosPerfil"
-                            />
-                            <br/>
-                            <TextField
-                                label="Algo sobre tí mismo"
-                                id="sobreMiPerfil"
-                                name="sobreMiPerfil"
-                                multiline
-                                rowsMax="4"
-                                fullWidth
-                                inputProps={{
-                                    maxLength: 140,
-                                }}
-                                value={this.state.sobreMi}
-                                onChange={this.oChangeInput.bind(this)}
-                                className="inputDatosPerfil"
-                            />
-                            {(this.state.mostrarAntiguaPass)? (
-                                <div>
-                                    <TextField
-                                        label="Tu antigüa contraseña"
-                                        id="viejaPassUsuario"
-                                        name="viejaPassUsuario"
-                                        fullWidth
-                                        type="password"
-                                        inputProps={{
-                                            maxLength: 20,
-                                        }}
-                                        value={this.state.viejaPassUsuario}
-                                        onChange={this.oChangeInput.bind(this)}
-                                        className="inputDatosPerfil"
-                                    />
-                                    <br/>
-                                </div>
-                            ): (<div/>)}
-                            <TextField
                                 label="Tu contraseña"
-                                id="passUsuario"
-                                name="passUsuario"
+                                id="userPass"
+                                name="userPass"
                                 fullWidth
                                 type="password"
                                 inputProps={{
@@ -198,26 +148,48 @@ class ProfileView extends Component {
                                 }}
                                 value={this.state.passUsuario}
                                 onChange={this.oChangeInput.bind(this)}
-                                className="inputDatosPerfil"
+                                className="inputLoginData"
                             />
                             <br/>
+                            {(this.state.mostrarAntiguaPass)? (
+                                <div>
+                                    <TextField
+                                        label="Repite tu contraseña"
+                                        id="userRepeatPass"
+                                        name="userRepeatPass"
+                                        fullWidth
+                                        type="password"
+                                        inputProps={{
+                                            maxLength: 20,
+                                        }}
+                                        value={this.state.userRepeatPass}
+                                        onChange={this.oChangeInput.bind(this)}
+                                        className="inputLoginData"
+                                    />
+                                    <br/>
+                                </div>
+                            ): (<div/>)}
                         </Paper>
                     </Grid>
                 </Grid>
                 <Grid container alignItems="flex-end">
                     <Grid item sm={12}>
-                        <div className="saveProfileButton">
-                            <Button variant="flat" color="secondary" 
-                                onClick={this.acceptDeleteProfile.bind(this)}
+                        <div className="loginButtons">
+                            <Button 
+                                variant="flat" 
+                                color={(!this.state.isARegister) ? "secondary" : "primary"}
+                                onClick={this.acceptRegister.bind(this)}
                                 disabled={(this.props.savingUserData !== REST_DEFAULT)}
                             >
-                                ELIMINAR MI PERFIL
+                                REGISTER
                             </Button>
-                            <Button variant="flat" color="primary" 
-                                onClick={this.acceptSaveProfile.bind(this)}
-                                disabled={(this.props.savingUserData !== REST_DEFAULT)}
+                            <Button 
+                                variant="flat" 
+                                color={(!this.state.isARegister) ? "primary" : "secondary"}
+                                onClick={this.acceptLogin.bind(this)}
+                                disabled={(this.state.acceptDisabled)}
                             >
-                                GUARDAR
+                                {(!this.state.isARegister) ? "LOGIN" : "CANCEL REGISTER"}
                             </Button>
                         </div>
                     </Grid>
@@ -229,10 +201,11 @@ class ProfileView extends Component {
 
 export default connect(
     (state) => ({
-        datosUsuario: appState.getUser(state),
-        savingUserData: appState.getsaveUserDataSuccess(state),
+        getAppLanguage: (state) => appState.getAppLanguage()
     }),
     (dispatch) => ({
-        fetchUserData: () => dispatch(fetchUserData())
+        fetchUserData: () => dispatch(fetchUserData()),
+        doLogin: (logName, logPass) => dispatch(doLogin(logName, logPass)),
+        doRegister: (logName, logPass) => dispatch(doRegister(logName, logPass))
     })
 )(ProfileView);

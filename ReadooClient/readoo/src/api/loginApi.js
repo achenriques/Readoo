@@ -2,29 +2,34 @@ import axios from 'axios';
 import {} from '../constants/appConstants';
 const baseURL = 'http://localhost:3030';
 
+// Setted for evict cross-sitting error
+axios.defaults.withCredentials = true;
+
+// Default basic auth
+//axios.defaults.headers.common['Authorization'] = bAuth.bUser;
+
 const doLogin = (userNickEmail, pass) => axios.post(
     `${baseURL}/login`,
     {
-        userNickEmail: user,
+        userNickEmail: userNickEmail,
         pass: pass
-    },
+    }
+)
+
+const doRegister = (userNickEmail, pass) => axios.post(
+    `${baseURL}/login/new`,
     {
-        withCredentials: true,
+        userNickEmail: userNickEmail,
+        pass: pass
     }
 )
 
 const doLogOut = () => axios.get( 
-    `${baseURL}/logout`,
-    {
-        withCredentials: true,
-    }
+    `${baseURL}/logout`
 )
 
 const checkToken = () => axios.get(
-    `${baseURL}/login/isme`,
-    {
-        withCredentials: true,
-    } 
+    `${baseURL}/login/isme`
 )
 
 export default {

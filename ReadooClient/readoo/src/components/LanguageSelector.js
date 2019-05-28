@@ -58,16 +58,16 @@ class LanguageSelector extends Component {
         return this.state.appLanguage;
     }
 
-    msg = (string) => {
-        let toRet = stringResources[this.state.appLanguage][string];
+    msg = (msgId, defaultMsg) => {
+        let toRet = stringResources[this.state.appLanguage][msgId];
         if (!toRet) {
-            toRet = "";
+            toRet = (defaultMsg) ? defaultMsg : "";
         }
         return toRet;
     }
 
     render = () => {
-        return null;
+        return ({ __html : this.msg(this.props.msgId, this.props.defaultMsg) });
     }
 }
 

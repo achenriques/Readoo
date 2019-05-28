@@ -69,7 +69,7 @@ class LoginProvider {
     }
   
     newUser(app) {
-        app.post('/login/new', middleware.verifyToken, function (req, res) {
+        app.post('/login/new', function (req, res) {
             console.log("Estoy insertando " + req.body.apodo);     
             if (req.body.apodo && req.body.pass && req.body.email) {
                 let hashedPassword = bcrypt.hashSync(req.body.pass, 8);
