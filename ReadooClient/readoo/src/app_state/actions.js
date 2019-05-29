@@ -45,6 +45,13 @@ const changeTab = (newTabID) => ({
     }
 })
 
+const resetErrLog = () => ({
+    type: actionTypes.RESET_FAILURE,
+    payload: {
+        err: []
+    }
+})
+
 const changeLanguage = (languageCode) => ({
     type: actionTypes.CHANGE_LANGUAGE,
     payload: {
@@ -142,7 +149,9 @@ const sendComment = (commentId, bookId, userId, comentText, commentFatherId) => 
 })
 
 export {
+    actionTypes,
     changeTab,
+    resetErrLog,
     changeLanguage,
     checkToken,
     doLogin,

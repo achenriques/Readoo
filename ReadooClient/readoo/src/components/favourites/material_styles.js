@@ -17,7 +17,7 @@ export default {
         width: '88%'
     },
 
-    alturaFavoritos: {
+    favouriteHight: {
         maxHeight: '850px'
     },
 
@@ -47,7 +47,7 @@ export default {
         padding: '5px'
     },
 
-    grbookIdSeleccionado: {
+    grSelectedBookId: {
         height: '100%',
         width: '100%',
         textAlign: 'center',

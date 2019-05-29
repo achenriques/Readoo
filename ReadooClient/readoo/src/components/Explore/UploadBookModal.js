@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { setIsOpenAddBook, uploadLibro, fetchGenres } from '../../app_state/actions';
+import { setIsOpenAddBook, uploadBook, fetchGenres } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -29,35 +29,35 @@ const customDialog = {
     height: '75%'
 };
 
-const portadaPreview = {
+const coverPreview = {
     height: '300px',
     maxHeight: '100%'
 };
 
-class SubirLibroModal extends Component {
+class UploadBookModal extends Component {
 
     initialState = {
         disabledButton: false,
-        add_libro_titulo: "",
-        add_libro_autor: "",
-        add_libro_historia: "",
-        add_libro_opinion: "",
-        add_libro_categoria: null,
-        add_libro_imagen: null,
-        add_libro_imagen_file: null,
-        categoria_items: [],
+        addBookTitle: "",
+        addBookAuthor: "",
+        addBookDescription: "",
+        addBookReview: "",
+        addBookGenre: null,
+        addBookCover: null,
+        addBookCoverFile: null,
+        genreItems: [],
 
         error: {
-            add_libro_titulo: "",
-            add_libro_autor: "",
-            add_libro_historia: "",
-            add_libro_opinion: "",
-            add_libro_categoria: "",
-            add_libro_imagen: false
+            addBookTitle: "",
+            addBookAuthor: "",
+            addBookDescription: "",
+            addBookReview: "",
+            addBookGenre: "",
+            addBookCover: false
         },
     };
 
-    categoria_items = [];
+    genreItems = [];
 
     constructor(props) {
         super(props);
@@ -67,21 +67,22 @@ class SubirLibroModal extends Component {
 
     // CICLO DE VIDA
     componentWillReceiveProps(nextProps) {
-        if (nextProps.uploadLibroSuccess) {
+        // TODO: revisar este if
+        /* if (nextProps.uploadLibroSuccess) {
             this.setState({
                 ...this.state,
                 disabledButton: false
             })
-        }
+        } */
 
         if (nextProps.genres) {
             let menuItems = nextProps.genres.map((i) => {
-                return <MenuItem key={i.idCategoria} value={i.idCategoria} primaryText={i.tipo} />;
+                return <MenuItem key={i.Gen} value={i.idCategoria} primaryText={i.tipo} />;
             });
-            this.categoria_items = menuItems;
+            this.genreItems = menuItems;
             this.setState({
                 ...this.state,
-                categoria_items: menuItems
+                genreItems: menuItems
             })
         }
     }
@@ -108,35 +109,36 @@ class SubirLibroModal extends Component {
         }, callState);
     }
 
-    subirLibro_aceptar = () => {
+    acceptUploadBook = () => {
+        // TODO: mensajes
         this.setState({
             ...this.state,
             error: {
-                add_libro_titulo: (this.state.add_libro_titulo === "") ? COMPLETA_CAMPO : "",
-                add_libro_autor: (this.state.add_libro_autor === "") ? COMPLETA_CAMPO : "",
-                add_libro_historia: (this.state.add_libro_historia === "") ? COMPLETA_CAMPO : "",
-                add_libro_categoria: this.state.add_libro_categoria === null || this.state.add_libro_categoria === "",
-                add_libro_imagen: (this.state.add_libro_imagen == null) ? true : false,
+                addBookTitle: (this.state.addBookTitle === "") ? COMPLETA_CAMPO : "",
+                addBookAuthor: (this.state.addBookAuthor === "") ? COMPLETA_CAMPO : "",
+                addBookDescription: (this.state.addBookDescription === "") ? COMPLETA_CAMPO : "",
+                addBookGenre: this.state.addBookGenre === null || this.state.addBookGenre === "",
+                addBookCover: (this.state.addBookCover == null) ? true : false,
             }
         });
 
-        if (this.state.add_libro_titulo && this.state.add_libro_autor
-            && this.state.add_libro_historia && this.state.add_libro_imagen != null) {
+        if (this.state.addBookTitle && this.state.addBookAuthor
+            && this.state.addBookDescription && this.state.addBookCover != null) {
             this.setState({
                 ...this.state,
                 disabledButton: true,
             });
 
             var formData = new FormData();
-            formData.set('titulo', this.state.add_libro_titulo);
-            formData.set('autor', this.state.add_libro_autor);
-            formData.set('descripcion', this.state.add_libro_historia);
-            formData.set('opinion', this.state.add_libro_opinion);
-            formData.set('portada', this.state.add_libro_imagen_file);
-            formData.set('usuario', 2);     // TODO : cambiar
-            formData.set('categoria', this.state.add_libro_categoria);
+            formData.set('bookTittle', this.state.addBookTitle);
+            formData.set('bookAuthor', this.state.addBookAuthor);
+            formData.set('bookDescription', this.state.addBookDescription);
+            formData.set('bookReview', this.state.addBookReview);
+            formData.set('bookCoverUrl', this.state.addBookCoverFile);
+            formData.set('userId', this.props.getCurrentUserId());     // TODO : cambiar
+            formData.set('genreId', this.state.addBookGenre);
 
-            this.props.uploadLibro({
+            this.props.uploadBook({
                 form: formData
             });
         }
@@ -144,12 +146,12 @@ class SubirLibroModal extends Component {
 
     cargarImagenPortada = (evt) => {
         const callState = () => {
-            if (this.state.error.add_libro_imagen === true) {
+            if (this.state.error.addBookCover === true) {
                 this.setState({
                     ...this.state,
                     error: {
                         ...this.state.error,
-                        add_libro_imagen: false
+                        addBookCover: false
                     }
                 });
             }
@@ -157,8 +159,8 @@ class SubirLibroModal extends Component {
 
         if (evt.target.files[0]) {
             this.setState({
-                add_libro_imagen: (URL.createObjectURL(evt.target.files[0])) ? URL.createObjectURL(evt.target.files[0]) : null,
-                add_libro_imagen_file: evt.target.files[0] ? evt.target.files[0] : null
+                addBookCover: (URL.createObjectURL(evt.target.files[0])) ? URL.createObjectURL(evt.target.files[0]) : null,
+                addBookCoverFile: evt.target.files[0] ? evt.target.files[0] : null
             }, callState);
         }
     }
@@ -167,18 +169,18 @@ class SubirLibroModal extends Component {
         this.setState({ 
             ...this.initialState,
             disabledButton: false,
-            categoria_items: this.categoria_items
-        }, this.props.openAddLibro.bind(this, false));
+            genreItems: this.genreItems
+        }, this.props.openAddBook.bind(this, false));
     }
 
     handleCategoria = (event, index, value) => {
         const callState = () => {
-            if (this.state.error.add_libro_categoria !== "") {
+            if (this.state.error.addBookGenre !== "") {
                 this.setState({
                     ...this.state,
                     error: {
                         ...this.state.error,
-                        add_libro_categoria: ""
+                        addBookGenre: ""
                     }
                 });
             }
@@ -186,7 +188,7 @@ class SubirLibroModal extends Component {
 
         this.setState({
             ...this.state,
-            add_libro_categoria: value
+            addBookGenre: value
         }, callState);
     }
 
@@ -214,36 +216,36 @@ class SubirLibroModal extends Component {
                     <Grid container>
                             <Grid item sm={6} className="uploadBookLeftGrid">
                                 <TextField
-                                    name="add_libro_titulo"
-                                    id="addTituloLibro"
+                                    name="addBookTitle"
+                                    id="addBookTitle"
                                     label="Título del libro"
                                     fullWidth
                                     inputProps={{
                                         maxLength: 45
                                     }}
                                     required
-                                    error={this.state.error.add_libro_titulo != ""}
-                                    errorText={this.state.error.add_libro_titulo}
+                                    error={this.state.error.addBookTitle != ""}
+                                    errorText={this.state.error.addBookTitle}
                                     onChange={this.oChangeInput.bind(this)}
                                     className="paddingTextFields"
                                 /><br />
                                 <TextField
-                                    name="add_libro_autor"
-                                    id="addAutorLibro"
+                                    name="addBookAuthor"
+                                    id="addBookAuthor"
                                     label="Título del libro"
                                     fullWidth
                                     inputProps={{
                                         maxLength: 45
                                     }}
                                     required
-                                    error={this.state.error.add_libro_autor != ""}
-                                    errorText={this.state.error.add_libro_autor}
+                                    error={this.state.error.addBookAuthor != ""}
+                                    errorText={this.state.error.addBookAuthor}
                                     onChange={this.oChangeInput.bind(this)}
                                     className="paddingTextFields"
                                 /><br />
                                 <TextField
-                                    name="add_libro_historia"
-                                    id="addDescripcionLibro"
+                                    name="addBookDescription"
+                                    id="addBookDescription"
                                     label="Describe un poco la historia, no lo cuentes TODO!"
                                     multiline
                                     rowsMax="4"
@@ -252,14 +254,14 @@ class SubirLibroModal extends Component {
                                         maxLength: 140,
                                     }}
                                     required
-                                    error={this.state.error.add_libro_historia != ""}
-                                    errorText={this.state.error.add_libro_historia}
+                                    error={this.state.error.addBookDescription != ""}
+                                    errorText={this.state.error.addBookDescription}
                                     onChange={this.oChangeInput.bind(this)}
                                     className="paddingTextFields"
                                 /><br />
                                 <TextField
-                                    name="add_libro_opinion"
-                                    id="addOpinionLibro"
+                                    name="addBookReview"
+                                    id="addBookReview"
                                     label="Escribe tu opinión personal"
                                     multiline
                                     rowsMax="4"
@@ -272,49 +274,49 @@ class SubirLibroModal extends Component {
                                     className="paddingTextFields"
                                 /><br />
                                 <FormControl /*className={classes.formControl}*/>
-                                    <InputLabel htmlFor="selectCategoriasSubir">Selecciona una categoria</InputLabel>
+                                    <InputLabel htmlFor="uploadBookGenreSelect">Selecciona una categoria</InputLabel>
                                     <Select
                                         multiple
-                                        value={this.state.add_libro_categoria}
+                                        value={this.state.addBookGenre}
                                         onChange={this.handleCategoria}
-                                        input={<Input id="selectCategoriasSubir" />}
+                                        input={<Input id="uploadBookGenreSelect" />}
                                         renderValue={selected => selected.join(', ')}
                                         style={{ width: '100%' }}
                                     >
-                                        {this.state.categoria_items.map((name, index, list) => (
+                                        {this.state.genreItems.map((name, index, list) => (
                                         <MenuItem key={name} value={name}>
                                             <Checkbox checked={this.state.name.indexOf(name) > -1} />
                                             <ListItemText primary={name} />
                                         </MenuItem>
                                         ))}
                                     </Select>
-                                    <p id="error_add_category" className="errorInput" hidden={!this.state.error.add_libro_categoria}>
+                                    <p id="error_add_category" className="errorInput" hidden={!this.state.error.addBookGenre}>
                                         Debes eligir al menos una categoría
                                     </p>
                                 </FormControl>
                             </Grid>
                             <Grid item sm={6} className="uploadBookLeftGrid">
-                                <Paper zDepth={4} rounded={false} style={portadaPreview}>
-                                    <img src={this.state.add_libro_imagen} alt="Necesitas una imagen" className="imagenPortadaPreview" />
+                                <Paper zDepth={4} rounded={false} style={coverPreview}>
+                                    <img src={this.state.addBookCover} alt="Necesitas una imagen" className="imagenPortadaPreview" />
                                 </Paper>
                                 <br />
-                                <div className="divBotonSubirAvatar">
+                                <div className="divUploadAvatarButton">
                                     <input
-                                        id="botonSubirLibro"
+                                        id="uploadBookButton"
                                         accept="image/*"
                                         type="file"
                                         style={DISPLAY_NONE} 
                                         className="imageInput" 
                                         onChange={this.cargarImagenPortada.bind(this)} 
                                     />
-                                    <label htmlFor="botonSubirLibro">
+                                    <label htmlFor="uploadBookButton">
                                         <Button variant="outlined" component="span" className="" fullWidth>
                                             AÑADE UNA IMAGEN DE PORTADA
                                         </Button>
                                     </label>
                                 </div>
-                                <p id="error_add_img" className="errorInput" hidden={!this.state.error.add_libro_imagen}>
-                                    Debes añadir una imagen de la portada
+                                <p id="error_add_img" className="errorInput" hidden={!this.state.error.addBookCover}>
+                                    Debes añadir una imagen de la bookCover
                                 </p>
                             </Grid>
                     </Grid>
@@ -328,7 +330,7 @@ class SubirLibroModal extends Component {
                         </Button>
                         <Button variant="contained" color="primary" 
                             disabled={this.state.disabledButton}
-                            onClick={this.subirLibro_aceptar.bind(this)}
+                            onClick={this.acceptUploadBook.bind(this)}
                         >
                             SÚBELO
                         </Button>
@@ -343,12 +345,12 @@ export default connect(
     (state) => ({
         isOpenModal: appState.getIsOpenModal(state).isOpenAddBook,
         selectedIndex: appState.getCurrentTabID(state),
-        uploadLibroSuccess: appState.libroSuccessUpload(state),
-        genres: appState.allCategorias(state)
+        genres: appState.getGenres(state),
+        getCurrentUserId: appState.getUserId(state)
     }),
     (dispatch) => ({
-        openAddLibro: (isOpen) => dispatch(setIsOpenAddBook(isOpen)),
-        uploadLibro: (datosLibro) => dispatch(uploadLibro(datosLibro)),
+        openAddBook: (isOpen) => dispatch(setIsOpenAddBook(isOpen)),
+        uploadBook: (bookData) => dispatch(uploadBook(bookData)),
         fetchGenres: () => dispatch(fetchGenres())
     })
-)(SubirLibroModal);
+)(UploadBookModal);

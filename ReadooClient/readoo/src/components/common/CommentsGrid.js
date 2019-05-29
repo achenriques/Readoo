@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchCommentaries, sendComment, setControllerCommentDefault } from '../../app_state/actions';
+import { fetchCommentaries, sendComment } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Grid from '@material-ui/core/Grid';
 // TODO change GridList
@@ -19,95 +19,97 @@ import { NUM_OF_COMENTARIES, REST_FAILURE, REST_SUCCESS, REST_DEFAULT } from '..
 class CommentsGrid extends Component {
 
     initialState = {
-        cargadosComentarios: null,  // 1 para cargados, -1 para error
-        comentariosLibros: [],
-        nuevoComentario: '',
-        bookIdActual: null
+        loadedComment: null,  // 1 para loaded, -1 para error
+        bookCommentaries: [],
+        newCommentary: '',
+        currentBookId: null
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
-        if(nextProps.getfetchComentarioSuccess && REST_FAILURE === nextProps.getfetchComentarioSuccess) {
-            nextProps.recibidoFetchComentario();
+        /* if(nextProps.getfetchcommentariesSuccess && REST_FAILURE === nextProps.getfetchcommentariesSuccess) {
+            nextProps.recibidoFetchcommentaries();
             return ({
                 ...prevState,
-                cargadosComentarios: REST_FAILURE
+                loadedComment: REST_FAILURE
             });
-        }
+        } */
 
-        if (nextProps.bookId > 0 && nextProps.bookId != prevState.bookIdActual/*&& prevState.cargadosComentarios !== REST_DEFAULT*/) {
-            let fechaUltimoComentario = null;
-            if (prevState.comentariosLibros && prevState.comentariosLibros.length) {
-                fechaUltimoComentario = new Date(Math.max.apply(null, prevState.comentariosLibros.map(function(e) {
-                    return new Date(e.fecha);
+        if (nextProps.bookId > 0 && nextProps.bookId != prevState.currentBookId/*&& prevState.loadedComment !== REST_DEFAULT*/) {
+            let lastCommentaryDate = null;
+            if (prevState.bookCommentaries && prevState.bookCommentaries.length) {
+                lastCommentaryDate = new Date(Math.max.apply(null, prevState.bookCommentaries.map(function(e) {
+                    return new Date(e.date);
                   })));
             }
-            // todo fecha
-            (nextProps.fetchCommentaries) && nextProps.fetchCommentaries(nextProps.bookId, NUM_OF_COMENTARIES, fechaUltimoComentario);
-            return ({ ...prevState, cargadosComentarios: REST_DEFAULT, bookIdActual: nextProps.bookId });
+            // todo date
+            (nextProps.fetchCommentaries) && nextProps.fetchCommentaries(nextProps.bookId, NUM_OF_COMENTARIES, lastCommentaryDate);
+            return ({ ...prevState, loadedComment: REST_DEFAULT, currentBookId: nextProps.bookId });
         } else
-        if (nextProps.comentariosMostrados == null) {
+        if (nextProps.shownCommentaries == null) {
             return ({
                 ...prevState,
-                cargadosComentarios: REST_FAILURE,
-                comentariosLibros: null
+                loadedComment: REST_FAILURE,
+                bookCommentaries: null
             })
         } else
-        if (nextProps.comentariosMostrados && prevState.cargadosComentarios === REST_DEFAULT) {
+        if (nextProps.shownCommentaries && prevState.loadedComment === REST_DEFAULT) {
             return ({
                 ...prevState.state,
-                cargadosComentarios: REST_SUCCESS,
-                comentarios: nextProps.comentariosMostrados
+                loadedComment: REST_SUCCESS,
+                comentaries: nextProps.shownCommentaries
             })
         } else
         return null;
     }
 
-    comentarios = [
+    comentaries = [
         {   
             commentId: 1,
-            usuario: "Minervo",
-            comentario: "Ou la la!",
-            subComentarios: []
+            userName: "Minervo",
+            commentaries: "Ou la la!",
+            subcommentaries: []
         },
         {   
             commentId: 2,
-            usuario: "Minervo",
-            comentario: "Ou la la!",
-            subComentarios: []
+            userName: "Minervo",
+            commentaries: "Ou la la!",
+            subcommentaries: []
         },
         {   
             commentId: 3,
-            usuario: "Minervo",
-            comentario: "Ou la lelo!",
-            subComentarios: [ 
+            userName: "Minervo",
+            commentaries: "Ou la lelo!",
+            subcommentaries: [ 
                 {
                     commentId: 13,
-                    usuario: "Minervo",
-                    comentario: "Me gusta lo que has dicho",
+                    userName: "Minervo",
+                    commentaries: "Me gusta lo que has dicho",
+                    subcommentaries: []
                 },  {
                     commentId: 14,
-                    usuario: "Minerv1",
-                    comentario: "Adios vella",
+                    userName: "Minerv1",
+                    commentaries: "Adios vella",
+                    subcommentaries: []
                 } 
             ]
         },
         {   
             commentId: 4,
-            usuario: "Minervo",
-            comentario: "Ou la la!",
-            subComentarios: []
+            userName: "Minervo",
+            commentaries: "Ou la la!",
+            subcommentaries: []
         },
         {   
             commentId: 5,
-            usuario: "Minervo",
-            comentario: "Ou la la!",
-            subComentarios: []
+            userName: "Minervo",
+            commentaries: "Ou la la!",
+            subcommentaries: []
         },
         {   
             commentId: 6,
-            usuario: "Minervo",
-            comentario: "Ou la la!",
-            subComentarios: []
+            userName: "Minervo",
+            commentaries: "Ou la la!",
+            subcommentaries: []
         },
     ]
 
@@ -145,27 +147,28 @@ class CommentsGrid extends Component {
         }
     }
 
-    changeNuevoComentario (evt) {
+    changeNewCommentaries (evt) {
         (evt) && this.setState({
             ...this.state,
-            nuevoComentario: evt.currentTarget.value
+            newCommentary: evt.currentTarget.value
         })
     }
 
-    sendComment (evt, commentId, bookId) {
-        if (this.state.nuevoComentario) {
-            let textoComentario = this.state.nuevoComentario.trim();
+    sendCommentary (evt, commentId, bookId) {
+        if (this.state.newCommentary) {
+            let commentText = this.state.newCommentary.trim();
 
-            this.props.sendComment(commentId, bookId, 2, /* TODO: usuario*/ textoComentario);
+            this.props.sendCommentary(commentId, bookId, this.props.currentUserId, 
+                this.props.currentUser.userNick, commentText);
         }
     }
 
-    mostrarSubComentarios (comentario) {
-        if (comentario.subComentarios.length) {
+    showSubcommentaries (commentaries) {
+        if (commentaries.subcommentaries.length) {
             return (
                 <div>
-                    <div className="respuestaComentario">
-                        {(comentario.subComentarios.length > 1)? 'Respuestas': 'Respuesta'}
+                    <div className="commentariesAnswer">
+                        {(commentaries.subcommentaries.length > 1)? 'Respuestas': 'Respuesta'}
                     </div>
                     <div style={material_styles.styleChildren} >
                         <GridList
@@ -174,11 +177,11 @@ class CommentsGrid extends Component {
                             padding={10}
                             style={material_styles.styleChildrenList}
                         >
-                        {comentario.subComentarios.map((subComment) => (
+                        {commentaries.subcommentaries.map((subComment) => (
                             <Paper elevation={1} >
                                 <GridTile
                                     key={subComment.commentId}
-                                    title={subComment.usuario}
+                                    title={subComment.userName}
                                     actionIcon={<IconButton><StarBorder color="white" style={{width: '30px', heigth: '30px' }}><Avatar src="" /></StarBorder></IconButton>}
                                     actionPosition="left"
                                     titlePosition="top"
@@ -187,7 +190,7 @@ class CommentsGrid extends Component {
                                     cols={1}
                                     rows={1}
                                 >
-                                    <div className='divComentario'> {subComment.comentario} </div>
+                                    <div className='divCommentaries'> {subComment.commentaries} </div>
                                 </GridTile>
                             </Paper>
                         ))}
@@ -199,22 +202,22 @@ class CommentsGrid extends Component {
     }
 
     render() {
-        switch (this.state.cargadosComentarios) {
+        switch (this.state.loadedComment) {
             case -1:
                 return (
-                    <div className="cargandoComentarios">
-                        <h3>Error en la carga de comentarios puede ser un problema de red o fallo del servidor...</h3>
+                    <div className="loadingCommentaries">
+                        <h3>Error en la carga de comentaries puede ser un problema de red o fallo del servidor...</h3>
                     </div>
                 )
             case 0:
                 return (
-                    <div className="cargandoComentarios">
+                    <div className="loadingCommentaries">
                         <h3>Cargando...</h3>
                     </div>
                 )
 
             case 1:
-                if (this.state.comentarios.length) {
+                if (this.state.comentaries.length) {
                     return (
                         <div style={material_styles.styleRoot} >
                             <GridList
@@ -224,11 +227,11 @@ class CommentsGrid extends Component {
                                 padding={15}
                                 style={material_styles.styleGridList}
                             >
-                            {/*this.props.comentarios*/this.props.comentarios.map((comentario) => (
+                            {/*this.props.comentaries*/this.props.comentaries.map((commentaries) => (
                                 <Paper elevation={4} >
                                     <GridTile
-                                        key={comentario.commentId}
-                                        title={comentario.usuario}
+                                        key={commentaries.commentId}
+                                        title={commentaries.userName}
                                         actionIcon={<IconButton><StarBorder color="white" ><Avatar src="" /></StarBorder></IconButton>}
                                         actionPosition="left"
                                         titlePosition="top"
@@ -239,10 +242,10 @@ class CommentsGrid extends Component {
                                         rows={1}
                                     >
                                         <div>
-                                            <div className='divComentario'> {comentario.comentario} </div>
+                                            <div className='divCommentaries'> {commentaries.commentaries} </div>
                                             <Divider style={material_styles.styleCommentSeparator}/>
-                                            {this.mostrarSubComentarios(comentario)}
-                                            <div className="divRespuestaComentario">
+                                            {this.showSubcommentaries(commentaries)}
+                                            <div className="divCommentaryAnswer">
                                                 <Grid container spacing={24}>
                                                     <Grid item sm={10}>
                                                         <TextField
@@ -251,11 +254,11 @@ class CommentsGrid extends Component {
                                                             multiline
                                                             rowsMax="2"
                                                             fullWidth={true}
-                                                            onChange={this.changeNuevoComentario.bind(this)}
+                                                            onChange={this.changeNewCommentaries.bind(this)}
                                                         />
                                                     </Grid>
                                                     <Grid item sm={1}>
-                                                        <IconButton color="primary" onClick={() => {this.sendComment(this, null, this.props.bookId)}} style={material_styles.styleSendButton}>
+                                                        <IconButton color="primary" onClick={() => {this.sendCommentary(this, null, this.props.bookId)}} style={material_styles.styleSendButton}>
                                                             <Send/>
                                                         </IconButton>
                                                     </Grid>
@@ -274,21 +277,21 @@ class CommentsGrid extends Component {
                 if (this.props.bookId > 0) {
                     return (
                         <div>
-                            <h3 className="margenNoComentarios" >No hay ningún comentario. Sé tu el primero en romper el hielo...</h3>
-                            <div className="divRespuestaComentario">
+                            <h3 className="marginNoCommentaries" >No hay ningún commentaries. Sé tu el primero en romper el hielo...</h3>
+                            <div className="divCommentaryAnswer">
                                 <Grid container spacing={24}>
                                     <Grid item sm={10}>
                                         <TextField
-                                            label="Escribe un comentario digno de un gran lector"
+                                            label="Escribe un commentaries digno de un gran lector"
                                             maxLength="140"
                                             multiline
                                             rowsMax="2"
                                             fullWidth={true}
-                                            onChange={this.changeNuevoComentario.bind(this)}
+                                            onChange={this.changeNewCommentaries.bind(this)}
                                         />
                                     </Grid>
                                     <Grid item sm={1} style={{position: 'relative'}}>
-                                        <IconButton color="primary" onClick={() => {this.sendComment(this, null, this.props.bookId)}} style={material_styles.styleSendButton}>
+                                        <IconButton color="primary" onClick={() => {this.sendCommentary(this, null, this.props.bookId)}} style={material_styles.styleSendButton}>
                                             <Send/>
                                         </IconButton>
                                     </Grid>
@@ -298,7 +301,7 @@ class CommentsGrid extends Component {
                     );  
                 } else {
                     return (
-                        <h3 className="margenNoComentarios" >No contrates Jastel!</h3>
+                        <h3 className="marginNoCommentaries" >No contrates Jastel!</h3>
                     )
                 }
                 break;
@@ -308,12 +311,11 @@ class CommentsGrid extends Component {
 
 export default connect(
     (state) => ({
-        comentariosMostrados: appState.getComentarios(state),
-        getfetchComentarioSuccess: appState.getfetchComentarioSuccess(state)
+        shownCommentaries: appState.getCommentaries(state),
+        // TODO getfetchcommentariesSuccess: appState.getfetchcommentariesSuccess(state)
     }),
     (dispatch) => ({
-        fetchCommentaries: (bookId, nCommentaries, fechaUltimo) => dispatch(fetchCommentaries(bookId, nCommentaries, fechaUltimo)),
-        sendComment: (commentId, bookId, userId, comentario) => dispatch(sendComment(commentId, bookId, userId, comentario)),
-        recibidoFetchComentario: () => dispatch(setControllerCommentDefault())
+        fetchCommentaries: (bookId, nCommentaries, lastDate) => dispatch(fetchCommentaries(bookId, nCommentaries, lastDate)),
+        sendCommentary: (commentId, bookId, userId, commentaries) => dispatch(sendComment(commentId, bookId, userId, commentaries)),
     })
 )(CommentsGrid);

@@ -12,32 +12,32 @@ import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT } from '../../constants/appCon
 class ProfileView extends Component {
 
     initialState = {
-        datosUsuario: {
-            avatar: avatarDefault,
-            nick: "",
-            contrasena: "******",
-            email: "",
-            nombre: "",
-            apellidos: "",
-            sobreMi: "",
-            misCategorias: []
+        userData: {
+            userAvatar: avatarDefault,
+            userNick: "",
+            userPass: "******",
+            userEmail: "",
+            userName: "",
+            userSurname: "",
+            userAboutMe: "",
+            myGenres: []
         },
-        nickUsuario: "",
-        viejaPassUsuario: "",
-        passUsuario: "",
-        emailUsuario: "",
-        nombreUsuario: "",
-        apellidosUsuario: "",
-        imagenAvatar: "",
-        cargandoPerfil: null,
-        mostrarAntiguaPass: false
+        userNick: "",
+        oldUserPass: "",
+        userPass: "",
+        userEmail: "",
+        userName: "",
+        userSurname: "",
+        avatarImage: "",
+        loadingProfile: null,
+        showOldPass: false
     };
 
     constructor(props) {
         super(props);
         this.state = { ...this.initialState };
         // TODO 
-        this.props.fetchUserData(1);
+        this.props.fetchUserData();
     };
 
     oChangeInput = (evt) => {
@@ -45,11 +45,11 @@ class ProfileView extends Component {
         const name = evt.target.name;
 
         let callback = () => {};
-        if (name === "passUsuario" && !this.state.mostrarAntiguaPass) {
+        if (name === "userPass" && !this.state.showOldPass) {
             callback = () => {
                 this.setState({
                     ...this.state,
-                    mostrarAntiguaPass: true
+                    showOldPass: true
                 });
             }
         }
@@ -63,12 +63,12 @@ class ProfileView extends Component {
     loadAvatarImage = (evt) => {
         /*
         const callState = () => {
-            if (this.state.error.add_libro_imagen === true) {
+            if (this.state.error.addBookCover === true) {
                 this.setState({
                     ...this.state,
                     error: {
                         ...this.state.error,
-                        add_libro_imagen: false
+                        addBookCover: false
                     }
                 });
             }
@@ -77,15 +77,15 @@ class ProfileView extends Component {
         if (evt.target.files[0]) {
             this.setState({
                 ...this.state,
-                datosUsuario: {
-                    ...this.state.datosUsuario,
-                    avatar: (URL.createObjectURL(evt.target.files[0])) ? URL.createObjectURL(evt.target.files[0]) : null,
+                userData: {
+                    ...this.state.userData,
+                    userAvatar: (URL.createObjectURL(evt.target.files[0])) ? URL.createObjectURL(evt.target.files[0]) : null,
                 },
-                imagenAvatar: evt.target.files[0] ? evt.target.files[0] : avatarDefault
+                avatarImage: evt.target.files[0] ? evt.target.files[0] : avatarDefault
             }, /*callState*/);
         } else {
             this.setState({
-                imagenAvatar: avatarDefault
+                avatarImage: avatarDefault
             });
         }
     }
@@ -99,16 +99,16 @@ class ProfileView extends Component {
     }
 
     render = () => {
-        switch (this.state.cargandoPerfil) {
+        switch (this.state.loadingProfile) {
             case -1:
                 return (
-                    <div className="cargandoComentarios">
+                    <div className="loadingCommentaries">
                         <h3>Error en la carga de los datos de usuario. Puede ser un problema de red o fallo del servidor...</h3>
                     </div>
                 )
             case 0:
                 return (
-                    <div className="cargandoComentarios">
+                    <div className="loadingCommentaries">
                         <h3>Cargando...</h3>
                     </div>
                 )
@@ -116,24 +116,24 @@ class ProfileView extends Component {
             default:
                 return (
                     <div>
-                        <Grid container className="gridPerfil">
-                            <Grid item sm={4} className="columnaAvatarPerfil">
+                        <Grid container className="profileGrid">
+                            <Grid item sm={4} className="profileAvatarColumn">
                                     <div style={{ position: "relative"}}>
-                                        <Paper elevation={4} className="divAvatarPerfil">
-                                            <img src={this.state.datosUsuario.avatar} alt="Imagen de presentación de usuario" className="imgAvatarPerfil"/>
+                                        <Paper elevation={4} className="divProfileAvatar">
+                                            <img src={this.state.userData.userAvatar} alt="Imagen de presentación de usuario" className="profileAvatarImage"/>
                                         </Paper>
                                     </div>
-                                    <div className="divBotonSubirAvatar">
+                                    <div className="divUploadAvatarButton">
                                         <input
                                             accept="image/*"
                                             style={DISPLAY_NONE}
-                                            id="botonSubirAvatar"
+                                            id="uploadAvatarButton"
                                             multiple
                                             type="file"
                                             onChange={this.loadAvatarImage.bind(this)} 
                                         />
-                                        <label htmlFor="botonSubirAvatar">
-                                            <Button variant="outlined" component="span" className="subirAvatarPerfil" fullWidth>
+                                        <label htmlFor="uploadAvatarButton">
+                                            <Button variant="outlined" component="span" className="uploadProfileAvatar" fullWidth>
                                                 AÑADE UNA IMAGEN DE PORTADA
                                             </Button>
                                         </label>
@@ -143,100 +143,100 @@ class ProfileView extends Component {
                                 <Paper elevation={4} className="divDatosPerfil">
                                     <TextField
                                         label="Nick de tu Usuario, es único recuerda"
-                                        id="nickUsuario"
-                                        name="nickUsuario"
+                                        id="userNick"
+                                        name="userNick"
                                         fullWidth
                                         inputProps={{
                                             maxLength: 45,
                                         }}
-                                        value={this.state.nickUsuario}
+                                        value={this.state.userNick}
                                         onChange={this.oChangeInput.bind(this)}
-                                        className="inputDatosPerfil"
+                                        className="inputProfileData"
                                     />
                                     <br/>
                                     <TextField
                                         label="Nombre de usuario"
-                                        id="nombreUsuario"
-                                        name="nombreUsuario"
+                                        id="userName"
+                                        name="userName"
                                         fullWidth
                                         inputProps={{
                                             maxLength: 45,
                                         }}
-                                        value={this.state.nombreUsuario}
+                                        value={this.state.userName}
                                         onChange={this.oChangeInput.bind(this)}
-                                        className="inputDatosPerfil"
+                                        className="inputProfileData"
                                     />
                                     <br/>
                                     <TextField
                                         label="Tus apellidos"
-                                        id="apellidoUsuario"
-                                        name="apellidoUsuario"
+                                        id="userSurname"
+                                        name="userSurname"
                                         fullWidth
                                         inputProps={{
                                             maxLength: 45,
                                         }}
-                                        value={this.state.apellidosUsuario}
+                                        value={this.state.userSurname}
                                         onChange={this.oChangeInput.bind(this)}
-                                        className="inputDatosPerfil"
+                                        className="inputProfileData"
                                     />
                                     <br/>
                                     <TextField
                                         label="Tu E-mail"
-                                        id="emailUsuario"
-                                        name="emailUsuario"
+                                        id="userEmail"
+                                        name="userEmail"
                                         fullWidth
                                         inputProps={{
                                             maxLength: 45,
                                         }}
-                                        value={this.state.emailUsuario}
+                                        value={this.state.userEmail}
                                         onChange={this.oChangeInput.bind(this)}
-                                        className="inputDatosPerfil"
+                                        className="inputProfileData"
                                     />
                                     <br/>
                                     <TextField
                                         label="Algo sobre tí mismo"
-                                        id="sobreMiPerfil"
-                                        name="sobreMiPerfil"
+                                        id="userAboutMe"
+                                        name="userAboutMe"
                                         multiline
                                         rowsMax="4"
                                         fullWidth
                                         inputProps={{
                                             maxLength: 140,
                                         }}
-                                        value={this.state.sobreMi}
+                                        value={this.state.userAboutMe}
                                         onChange={this.oChangeInput.bind(this)}
-                                        className="inputDatosPerfil"
+                                        className="inputProfileData"
                                     />
-                                    {(this.state.mostrarAntiguaPass)? (
+                                    {(this.state.showOldPass)? (
                                         <div>
                                             <TextField
                                                 label="Tu antigüa contraseña"
-                                                id="viejaPassUsuario"
-                                                name="viejaPassUsuario"
+                                                id="oldUserPass"
+                                                name="oldUserPass"
                                                 fullWidth
                                                 type="password"
                                                 inputProps={{
                                                     maxLength: 20,
                                                 }}
-                                                value={this.state.viejaPassUsuario}
+                                                value={this.state.oldUserPass}
                                                 onChange={this.oChangeInput.bind(this)}
-                                                className="inputDatosPerfil"
+                                                className="inputProfileData"
                                             />
                                             <br/>
                                         </div>
                                     ): (<div/>)}
                                     <TextField
                                         label="Tu contraseña"
-                                        id="passUsuario"
-                                        name="passUsuario"
+                                        id="userPass"
+                                        name="userPass"
                                         fullWidth
                                         type="password"
                                         inputProps={{
                                             maxLength: 20,
                                         }}
-                                        value={this.state.passUsuario}
+                                        value={this.state.userPass}
                                         onChange={this.oChangeInput.bind(this)}
-                                        className="inputDatosPerfil"
+                                        className="inputProfileData"
                                     />
                                     <br/>
                                 </Paper>
@@ -268,8 +268,7 @@ class ProfileView extends Component {
 
 export default connect(
     (state) => ({
-        datosUsuario: appState.getUser(state),
-        savingUserData: appState.getsaveUserDataSuccess(state),
+        userData: appState.getUser(state),
     }),
     (dispatch) => ({
         fetchUserData: () => dispatch(fetchUserData())

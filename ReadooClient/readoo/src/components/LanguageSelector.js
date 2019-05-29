@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as appState from '../../app_state/reducers';
-import { changeLanguage } from '../../app_state/actions';
+import * as appState from '../app_state/reducers';
+import { changeLanguage } from '../app_state/actions';
 import stringResources from '../resources/stringResources';
-import { LANGUAGE_ENGLISH } from '../../constants/appConstants';
+import { LANGUAGE_ENGLISH } from '../constants/appConstants';
 
 class LanguageSelector extends Component {
 
@@ -67,7 +67,7 @@ class LanguageSelector extends Component {
     }
 
     render = () => {
-        return ({ __html : this.msg(this.props.msgId, this.props.defaultMsg) });
+        return (<span>{ this.msg(this.props.msgId, this.props.defaultMsg) }</span>);
     }
 }
 

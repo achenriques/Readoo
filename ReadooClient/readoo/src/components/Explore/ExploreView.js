@@ -19,52 +19,52 @@ import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import Divider from '@material-ui/core/Divider';
 import CommentsGrid from '../common/CommentsGrid';
 import { NUM_OF_BOOKS, DISPLAY_NONE } from '../../constants/appConstants';
-import libroDefault from '../../resources/libroDefault.gif';
+import bookDefault from '../../resources/bookDefault.gif';
 import material_styles from './material_styles';
 
 class ExploreView extends Component {
 
     initilState = {
-        estoyLibroAtras: false,
-        libroAtras : null,
-        libroActual: {
+        isPreviousBook: false,
+        previousBook : null,
+        currentBook: {
             bookId: null,
-            titulo: '',
-            autor: '',
-            portada: null,
-            argumento: '',
-            historia: '',
-            likes: 0,
+            bookTitle: '',
+            bookAuthor: '',
+            bookCover: null,
+            bookDescription: '',
+            bookReview: '',
+            bookLikes: 0,
         },
-        likeLibro: false,
-        errorImgLibro: false,
-        mostrarCorazon: 0,  // 0 no mostrar, 1 red, 2 black
+        likeBook: false,
+        bookCoverErr: false,
+        showHeart: 0,  // 0 no mostrar, 1 red, 2 black
         expanded: false,
     };
 
-    cargarLibroActualFromProps (props) {
-        console.log(props.librosMostrados[props.indexLibro]);
-        if (props.librosMostrados.length > 0 || props.indexLibro > -1) {
-            let portada;
-            if (props.librosMostrados.length === 1)
-                portada = props.librosMostrados[props.indexLibro].coverUrl;
-            else if (props.librosMostrados[props.indexLibro].coverUrl)
-                portada = 'data:image/png;base64, ' + props.librosMostrados[props.indexLibro].coverUrl;
+    loadCurrentBookFromProps (props) {
+        console.log(props.shownBooks[props.bookIndex]);
+        if (props.shownBooks.length > 0 || props.bookIndex > -1) {
+            let bookCover;
+            if (props.shownBooks.length === 1)
+                bookCover = props.shownBooks[props.bookIndex].coverUrl;
+            else if (props.shownBooks[props.bookIndex].coverUrl)
+                bookCover = 'data:image/png;base64, ' + props.shownBooks[props.bookIndex].coverUrl;
             else
-                portada =  libroDefault;
+                bookCover =  bookDefault;
             
             this.setState({
                 ...this.state,
-                libroActual: {
-                    bookId: props.librosMostrados[props.indexLibro].bookId,
-                    titulo: props.librosMostrados[props.indexLibro].titulo,
-                    autor: props.librosMostrados[props.indexLibro].autor,
-                    portada: portada,
-                    argumento: props.librosMostrados[props.indexLibro].descripcion,
-                    opinion: props.librosMostrados[props.indexLibro].review,
-                    likes: +props.librosMostrados[props.indexLibro].likes,
+                currentBook: {
+                    bookId: props.shownBooks[props.bookIndex].bookId,
+                    bookTitle: props.shownBooks[props.bookIndex].bookTitle,
+                    bookAuthor: props.shownBooks[props.bookIndex].bookAuthor,
+                    bookCover: bookCover,
+                    bookDescription: props.shownBooks[props.bookIndex].descripcion,
+                    bookReview: props.shownBooks[props.bookIndex].review,
+                    bookLikes: +props.shownBooks[props.bookIndex].bookLikes,
                 },
-                errorImgLibro: (!props.librosMostrados[props.indexLibro].coverUrl)? "Oh oh! No se ha cargado la imagen. Que mal!": '',
+                bookCoverErr: (!props.shownBooks[props.bookIndex].coverUrl)? "Oh oh! No se ha cargado la imagen. Que mal!": '',
             });
         } else {
 
@@ -81,33 +81,33 @@ class ExploreView extends Component {
     }
 
     componentWillReceiveProps(newProps) {
-        this.cargarLibroActualFromProps (newProps);
+        this.loadCurrentBookFromProps (newProps);
     }
 
     handleBack(evt) {
         this.setState({
             ...this.state,
-            errorImgLibro: (!this.state.libroAtras.portada)? "Oh oh! No se ha cargado la imagen. Que mal!": '',
-            libroActual: { ...this.state.libroAtras },
-            libroAtras: null,
-            estoyLibroAtras: true,
+            bookCoverErr: (!this.state.previousBook.bookCover)? "Oh oh! No se ha cargado la imagen. Que mal!": '',
+            currentBook: { ...this.state.previousBook },
+            previousBook: null,
+            isPreviousBook: true,
         })
     }
 
     handleForward(evt) {
-        if (this.props.indexLibro === NUM_OF_BOOKS / 2) {
+        if (this.props.bookIndex === NUM_OF_BOOKS / 2) {
             this.props.fetchBooks(0, []);
             this.props.nextBook();
         }
-        else if (this.state.estoyLibroAtras) {
+        else if (this.state.isPreviousBook) {
             this.setState({
                 ...this.state,
-                estoyLibroAtras: false,
-            }, () => { this.cargarLibroActualFromProps (this.props) });
+                isPreviousBook: false,
+            }, () => { this.loadCurrentBookFromProps (this.props) });
         } else {
             this.setState({
                 ...this.state,
-                libroAtras: this.state.libroActual
+                previousBook: this.state.currentBook
             }, () => {
                 this.props.nextBook();
             });
@@ -115,8 +115,8 @@ class ExploreView extends Component {
     }
 
     handleDbClickImage(evt) {
-        if (this.state.libroActual && this.state.libroActual.bookId > 0) {
-            if (this.state.likeLibro) {
+        if (this.state.currentBook && this.state.currentBook.bookId > 0) {
+            if (this.state.likeBook) {
                 this.handleUnlike(evt);
             } else {
                 this.handleLike(evt);
@@ -125,51 +125,53 @@ class ExploreView extends Component {
     }
 
     handleLike(evt) {
-        if (!this.state.likeLibro) {
-            const cerrarCorazon = () => {
+        if (!this.state.likeBook) {
+            const closeHeart = () => {
                 setTimeout(()=>{
                     this.setState(
                         {
                             ...this.state,
-                            libroActual: { ...this.state.libroActual, likes: this.state.libroActual.likes +1},
-                            mostrarCorazon: 0,
-                            likeLibro: true,
+                            currentBook: { ...this.state.currentBook, bookLikes: this.state.currentBook.bookLikes +1},
+                            showHeart: 0,
+                            likeBook: true,
                         }
                     )
                 }, 1000);
             }
 
-            (this.props.enviandoMegusta === false) && this.props.doLikeBook(this.state.libroActual.bookId, 2); //FIXME TODO usuarios
+            // (this.props.enviandoMegusta === false) && 
+            this.props.doLikeBook(this.state.currentBook.bookId, this.props.currentUserId);
             this.setState(
                 {
                     ...this.state,
-                    mostrarCorazon: 1
-                }, cerrarCorazon
+                    showHeart: 1
+                }, closeHeart
             )
         }
     }
 
     handleUnlike(evt) {
-        if (this.state.likeLibro) {
-            const cerrarCorazon = () => {
+        if (this.state.likeBook) {
+            const closeHeart = () => {
                 setTimeout(()=>{
                     this.setState(
                         {
                             ...this.state,
-                            libroActual: { ...this.state.libroActual, likes: this.state.libroActual.likes -1},
-                            mostrarCorazon: 0,
-                            likeLibro: false
+                            currentBook: { ...this.state.currentBook, bookLikes: this.state.currentBook.bookLikes -1},
+                            showHeart: 0,
+                            likeBook: false
                         }
                     )
                 }, 1000);
             }
             
-            (this.props.enviandoMegusta === false) && this.props.doDislikeBook(this.state.libroActual.bookId, 2); //FIXME TODO usuarios
+            // (this.props.enviandoMegusta === false) && 
+            this.props.doDislikeBook(this.state.currentBook.bookId, this.props.currentUserId);
             this.setState(
                 {
                     ...this.state,
-                    mostrarCorazon: 2
-                }, cerrarCorazon
+                    showHeart: 2
+                }, closeHeart
             )
 
         }        
@@ -184,16 +186,16 @@ class ExploreView extends Component {
     }
 
     // Devuelve el estilo de doble click sobre la imagen
-    tipoDeCorazon = (idTipo) => {
-        switch (idTipo) {
+    heartType = (typeId) => {
+        switch (typeId) {
             case 0:
                 return (DISPLAY_NONE);
         
             case 1:
-                return ({ ...material_styles.styleCorazon, fill: 'red' });
+                return ({ ...material_styles.heartStyle, fill: 'red' });
 
             case 2:
-                return (material_styles.styleCorazon)
+                return (material_styles.heartStyle)
                 
             default:
                 break;
@@ -210,40 +212,40 @@ class ExploreView extends Component {
                     //overlay={<CardTitle title="Overlay title" subtitle="Overlay subtitle" />}
                     >
                     <div className='imageExplore'>
-                        <IconButton onClick={this.handleBack.bind(this)} style={material_styles.styleLeftArrow} disabled={(this.state.libroAtras)? false: true}>
-                            <ArrowLeft style={(this.state.libroAtras)? material_styles.styleArrows: DISPLAY_NONE} />
+                        <IconButton onClick={this.handleBack.bind(this)} style={material_styles.styleLeftArrow} disabled={(this.state.previousBook)? false: true}>
+                            <ArrowLeft style={(this.state.previousBook)? material_styles.styleArrows: DISPLAY_NONE} />
                         </IconButton>
-                        <IconButton onClick={this.handleForward.bind(this)} style={material_styles.styleRightArrow} disabled={this.props.librosMostrados.length === 1}>
-                            <ArrowRight style={(this.props.librosMostrados.length > 1)? material_styles.styleArrows: DISPLAY_NONE} />
+                        <IconButton onClick={this.handleForward.bind(this)} style={material_styles.styleRightArrow} disabled={this.props.shownBooks.length === 1}>
+                            <ArrowRight style={(this.props.shownBooks.length > 1)? material_styles.styleArrows: DISPLAY_NONE} />
                         </IconButton >
-                        <div style= {(this.state.errorImgLibro.length)? { color: 'red', paddingTop: '1em' }: DISPLAY_NONE}>
-                            { this.state.errorImgLibro }
+                        <div style= {(this.state.bookCoverErr.length)? { color: 'red', paddingTop: '1em' }: DISPLAY_NONE}>
+                            { this.state.bookCoverErr }
                         </div>
-                        <img src={this.state.libroActual.portada} alt="" className="imageExplore" onDoubleClick={this.handleDbClickImage.bind(this)}/>
-                        <Favorite style={ this.tipoDeCorazon(this.state.mostrarCorazon) } />
+                        <img src={this.state.currentBook.bookCover} alt="" className="imageExplore" onDoubleClick={this.handleDbClickImage.bind(this)}/>
+                        <Favorite style={ this.heartType(this.state.showHeart) } />
                     </div>
                     </CardMedia>
                     <CardContent style={material_styles.width50}>
                         <Divider/>
                         <Typography gutterBottom variant='headline'>
-                            {this.state.libroActual.titulo}
+                            {this.state.currentBook.bookTitle}
                         </Typography>
                         <div className="escritoPor">de:  </div><Typography gutterBottom variant='title' style={material_styles.inlineBlock}>
-                            {this.state.libroActual.autor}
+                            {this.state.currentBook.bookAuthor}
                         </Typography>
-                        <h3 style={(this.state.libroActual.argumento)? {marginBottom: '5px'}: {display: 'none'}}>De qué va la cosa...</h3>
-                        {this.state.libroActual.argumento}
+                        <h3 style={(this.state.currentBook.bookDescription)? {marginBottom: '5px'}: {display: 'none'}}>De qué va la cosa... TODO</h3>
+                        {this.state.currentBook.bookDescription}
                         <br/>
-                        <h4 style={(this.state.libroActual.opinion)? {marginBottom: '5px'}: {display: 'none'}}>Qué opina...</h4>
-                        {this.state.libroActual.opinion}
+                        <h4 style={(this.state.currentBook.bookReview)? {marginBottom: '5px'}: {display: 'none'}}>Qué opina... TODO</h4>
+                        {this.state.currentBook.bookReview}
                     </CardContent>
                     <CardActions>
-                        {(this.state.libroActual.bookId)
-                            ? (<div>Son {this.state.libroActual.likes} los que piensan que este libro mola
+                        {(this.state.currentBook.bookId)
+                            ? (<div>Son {this.state.currentBook.bookLikes} los que piensan que este libro mola
                                 <Button size='small' disableRipple disableFocusRipple variant='flat' onClick={this.handleDbClickImage.bind(this)} style={material_styles.backgroundTransparent}>
-                                    <Favorite style={{...material_styles.styleFavorite, fill: (this.state.likeLibro)? 'red': ''}} />
+                                    <Favorite style={{...material_styles.styleFavorite, fill: (this.state.likeBook)? 'red': ''}} />
                                 </Button>
-                                <Button disableRipple size="small" variant='flat' onClick={this.handleCollapse.bind(this)} style={material_styles.styleExpandComentarios}>{(this.state.expanded)? "Ocultar comentarios": "Ver Comentarios"}
+                                <Button disableRipple size="small" variant='flat' onClick={this.handleCollapse.bind(this)} style={material_styles.styleExpandComentaries}>{(this.state.expanded)? "Ocultar comentaries": "Ver Comentarios"}
                                     {(this.state.expanded)? (<ExpandLessIcon />): (<ExpandMoreIcon />)}
                                 </Button >
                             </div>)
@@ -252,8 +254,8 @@ class ExploreView extends Component {
                     </CardActions>
                     <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
                         <CardContent>
-                            { /* Grid de comentarios */ }
-                            <CommentsGrid bookId={this.state.libroActual.bookId} />
+                            { /* Grid of comentaries */ }
+                            <CommentsGrid bookId={this.state.currentBook.bookId} />
                         </CardContent>
                     </Collapse>
                 </Card>
@@ -264,10 +266,11 @@ class ExploreView extends Component {
 
 export default connect(
     (state) => ({
-        indexLibro: appState.getIndiceLibro(state),
-        librosMostrados: appState.getLibros(state),
-        success_libro: appState.getLibroSuccess(state),
-        enviandoMegusta: appState.getEnviandoMeGusta(state)
+        bookIndex: appState.getBookIndex(state),
+        shownBooks: appState.getBooks(state),
+        currentUserId: appState.getUserId(state)
+        // TODO
+        // enviandoMegusta: appState.getEnviandoMeGusta(state) */
     }),
     (dispatch) => ({
         fetchBooks: (lastBookId, genres, primeraVez) => dispatch(fetchBooks(lastBookId, genres, primeraVez)),

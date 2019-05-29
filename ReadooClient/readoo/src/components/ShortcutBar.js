@@ -44,6 +44,7 @@ class ShortcutBar extends Component {
                         icon={perfil}
                         onClick={(tab) => this.handleActive(3)}
                     />
+                    {/* TODO: implementar botones de idioma */}
                 </BottomNavigation>
             </Paper >
         );

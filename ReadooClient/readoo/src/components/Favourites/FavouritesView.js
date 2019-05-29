@@ -20,22 +20,22 @@ import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import { Avatar, Divider } from '@material-ui/core';
 import Close from '@material-ui/icons/Close';
 import CommentsGrid from '../common/CommentsGrid';
-import * as constantes from '../../constants/appConstants';
-import libroDefault from '../../resources/libroDefault.gif';
+import * as constants from '../../constants/appConstants';
+import bookDefault from '../../resources/bookDefault.gif';
 import material_styles from './material_styles';
 
 class FavouritesView extends Component {
 
     initilState = {
-        estadoCarga: constantes.REST_DEFAULT,
+        loadingState: constants.REST_DEFAULT,
         expanded: false,
-        pagina: 0,
+        page: 0,
         total: 15,
-        filasPorPagina: constantes.ROWS_PER_PAGE,
-        librosPorPagina: constantes.BOOKS_PER_PAGE,
-        librosPorFila: constantes.BOOKS_PER_PAGE / constantes.ROWS_PER_PAGE,
-        celdaLibroSeleccionado: null,
-        libroSeleccionado: null
+        rowsPerPage: constants.ROWS_PER_PAGE,
+        booksPerPage: constants.BOOKS_PER_PAGE,
+        booksPerRow: constants.BOOKS_PER_PAGE / constants.ROWS_PER_PAGE,
+        selectedCell: null,
+        selectedBook: null
     };
 
     constructor(props) {
@@ -46,108 +46,108 @@ class FavouritesView extends Component {
     librosExample = [
         {
             bookId: 12,
-            autor: "Curro Jimenez",
-            titulo: "Mil y una noches",
-            opinion: "No muy bien",
-            likes: 0, 
+            bookAuthor: "Curro Jimenez",
+            bookTitle: "Mil y una noches",
+            bookReview: "No muy bien",
+            bookLikes: 0, 
         },
         {
             bookId: 13,
-            autor: "Curro Jimenez",
-            titulo: "Mil y una noches",
-            opinion: "No muy bien",
-            likes: 1, 
+            bookAuthor: "Curro Jimenez",
+            bookTitle: "Mil y una noches",
+            bookReview: "No muy bien",
+            bookLikes: 1, 
         },
         {
             bookId: 14,
-            autor: "Curro Jimenez",
-            titulo: "Mil y una noches",
-            opinion: "No muy bien",
-            likes: 2, 
+            bookAuthor: "Curro Jimenez",
+            bookTitle: "Mil y una noches",
+            bookReview: "No muy bien",
+            bookLikes: 2, 
         },
         {
             bookId: 15,
-            autor: "Curro Jimenez",
-            titulo: "Mil y una noches",
-            opinion: "No muy bien",
-            likes: 3, 
+            bookAuthor: "Curro Jimenez",
+            bookTitle: "Mil y una noches",
+            bookReview: "No muy bien",
+            bookLikes: 3, 
         },
         {
             bookId: 16,
-            autor: "Curro Jimenez",
-            titulo: "Mil y una noches",
-            opinion: "No muy bien",
-            likes: 3, 
+            bookAuthor: "Curro Jimenez",
+            bookTitle: "Mil y una noches",
+            bookReview: "No muy bien",
+            bookLikes: 3, 
         },
         {
             bookId: 17,
-            autor: "Curro Jimenez",
-            titulo: "Mil y una noches",
-            opinion: "No muy bien",
-            likes: 3, 
+            bookAuthor: "Curro Jimenez",
+            bookTitle: "Mil y una noches",
+            bookReview: "No muy bien",
+            bookLikes: 3, 
         },
         {
             bookId: 18,
-            autor: "Curro Jimenez",
-            titulo: "Mil y una noches",
-            opinion: "No muy bien",
-            likes: 3, 
+            bookAuthor: "Curro Jimenez",
+            bookTitle: "Mil y una noches",
+            bookReview: "No muy bien",
+            bookLikes: 3, 
         },
         {
             bookId: 19,
-            autor: "Curro Jimenez",
-            titulo: "Mil y una noches",
-            opinion: "No muy bien",
-            likes: 3, 
+            bookAuthor: "Curro Jimenez",
+            bookTitle: "Mil y una noches",
+            bookReview: "No muy bien",
+            bookLikes: 3, 
         },
         {
             bookId: 22,
-            autor: "Curro Jimenez",
-            titulo: "Mil y una noches",
-            opinion: "No muy bien",
-            likes: 3, 
+            bookAuthor: "Curro Jimenez",
+            bookTitle: "Mil y una noches",
+            bookReview: "No muy bien",
+            bookLikes: 3, 
         },
         {
             bookId: 33,
-            autor: "Curro Jimenez",
-            titulo: "Mil y una noches",
-            opinion: "No muy bien",
-            likes: 3, 
+            bookAuthor: "Curro Jimenez",
+            bookTitle: "Mil y una noches",
+            bookReview: "No muy bien",
+            bookLikes: 3, 
         },
         {
             bookId: 34,
-            autor: "Curro Jimenez",
-            titulo: "Mil y una noches",
-            opinion: "No muy bien",
-            likes: 3, 
+            bookAuthor: "Curro Jimenez",
+            bookTitle: "Mil y una noches",
+            bookReview: "No muy bien",
+            bookLikes: 3, 
         },
         {
             bookId: 35,
-            autor: "Curro Jimenez",
-            titulo: "Mil y una noches",
-            opinion: "No muy bien",
-            likes: 3, 
+            bookAuthor: "Curro Jimenez",
+            bookTitle: "Mil y una noches",
+            bookReview: "No muy bien",
+            bookLikes: 3, 
         },
         {
             bookId: 36,
-            autor: "Curro Jimenez",
-            titulo: "Mil y una noches",
-            opinion: "No muy bien",
-            likes: 3, 
+            bookAuthor: "Curro Jimenez",
+            bookTitle: "Mil y una noches",
+            bookReview: "No muy bien",
+            bookLikes: 3, 
         },
         {
             bookId: 44,
-            autor: "Curro Jimenez",
-            titulo: "Mil y una noches",
-            opinion: "No muy bien",
-            likes: 3, 
+            bookAuthor: "Curro Jimenez",
+            bookTitle: "Mil y una noches",
+            bookReview: "No muy bien",
+            bookLikes: 3, 
         },
         {
             bookId: 54,
-            autor: "Curro Jimenez",
-            titulo: "Mil y una noches",
-            opinion: "No muy bien",
-            likes: 3, 
+            bookAuthor: "Curro Jimenez",
+            bookTitle: "Mil y una noches",
+            bookReview: "No muy bien",
+            bookLikes: 3, 
         }
     ]
 
@@ -157,68 +157,68 @@ class FavouritesView extends Component {
     }
 
     componentWillReceiveProps(newProps) {
-//        this.cargarLibroActualFromProps (newProps);
+//        this.loadCurrentBookFromProps (newProps);
     }
 
     // Handlers tabla
     // Eventos tabla
     handleFirstPageButtonClick (event) {
-        //this.props.onChangePage(event, this.state.pagina + 1);
-        this.handleChangePagina(event, 0)
+        //this.props.onChangePage(event, this.state.page + 1);
+        this.handleChangePage(event, 0)
     };
 
     handleBackButtonClick (event) {
-        this.handleChangePagina(event, this.state.pagina - 1);
+        this.handleChangePage(event, this.state.page - 1);
     };
 
     handleNextButtonClick (event) {
-        //this.props.onChangePage(event, this.state.pagina + 1);
-        this.handleChangePagina(event, this.state.pagina + 1)
+        //this.props.onChangePage(event, this.state.page + 1);
+        this.handleChangePage(event, this.state.page + 1)
     };
 
     handleLastPageButtonClick (event) {
-        this.handleChangePagina(event, Math.ceil(this.state.total / this.state.filasPorPagina) - 1);
+        this.handleChangePage(event, Math.ceil(this.state.total / this.state.rowsPerPage) - 1);
         /* this.props.onChangePage(
             event,
-            Math.max(0, Math.ceil(this.state.total / this.state.filasPorPagina) - 1),
+            Math.max(0, Math.ceil(this.state.total / this.state.rowsPerPage) - 1),
         ); */
     };
 
-    handleChangePagina = (event, pagina) => {
-        this.setState({ ...this.state, pagina: pagina });
+    handleChangePage = (event, page) => {
+        this.setState({ ...this.state, page: page });
     };
 
     // funcion de carga de pie de tabla
-    actionButtonsTabla () {
-        const { total, pagina, librosPorPagina } = this.state;
+    tableActionButtons () {
+        const { total, page, booksPerPage } = this.state;
 
         return (
-          <div className="paginadoFavoritos">
-            <span>Página: {this.state.pagina + 1} de {Math.floor(this.state.total/this.state.librosPorPagina) + 1} </span>
+          <div className="favouritePages">
+            <span>Página: {this.state.page + 1} de {Math.floor(this.state.total/this.state.booksPerPage) + 1} </span>
             <IconButton
               onClick= {(evt) => {this.handleFirstPageButtonClick(evt)}}
-              disabled={pagina === 0}
+              disabled={page === 0}
               aria-label="Primera página"
             >
               <FirstPageIcon />
             </IconButton>
             <IconButton
               onClick={(evt) => {this.handleBackButtonClick(evt)}}
-              disabled={pagina === 0}
+              disabled={page === 0}
               aria-label="Página anterior"
             >
               <KeyboardArrowLeft />
             </IconButton>
             <IconButton
               onClick={(evt) => {this.handleNextButtonClick(evt)}}
-              disabled={pagina >= Math.ceil(total / librosPorPagina) - 1}
+              disabled={page >= Math.ceil(total / booksPerPage) - 1}
               aria-label="Página siguiente"
             >
               <KeyboardArrowRight />
             </IconButton>
             <IconButton
               onClick={(evt) => {this.handleLastPageButtonClick(evt)}}
-              disabled={pagina >= Math.ceil(total / librosPorPagina) - 1}
+              disabled={page >= Math.ceil(total / booksPerPage) - 1}
               aria-label="Última página"
             >
               <LastPageIcon />
@@ -227,16 +227,16 @@ class FavouritesView extends Component {
         );
     }
 
-    // likes sobre los libros
+    // bookLikes
     handleLike(evt) {
         if (!this.state.likeLibro) {
-            const cerrarCorazon = () => {
+            const closeHeart = () => {
                 setTimeout(()=>{
                     this.setState(
                         {
                             ...this.state,
-                            libroActual: { ...this.state.libroActual, likes: this.state.libroActual.likes +1},
-                            mostrarCorazon: 0,
+                            currentBook: { ...this.state.currentBook, bookLikes: this.state.currentBook.bookLikes +1},
+                            showHeart: 0,
                             likeLibro: true,
                         }
                     )
@@ -246,8 +246,8 @@ class FavouritesView extends Component {
             this.setState(
                 {
                     ...this.state,
-                    mostrarCorazon: 1
-                }, cerrarCorazon
+                    showHeart: 1
+                }, closeHeart
             )
     
             // TODO: this.props.setLikeLibro(bookId, true)
@@ -256,13 +256,13 @@ class FavouritesView extends Component {
 
     handleUnlike(evt) {
         if (this.state.likeLibro) {
-            const cerrarCorazon = () => {
+            const closeHeart = () => {
                 setTimeout(()=>{
                     this.setState(
                         {
                             ...this.state,
-                            libroActual: { ...this.state.libroActual, likes: this.state.libroActual.likes -1},
-                            mostrarCorazon: 0,
+                            currentBook: { ...this.state.currentBook, bookLikes: this.state.currentBook.bookLikes -1},
+                            showHeart: 0,
                             likeLibro: false
                         }
                     )
@@ -272,8 +272,8 @@ class FavouritesView extends Component {
             this.setState(
                 {
                     ...this.state,
-                    mostrarCorazon: 2
-                }, cerrarCorazon
+                    showHeart: 2
+                }, closeHeart
             )
             // TODO: this.props.setLikeLibro(bookId, false)
         }        
@@ -286,73 +286,73 @@ class FavouritesView extends Component {
         })
     }
 
-    handleClickImagen(evt, numeroRecuadro, bookId) {
+    handleImageClick(evt, cellNumber, bookId) {
         let nextState = {
             ...this.state, 
-            celdaLibroSeleccionado: numeroRecuadro, 
-            libroSeleccionado: bookId
+            selectedCell: cellNumber, 
+            selectedBook: bookId
         };
 
         for (let i in nextState) {
-            if (Number.isInteger(+i) && +i >= 0 && +i <= nextState.librosPorPagina) {
+            if (Number.isInteger(+i) && +i >= 0 && +i <= nextState.booksPerPage) {
                 nextState[i] = null;
             }
         }
 
-        if (numeroRecuadro && bookId) {
-            if (numeroRecuadro && !this.state[numeroRecuadro]) {
-                nextState[numeroRecuadro] = true;
+        if (cellNumber && bookId) {
+            if (cellNumber && !this.state[cellNumber]) {
+                nextState[cellNumber] = true;
             }
     
-            if (numeroRecuadro && this.state[numeroRecuadro]) {
-                nextState.celdaLibroSeleccionado = null;
-                nextState.libroSeleccionado = null;
+            if (cellNumber && this.state[cellNumber]) {
+                nextState.selectedCell = null;
+                nextState.selectedBook = null;
             }
         }
         this.setState(nextState);        
     }
 
-    // Devuelve el estilo de doble click sobre la imagen
-    tipoDeCorazon = (idTipo) => {
-        switch (idTipo) {
+    // returns double click style over the images clicked
+    heartType = (typeId) => {
+        switch (typeId) {
             case 0:
-                return (constantes.DISPLAY_NONE);
+                return (constants.DISPLAY_NONE);
         
             case 1:
-                return ({ ...material_styles.styleCorazon, fill: 'red' });
+                return ({ ...material_styles.heartStyle, fill: 'red' });
 
             case 2:
-                return (material_styles.styleCorazon)
+                return (material_styles.heartStyle)
                 
             default:
-                return ({ ...material_styles.styleCorazon, fill: 'red', fontSize:'15px' });
+                return ({ ...material_styles.heartStyle, fill: 'red', fontSize:'15px' });
         }
     }
 
     render() {
-        const {total, filasPorPagina, pagina , librosPorPagina, librosPorFila} = this.state;
+        const {total, rowsPerPage, page , booksPerPage, booksPerRow} = this.state;
         const data = this.librosExample;
 
-        //const filasVacias = filasPorPagina - Math.min(filasPorPagina, data.length - pagina * filasPorPagina);
+        //const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
     
         return (
             <div>
-                <Grid container spacing={24} style={material_styles.alturaFavoritos}>
+                <Grid container spacing={24} style={material_styles.favouriteHight}>
                     <Grid item sm={8} xs={12} >
                         <div className="gridDiv">
                             <GridList cellHeight={'auto'} cols={3} spacing={0} style={material_styles.gridList}>
-                                {data.slice(pagina * librosPorPagina, pagina * librosPorPagina + librosPorPagina).map((libro, index, lista) => {
+                                {data.slice(page * booksPerPage, page * booksPerPage + booksPerPage).map((book, index, list) => {
                                     return (
                                         <div>
-                                            <GridListTile key={libro.bookId} style={(!this.state[index])? material_styles.grbookId: material_styles.grbookIdSeleccionado}>
-                                                <img style={material_styles.imagenesFavoritos} src={libroDefault} alt={libro.titulo} onClick={(evt) => this.handleClickImagen(evt, index, libro.bookId)}/>
+                                            <GridListTile key={book.bookId} style={(!this.state[index])? material_styles.grbookId: material_styles.grSelectedBookId}>
+                                                <img style={material_styles.imagenesFavoritos} src={bookDefault} alt={book.bookTitle} onClick={(evt) => this.handleImageClick(evt, index, book.bookId)}/>
                                                 <GridListTileBar
-                                                title={libro.titulo}
-                                                subtitle={<span>Escrito por: {libro.autor}</span>}
+                                                title={book.bookTitle}
+                                                subtitle={<span>Escrito por: {book.bookAuthor}</span>}
                                                 actionIcon={
                                                     <div>
-                                                        <Favorite style={this.tipoDeCorazon(-1)}/>
-                                                            <span className="textoBlanco">{" " + libro.likes}</span>
+                                                        <Favorite style={this.heartType(-1)}/>
+                                                            <span className="textoBlanco">{" " + book.bookLikes}</span>
                                                         <IconButton>
                                                             <Avatar src=""/>
                                                         </IconButton>
@@ -367,28 +367,28 @@ class FavouritesView extends Component {
                             </GridList>
                         </div>
                     <Divider/>
-                    {this.actionButtonsTabla()}
+                    {this.tableActionButtons()}
                     </Grid>
                     <Grid item sm={4} xs={12}>
-                        { (this.state.libroSeleccionado != null)? (
+                        { (this.state.selectedBook != null)? (
                             <div>
                                 <Typography gutterBottom variant='headline' style={material_styles.inlineConBoton}>
-                                    {data[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].titulo}
+                                    {data[this.state.selectedCell * (this.state.page + 1)].bookTitle}
                                 </Typography>
-                                <IconButton style={material_styles.inlineBlock} onClick={(evt) => {this.handleClickImagen(evt, null, null)}}>
+                                <IconButton style={material_styles.inlineBlock} onClick={(evt) => {this.handleImageClick(evt, null, null)}}>
                                     <Close/>
                                 </IconButton>
                                 <br/>
                                 <div className="escritoPor">de:  </div><Typography gutterBottom variant='title' style={material_styles.inlineBlock}>
-                                    {data[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].autor}
+                                    {data[this.state.selectedCell * (this.state.page + 1)].bookAuthor}
                                 </Typography>
-                                <h3 style={(data[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].argumento)? {marginBottom: '5px'}: {display: 'none'}}>De qué va la cosa...</h3>
-                                {data[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].argumento}
+                                <h3 style={(data[this.state.selectedCell * (this.state.page + 1)].bookDescription)? {marginBottom: '5px'}: {display: 'none'}}>De qué va la cosa...</h3>
+                                {data[this.state.selectedCell * (this.state.page + 1)].bookDescription}
                                 <br/>
-                                <h4 style={(data[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].opinion)? {marginBottom: '5px'}: {display: 'none'}}>Qué opina...</h4>
-                                {data[this.state.celdaLibroSeleccionado * (this.state.pagina + 1)].opinion}
+                                <h4 style={(data[this.state.selectedCell * (this.state.page + 1)].bookReview)? {marginBottom: '5px'}: {display: 'none'}}>Qué opina...</h4>
+                                {data[this.state.selectedCell * (this.state.page + 1)].bookReview}
                                 <Divider/>
-                                <CommentsGrid bookId={this.state.libroSeleccionado} isFavorite={true}/>    
+                                <CommentsGrid bookId={this.state.selectedBook} isFavorite={true}/>    
                             </div>
                             ) : (
                             <div>
@@ -407,8 +407,7 @@ class FavouritesView extends Component {
 
 export default connect(
     (state) => ({
-        librosMostrados: appState.getLibros(state),
-        success_libro: appState.getLibroSuccess(state),
+        shownBooks: appState.getBooks(state),
     }),
     (dispatch) => ({
         //fetchBooksPorGusto: (lastBookId, primeraVez) => dispatch(fetchBooksPorGusto(lastBookId, primeraVez)),

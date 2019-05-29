@@ -118,7 +118,7 @@ class LibroProvider {
     }
 
     insertOne(app) {
-        app.post('/book/new', [middleware.verifyToken, upload.single('portada')], function (req, res) { // TODO: have a look to multiple middleware
+        app.post('/book/new', [middleware.verifyToken, upload.single('bookCover')], function (req, res) { // TODO: have a look to multiple middleware
             console.log("Estoy insertando libro");
             let bookInfo = req.body;
             if (bookInfo && bookInfo.bookTitle && bookInfo.bookAuthor && bookInfo.bookDescription && bookInfo.bookReview

@@ -36,14 +36,14 @@ class BookDao extends DaoManager{
             if (commentaryToRet !== undefined) {
                 // If the commentary exits in toRet array thats means the
                 //  id is unique so we only have to add the new subComments...
-                commentaryToRet.subCommentaries.push({
+                commentaryToRet.subcommentaries.push({
                     commentId: c.commentId2, 
                     userId: c.userId2, 
                     bookId: c.bookId, 
                     date: c.commentDate2,
                     userAvatarUrl: c.userAvatarUrl2, 
                     commentFatherId: null,
-                    subCommentaries: []
+                    subcommentaries: []
                 });
             } else {
                 toRet.push({
@@ -53,14 +53,14 @@ class BookDao extends DaoManager{
                     date: c.commentDate,
                     userAvatarUrl: c.userAvatarUrl, 
                     commentFatherId: c.commentFatherId,
-                    subCommentaries: (c.commentId2 != null) ? [{
+                    subcommentaries: (c.commentId2 != null) ? [{
                         commentId: c.commentId2, 
                         userId: c.userId2, 
                         bookId: c.bookId, 
                         date: c.commentDate2,
                         userAvatarUrl: c.userAvatarUrl2, 
                         commentFatherId: null,
-                        subCommentaries: null
+                        subcommentaries: null
                     }] : []
                 });
             }

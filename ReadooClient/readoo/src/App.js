@@ -5,8 +5,8 @@ import ShortcutBar from './components/ShortcutBar';
 import BodyContainer from './components/BodyContainer';
 import Footer from './components/Footer';
 import { connect } from 'react-redux';
-import { checkToken } from '../../app_state/actions';
-import * as appState from '../../app_state/reducers';
+import { checkToken } from './app_state/actions';
+import * as appState from './app_state/reducers';
 
 class App extends Component {
 
@@ -38,7 +38,7 @@ class App extends Component {
 
 export default connect(
     (state) => ({
-        userIsLogged: appState.userIsLogged(state),
+        userIsLogged: appState.getUserIsLogged(state),
     }),
     (dispatch) => ({
         //fetchUserData: () => dispatch(fetchUserData()),

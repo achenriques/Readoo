@@ -1,18 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { changeTab, setIsOpenAddBook, 
-    setBookControllerDefault, setControllerCommentDefault,
-    setControllerUserDefault } from '../app_state/actions';
+import { changeTab, setIsOpenAddBook, resetErrLog } from '../app_state/actions';
 import * as appState from '../app_state/reducers';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import Snackbar from '@material-ui/core/Snackbar';
 import ExploreView from './explore/ExploreView';
-import SubirLibroModal from './explore/SubirLibroModal';
+import UploadBookModal from './explore/UploadBookModal';
 import '../styles/BodyContainer.css';
 import FavouritesView from './favourites/FavouritesView';
 import ProfileView from './profile/ProfileView';
-import { REST_SUCCESS, REST_DEFAULT, REST_FAILURE } from '../constants/appConstants';
 
 const styleButton = {
     position: 'fixed',
@@ -34,80 +31,22 @@ class BodyContainer extends Component {
 
     static getDerivedStateFromProps(nextProps, prevState) {
         console.log("eih");
-        if(nextProps.enviarNuevoComentarioSuccess && REST_FAILURE === nextProps.enviarNuevoComentarioSuccess) {
-            nextProps.recibidoEnviarComentario();
+        if(nextProps.enviarNuevoComentarioSuccess) {
+            let errorMsg = "";
+            nextProps.enviarNuevoComentarioSuccess.each((err) => {
+                return errorMsg += err + " / ";
+            }, this);
             return({
                 ...prevState,
-                snackBarMsg: 'Error al subir el comentario al servidor',
+                snackBarMsg: errorMsg,
                 openSnackBar: true,
             });
-        }
-
-        if (nextProps.uploadLibroSuccess && REST_SUCCESS === nextProps.uploadLibroSuccess) {
-            nextProps.openAddLibro(false);
-            nextProps.listenedUploadLibro();
-            return ({
-                ...prevState,
-                snackBarMsg: 'Libro subido correctamente',
-                openSnackBar: true,
-            });
-        }
-        
-        if (nextProps.uploadLibroSuccess && REST_SUCCESS === nextProps.uploadLibroSuccess) {
-            nextProps.openAddLibro(false);
-            nextProps.listenedUploadLibro();
-            return ({
-                ...prevState,
-                snackBarMsg: 'Libro subido correctamente',
-                openSnackBar: true,
-            });
-        }
-
-        if (nextProps.uploadLibroSuccess && REST_FAILURE === nextProps.uploadLibroSuccess) {
-            nextProps.openAddLibro(false);
-            return ({
-                ...prevState,
-                snackBarMsg: 'Ha fallado la subida del libro',
-                openSnackBar: true,
-            });
-        }
-
-        if (nextProps.getfetchComentarioSuccess && REST_FAILURE == nextProps.getfetchComentarioSuccess) {
-            return({
-                ...prevState,
-                snackBarMsg: 'Error al leer los comentarios desde el servidor',
-                openSnackBar: true,
-            });
-        }
-
-        if (nextProps.failFetchUserData && REST_FAILURE == nextProps.failFetchUserData) {
-            return({
-                ...prevState,
-                snackBarMsg: 'Error al leer los datos de usuario desde el servidor',
-                openSnackBar: true,
-            });
-        }
-
-        if (nextProps.failSavingUserData) {
-            if ( REST_FAILURE == nextProps.failSavingUserData) {
-                return({
-                    ...prevState,
-                    snackBarMsg: 'Error al escribir los datos de usuario en el servidor',
-                    openSnackBar: true,
-                });
-            } else if ( REST_SUCCESS == nextProps.failSavingUserData) {
-                return({
-                    ...prevState,
-                    snackBarMsg: 'Se han guardado los datos de usuario correctamente',
-                    openSnackBar: true,
-                });
-            }
-        }
-
+        }        
         return null;
     }
 
     handleSnakRequestClose () {
+        this.props.resetErrLog();
         this.setState({
             ...this.state,
             openSnackBar: false,
@@ -132,7 +71,7 @@ class BodyContainer extends Component {
                         <Button variant="fab" color="primary" aria-label="añadir" onClick={this.hadleOpenAddLibro.bind(this)} style={styleButton}>
                             <AddIcon />
                         </Button>
-                        <SubirLibroModal />
+                        <UploadBookModal />
                         <Snackbar
                             open={this.state.openSnackBar}
                             message={this.state.snackBarMsg}                            
@@ -181,17 +120,11 @@ export default connect(
     (state) => ({
         //isOpenModal: appState.getIsOpenModal(state).isOpenAddBook,
         selectedIndex: appState.getCurrentTabID(state),
-        uploadLibroSuccess: appState.libroSuccessUpload(state),
-        enviarNuevoComentarioSuccess: appState.getComentarioEnviado(state),
-        getfetchComentarioSuccess: appState.getfetchComentarioSuccess(state),
-        failSavingUserData: appState.getsaveUserDataSuccess(state),
-        failFetchUserData: appState.getfetchComentarioSuccess(state) === REST_FAILURE
+        petitionFailed: appState.getFailingStatus(state),
     }),
     (dispatch) => ({
         changeTab: (tabID) => dispatch(changeTab(tabID)),
         openAddLibro: (isOpen) => dispatch(setIsOpenAddBook(isOpen)),
-        listenedUploadLibro: () => dispatch(setBookControllerDefault()),
-        recibidoEnviarComentario: () => dispatch(setControllerCommentDefault()),
-        listenedUserData: () => dispatch(setControllerUserDefault()),
+        resetErrLog: () => dispatch(resetErrLog())
     })
 )(BodyContainer);

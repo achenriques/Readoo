@@ -1,11 +1,10 @@
 import { combineReducers } from 'redux';
-import * as constantes from '../constants/appConstants';
+import * as constants from '../constants/appConstants';
 import isEmpty from '../resources/isEmpty.png';
 import noInternet from '../resources/noInternet.png';
 import { LANGUAGE_ENGLISH, LANGUAGE_SPANISH } from '../constants/appConstants';
 
-import actionTypes from './actions';
-import { state } from 'fs';
+import { actionTypes } from './actions';
 // Asi puedo tener varios modulos
 
 const failureType = (actionType) => `${actionType}_FAILURE`;
@@ -26,52 +25,54 @@ const initialState = {
     appLanguage: LANGUAGE_ENGLISH,
     userIsLogged : false,
     user: {
-        id: '',
-        nick: '',
-        email: '',
-        nombre: '',
-        apellido: '',
-        avatar: '',
-        sobreMi: '',
-        pass: '',
+        userId: '',
+        userNick: '',
+        userEmail: '',
+        userName: '',
+        userSurname: '',
+        userAvatarUrl: '',
+        userAboutMe: '',
+        userPass: '',
+        userKarma: null,
+        userVisible: true,
         preferedLanguage: null
     },
-    libros: {
-        libroDefault: {
+    books: {
+        bookDefault: {
             bookId: -1,
-            titulo : 'Has explorados todos los libros de tus deseos.',
-            autor: 'Prueba a cambiar tus filtos en tu perfil de usuario.',
+            bookTitle : 'Has explorados todos los books de tus deseos.',
+            bookAuthor: 'Prueba a cambiar tus filtos en tu perfil de usuario.',
             coverUrl: isEmpty,
             descripcion: '',
             review: '',
-            likes: 0
+            bookLikes: 0
         },
         libroFailure: {
             bookId: -1,
-            titulo : 'Jope! Se ha producido un error de red...',
-            autor: 'Prueba a refrescar la aplicación o espera a que el problema se resuelva.',
+            bookTitle : 'Jope! Se ha producido un error de red...',
+            bookAuthor: 'Prueba a refrescar la aplicación o espera a que el problema se resuelva.',
             coverUrl: noInternet,
             descripcion: '',
             review: '',
-            likes: 0
+            bookLikes: 0
         },
-        libroActual: 0,
-        mostrados: [],
-        cargados: [],
+        currentBook: 0,
+        shownBooks: [],
+        loaded: [],
         success_fetch: true,
     },
-    comentarios: {
-        comentariosLibro: [],
+    comentaries: {
+        bookCommentaries: [],
     },
     genres: {
-        todas: [],
-        usuario_categorias: []
+        all: [],
+        userGenres: []
     },
     controllerStatus: {
         loading: 0,
         failure: []
     },
-    filtros: [],
+    filters: [],
 }
 
 const tabs = (state = initialState.tabs, { type, payload, data }) => {
@@ -127,34 +128,15 @@ const userLogged = (state = initialState, { type, payload, data }) => {
     }
 }
 
-const user = (state = initialState.user, { type, payload, data }) => {
-    let userData = data;
-    userData.preferedLanguage = (payload.preferedLanguage) ? payload.preferedLanguage : 1
-    switch (type) {
-        case successType(actionTypes.DO_LOGIN):
-            console.log(actionTypes.DO_LOGIN);
-            return userData;
-
-        case successType(actionTypes.DO_REGISTER):
-            console.log(actionTypes.DO_REGISTER);
-            return userData;
-
-        case successType(actionTypes.FETCH_USER_DATA):
-            console.log(actionTypes.FETCH_USER_DATA)
-            return userData;
-
-        default:
-            return state;
-    }
-}
-
 /**
  * Reducer para el usuario actual de la aplicación. Responde al login inicial y ofrece los datos del mismo para futuras peticiones y otras
  * secciones de la aplicacion
  **/
 const user = (state = initialState.user, { type, payload, data }) => {
     let userData = data;
-    userData.preferedLanguage = (payload.preferedLanguage) ? payload.preferedLanguage : 1
+    if (payload && payload.preferedLanguage != null) {
+        userData.preferedLanguage = (payload.preferedLanguage) ? payload.preferedLanguage : 1
+    }
     switch (type) {
         case successType(actionTypes.DO_LOGIN):
             console.log(actionTypes.DO_LOGIN);
@@ -174,38 +156,38 @@ const user = (state = initialState.user, { type, payload, data }) => {
 }
 
 /**
- * Reducer para los libros a mostrar y operaciones de las mismas
+ * Reducer para los books a mostrar y operaciones de las mismas
  */
-const libros = (state = initialState.libros, { type, payload, data }) => {
+const books = (state = initialState.books, { type, payload, data }) => {
   switch (type) {
     case actionTypes.NEXT_BOOK:
-        console.log(actionTypes.NEXT_BOOK + ': ' + state.libroActual + '- m:' + state.mostrados.length + '- c' + state.cargados.length);
-        console.log(state.mostrados);
-        console.log(state.cargados);
+        console.log(actionTypes.NEXT_BOOK + ': ' + state.currentBook + '- m:' + state.shownBooks.length + '- c' + state.loaded.length);
+        console.log(state.shownBooks);
+        console.log(state.loaded);
 
         let toRet = {};
-        if (state.libroActual +1 < state.mostrados.length) {
+        if (state.currentBook +1 < state.shownBooks.length) {
             toRet = {
             ...state,
-            libroActual: state.libroActual + 1,
+            currentBook: state.currentBook + 1,
             }
         }
 
-        if (state.libroActual + 1 === state.mostrados.length
-            && state.mostrados.length === constantes.NUM_OF_BOOKS) {
+        if (state.currentBook + 1 === state.shownBooks.length
+            && state.shownBooks.length === constants.NUM_OF_BOOKS) {
             toRet = {
                 ...state,
-                mostrados: state.cargados.slice(0),
-                libroActual: 0,
+                shownBooks: state.loaded.slice(0),
+                currentBook: 0,
             }
         }
 
-        if (state.libroActual + 1 === state.mostrados.length
-            && state.mostrados.length < constantes.NUM_OF_BOOKS) {
+        if (state.currentBook + 1 === state.shownBooks.length
+            && state.shownBooks.length < constants.NUM_OF_BOOKS) {
             toRet = {
                 ...state,
-                mostrados: [ state.libroDefault ],
-                libroActual: 0,
+                shownBooks: [ state.bookDefault ],
+                currentBook: 0,
             }
         }
         return toRet;
@@ -223,14 +205,14 @@ const libros = (state = initialState.libros, { type, payload, data }) => {
         if (payload.primeraVez) {
             return {
                 ...state,
-                mostrados: data.data,
-                cargados: data.data,
+                shownBooks: data.data,
+                loaded: data.data,
                 success_fetch: true,
             }
         } else {
             return {
                 ...state,
-                cargados: data.data,
+                loaded: data.data,
                 success_fetch: true,
             }
         }
@@ -239,7 +221,7 @@ const libros = (state = initialState.libros, { type, payload, data }) => {
         console.log(failureType(actionTypes.FETCH_LIBROS));
         return {
             ...state,
-            mostrados: [ state.libroFailure ],
+            shownBooks: [ state.libroFailure ],
             success_fetch: false,
         }
 
@@ -248,13 +230,13 @@ const libros = (state = initialState.libros, { type, payload, data }) => {
   }
 }
 
-const comentarios = (state = initialState.comentarios, { type, payload, data }) => {
+const comentaries = (state = initialState.comentaries, { type, payload, data }) => {
     switch (type) {
         case successType(actionTypes.FETCH_COMMENTARIES):
         console.log(successType(actionTypes.FETCH_COMMENTARIES));
         return {
             ...state,
-            comentariosLibro: data.data,
+            bookCommentaries: data.data,
         }
 
         default:
@@ -265,20 +247,20 @@ const comentarios = (state = initialState.comentarios, { type, payload, data }) 
 /**
  * Reducer para las genres a mostrar y operaciones de las mismas
  */
-const genres = (state = initialState.libros, { type, payload, data }) => {
+const genres = (state = initialState.books, { type, payload, data }) => {
     switch (type) {
         case successType(actionTypes.FETCH_GENRES):
             console.log(successType(actionTypes.FETCH_GENRES));
             return {
                 ...state,
-                todas: data.data,
+                all: data.data,
             }
 
         case failureType(actionTypes.FETCH_GENRES):
             console.log(failureType(actionTypes.FETCH_GENRES));
             return {
                 ...state,
-                todas: null,
+                all: null,
             }
 
         default:
@@ -335,7 +317,7 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
 }
 
 /**
- * El export por defecto se lo lleva redux para hacer su magia, usaremos exports concretos más abajo
+ * El export por defecto es para redux para que sea aceptado correctamente por index.js
  */
 export default combineReducers({
     tabs,
@@ -343,11 +325,11 @@ export default combineReducers({
     userLogged,
     user,
     dialogs,
-    libros,
-    comentarios,
+    books,
+    comentaries,
     genres,
     controllerStatus
-})
+});
 
 /**
  * A continuación se exportan fragmentos del estado para mantener ordenado el acceso al mismo.
@@ -361,11 +343,10 @@ export const getCurrentTabID = (state) => state.tabs.currentTabID;
 export const getIsOpenModal = (state) => state.dialogs;
 export const getUserId = (state) => state.user.id;
 export const getUser = (state) => state.user;
-export const allCategorias = (state) => state.genres.todas;
-export const usuarioCategorias = (state) => state.genres.usuario_categorias;
-export const getIndiceLibro = (state) => state.libros.libroActual;
-export const getLibroSuccess = (state) => state.libros.success_fetch;
-export const getLibros = (state) => state.libros.mostrados;
-export const getComentarios = (state) => state.comentarios.comentariosLibro;
+export const getGenres = (state) => state.genres.all;
+export const getUserGenres = (state) => state.genres.userGenres;
+export const getBookIndex = (state) => state.books.currentBook;
+export const getBooks = (state) => state.books.shownBooks;
+export const getCommentaries = (state) => state.comentaries.bookCommentaries;
 export const getLoadingStatus = (state) => state.controllerStatus.loading;
 export const getFailingStatus = (state) => state.controllerStatus.failure;

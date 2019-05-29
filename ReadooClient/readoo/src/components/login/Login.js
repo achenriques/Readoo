@@ -63,12 +63,12 @@ class ProfileView extends Component {
     loadAvatarImage = (evt) => {
         /*
         const callState = () => {
-            if (this.state.error.add_libro_imagen === true) {
+            if (this.state.error.addBookCover === true) {
                 this.setState({
                     ...this.state,
                     error: {
                         ...this.state.error,
-                        add_libro_imagen: false
+                        addBookCover: false
                     }
                 });
             }
@@ -77,8 +77,8 @@ class ProfileView extends Component {
         if (evt.target.files[0]) {
             this.setState({
                 ...this.state,
-                datosUsuario: {
-                    ...this.state.datosUsuario,
+                userData: {
+                    ...this.state.userData,
                     avatar: (URL.createObjectURL(evt.target.files[0])) ? URL.createObjectURL(evt.target.files[0]) : null,
                 },
                 imagenAvatar: evt.target.files[0] ? evt.target.files[0] : avatarDefault
@@ -90,7 +90,7 @@ class ProfileView extends Component {
         }
     }
 
-    acceptLoggin = (evt) => {
+    acceptLogin = (evt) => {
         if(this.state.isARegister){
             this.setState({
                 ...this.state,
@@ -146,12 +146,12 @@ class ProfileView extends Component {
                                 inputProps={{
                                     maxLength: 20,
                                 }}
-                                value={this.state.passUsuario}
+                                value={this.state.userPass}
                                 onChange={this.oChangeInput.bind(this)}
                                 className="inputLoginData"
                             />
                             <br/>
-                            {(this.state.mostrarAntiguaPass)? (
+                            {(this.state.showOldPass)? (
                                 <div>
                                     <TextField
                                         label="Repite tu contraseña"
@@ -205,7 +205,7 @@ export default connect(
     }),
     (dispatch) => ({
         fetchUserData: () => dispatch(fetchUserData()),
-        doLogin: (logName, logPass) => dispatch(doLogin(logName, logPass)),
-        doRegister: (logName, logPass) => dispatch(doRegister(logName, logPass))
+        doLogin: (logName, logPass, language) => dispatch(doLogin(logName, logPass, language)),
+        doRegister: (logName, logPass, language) => dispatch(doRegister(logName, logPass, language))
     })
 )(ProfileView);

@@ -45,7 +45,7 @@ export default {
         color: 'rgba(150, 150, 150, 0.5)'
     },
 
-    styleCorazon: {
+    heartStyle: {
         position: 'absolute',
         height: '100px',
         width: '100px',
@@ -53,7 +53,7 @@ export default {
         left: '45%'
     },
 
-    styleExpandComentarios: {
+    styleExpandComentaries: {
          marginLeft: '300px',
     },
 
