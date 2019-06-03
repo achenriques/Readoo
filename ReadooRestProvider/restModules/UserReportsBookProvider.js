@@ -3,8 +3,6 @@ const UserReportsBookDao = require('../daos/UserReportsBookDao');
 
 class UserReportsBookProvider {
     
-    userReportsBookDao = null;
-
     constructor(app, db)
     {
         this.userReportsBookDao = new UserReportsBookDao(db);

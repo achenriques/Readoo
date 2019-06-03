@@ -27,8 +27,6 @@ const upload = multer({ storage: storage });
 
 class LibroProvider {
 
-    bookDao = null;
-
     constructor(app, db) {
         this.bookDao = new BookDao(db);
         this.getBookCover(app); //Get

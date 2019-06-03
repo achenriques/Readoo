@@ -4,8 +4,6 @@ const middleware = require('./middlewares');
 
 class CommentProvider {
     
-    commentDao = null;
-
     constructor(app, db)
     {
         this.commentDao = new CommentDao(db);

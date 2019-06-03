@@ -3,14 +3,12 @@ const GenreDao = require('../daos/GenreDao');
 
 class GenreProvider {
 
-    genreDao = null;
-
     constructor(app, db) {
         this.genreDao = new GenreDao(db);
-        this.getAll(app, db);       //Get
-        this.getOne(app, db);       //Get
-        this.deleteOne(app, db);    //Delete
-        this.insertOne(app, db);    // Post
+        this.getAll(app);       //Get
+        this.getOne(app);       //Get
+        this.deleteOne(app);    //Delete
+        this.insertOne(app);    // Post
     }
 
     getAll(app) {
@@ -52,7 +50,7 @@ class GenreProvider {
         });
     }
 
-    insertOne(db) {
+    insertOne(app) {
         app.post('/genre', function (req, res) {
             let genre = req.body.genre;
             console.log("Estoy insertando categoria de usuario" + genre);
@@ -73,7 +71,7 @@ class GenreProvider {
         });
     }
 
-    deleteOne(db) {
+    deleteOne(app) {
         app.delete('/genre', function (req, res) {
             let genreId = req.body.genre;
             console.log("Estoy deleteando " + genreId);

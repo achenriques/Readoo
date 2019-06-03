@@ -16,11 +16,13 @@ const doLogin = (userNickEmail, pass) => axios.post(
     }
 )
 
-const doRegister = (userNickEmail, pass) => axios.post(
+const doRegister = (userNickEmail, pass, email, language) => axios.post(
     `${baseURL}/login/new`,
     {
         userNickEmail: userNickEmail,
-        pass: pass
+        pass: pass,
+        email: email,
+        language: language
     }
 )
 
@@ -34,6 +36,7 @@ const checkToken = () => axios.get(
 
 export default {
     doLogin,
+    doRegister,
     doLogOut,
     checkToken
 }

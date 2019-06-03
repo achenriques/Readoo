@@ -3,8 +3,6 @@ const UserGenreDao = require('../daos/UserGenreDao');
 
 class UserGenreProvider {
 
-    userGenreDao = null;
-
     constructor(app, db) {
         this.userGenreDao = new UserGenreDao(db);
         this.getAll(app);           //Get

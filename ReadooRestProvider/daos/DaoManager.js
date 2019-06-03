@@ -7,8 +7,6 @@ const constants = require('../util/constants');
 */
 class DaoManager {
     
-    db = null;
-
     constructor(db) {
         this.db = db;
     }

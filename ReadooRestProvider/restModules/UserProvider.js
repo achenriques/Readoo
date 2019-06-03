@@ -3,8 +3,6 @@ const UserDao = require('../daos/UserDao');
 
 class UserProvider {
     
-    userDao = null;
-
     constructor(app, db)
     {
         this.userDao = new UserDao(db);

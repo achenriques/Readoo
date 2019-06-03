@@ -26,34 +26,34 @@ const Connection = require('./Util/dbConnection');
 const db = new Connection();
 
 const LoginProvider = require('./restModules/LoginProvider');
-new LoginProvider(app, db, middleware);
+new LoginProvider(app, db);
 
 const BookProvider = require('./restModules/BookProvider')
-new BookProvider(app, db, middleware);
+new BookProvider(app, db);
 
 const UserProvider = require('./restModules/UserProvider');
-new UserProvider(app, db, middleware);
+new UserProvider(app, db);
 
 const GenreProvider = require('./restModules/GenreProvider');
-new GenreProvider(app, db, middleware);
+new GenreProvider(app, db);
 
 const UserGenreProvider = require('./restModules/UserGenreProvider');
-new UserGenreProvider(app, db, middleware);
+new UserGenreProvider(app, db);
 
 const LastBookProvider = require('./restModules/LastBookProvider');
-new LastBookProvider(app, db, middleware);
+new LastBookProvider(app, db);
 
 const UserLikesBookProvider = require('./restModules/UserLikesBookProvider');
-new UserLikesBookProvider(app, db, middleware);
+new UserLikesBookProvider(app, db);
 
 const CommentProvider = require('./restModules/CommentProvider');
-new CommentProvider(app, db, middleware);
+new CommentProvider(app, db);
 
-const UserReportsCommentProvider = require('./restModules/UserReportsCommentProvider');
-new UserReportsCommentProvider(app, db, middleware);
+const UserReportsCommentaryProvider = require('./restModules/UserReportsCommentaryProvider');
+new UserReportsCommentaryProvider(app, db);
 
 const UserReportsBookProvider = require('./restModules/UserReportsBookProvider');
-new UserReportsBookProvider(app, db, middleware);
+new UserReportsBookProvider(app, db);
 
 app.listen(3030, function () {
   console.log('App is listening on port 3030!');

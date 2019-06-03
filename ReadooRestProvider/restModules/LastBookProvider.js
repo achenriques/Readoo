@@ -3,8 +3,6 @@ const LastBookDao = require('../daos/LastBookDao');
 
 class LastBookProvider {
     
-    lastBookDao = null;
-
     constructor(app, db)
     {
         this.lastBookDao = new LastBookDao(db);

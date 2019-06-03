@@ -3,8 +3,6 @@ const UserLikesBookDao = require('../daos/UserLikesBookDao');
 
 class UserLikesBookProvider {
 
-    userLikesBookDao= null;
-
     constructor(app, db) {
         this.userLikesBookDao = new UserLikesBookDao(db);
         this.getAll(app);           //Get

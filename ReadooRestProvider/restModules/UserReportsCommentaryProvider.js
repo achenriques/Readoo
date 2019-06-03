@@ -3,8 +3,6 @@ const UserReportsCommentDao = require('../daos/UserReportsCommentaryDao');
 
 class UserReportsCommentaryProvider {
     
-    userReportsCommentDao = null
-
     constructor(app, db)
     {
         this.userReportsCommentDao = new UserReportsCommentDao(db);
