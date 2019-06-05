@@ -17,9 +17,9 @@ class LoginDao extends DaoManager{
         return this.executeStatment(statement, [userId]);
     }
 
-    addUser(nick, email, pass, preferedLanguage) {
+    addUser(nick, pass, email, preferedLanguage) {
         let statement = queries.addUser;
-        return this.executeStatment(statement, [nick, email, pass, preferedLanguage]);
+        return this.executeStatment(statement, [nick, pass, email, preferedLanguage]);
     }
             
             

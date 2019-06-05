@@ -8,7 +8,6 @@ import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import avatarDefault from '../../resources/avatarDefault.svg';
-import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT } from '../../constants/appConstants';
 
 class Login extends Component {
 
@@ -148,9 +147,9 @@ class Login extends Component {
         } else {
             let logName = this.state.userData.userNickEmail.trim();
             let logPass = this.state.userData.userPass;
-            this.props.doRegister(logName, logPass, this.props.appLanguage);
+            let logEmail = this.state.userData.userEmail.trim();
+            this.props.doRegister(logName, logPass, logEmail, this.props.appLanguage);
         }
-        console.log(this.state)
     }
 
     render = () => {

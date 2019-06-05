@@ -13,29 +13,32 @@ class DaoManager {
 
     // this function manages a operation on the DB: resultHandeler must be a function
     executeStatment(stringQuery, params, resultHandler) {
-        this.db.getConn(this.db.connect).then(function(response) {
-            response.query(stringQuery, params, function (err, result, fields) {
-                response.release();
-                if (err) {
-                    if (err.code == 'ER_DUP_ENTRY') {
-                        console.log('Duplicated Entry!'); 
-                        console.log(err);
-                        return constants.queryErrorDuplicateEntry;
+        let that = this;
+        return new Promise(function(resolve, reject) {
+            that.db.getConn(that.db.connect).then(function(response) {
+                response.query(stringQuery, params, function (err, result, fields) {
+                    response.release();
+                    if (err) {
+                        if (err.code == 'ER_DUP_ENTRY') {
+                            console.log('Duplicated Entry!'); 
+                            console.log(err);
+                            reject(constants.queryErrorDuplicateEntry);
+                        } else {
+                            console.log('Query Error!');
+                            console.log(err);
+                            reject(constants.queryError);
+                        }
                     } else {
-                        console.log('Query Error!');
-                        console.log(err);
-                        return constants.queryError;
+                        if (resultHandler && typeof resultHandler === 'function') {
+                            resolve(resultHandler(result));
+                        }
+                        resolve(result);
                     }
-                } else {
-                    if (resultHandler && typeof resultHandler === 'function') {
-                        return resultHandler(result);
-                    }
-                    return result;
-                }
+                });
+            }, function (error) {
+                console.log(error);
+                reject(constants.dbConnectionFail);
             });
-        }, function (error) {
-            console.log(error);
-            return constants.dbConnectionFail;
         });
     }
 
@@ -44,23 +47,29 @@ class DaoManager {
     // Return -> a list of results of the transactions, ordered by arguments positions in the gived list
     executeStatmentOnSameTransaction(executeStatmentFunctionsParametersLists) {
         var toRet = [];
-        this.db.getConn(this.db.connect).beginTransaction(function(err) {
-            if (err) {
-                console.log('Create Transaction Error!');
-                console.log(err);
-                return constants.queryError;
-            } else {
-                for (let f of  executeStatmentFunctionsParametersLists) {
-                    let result = this.executeStatment.apply(this, executeStatmentFunctionsParametersLists);
-                    if (Number.isInteger(result) && result < 0) {
-                        return result;
-                    } else {
-                        toRet.push(result);
+        let that = this;
+        return new Promise(function(resolve, reject) {
+            that.db.getConn(that.db.connect).beginTransaction(function(err) {
+                if (err) {
+                    console.log('Create Transaction Error!');
+                    console.log(err);
+                    return constants.queryError;
+                } else {
+                    for (let f of  executeStatmentFunctionsParametersLists) {
+                        let result = that.executeStatment.apply(that, executeStatmentFunctionsParametersLists).then(
+                            function (res) {
+                                toRet.push(res);
+                            }
+                        ).catch(
+                            function (err) {
+                                return err;
+                            }
+                        );
                     }
+                    return toRet;
                 }
-            }
+            });
         });
-        return toRet;
     }
 }
 

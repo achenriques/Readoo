@@ -18,19 +18,13 @@ class LanguageSelector extends Component {
     };
 
     static getDerivedStateFromProps(nextProps, prevState) {
-        if(nextProps.appLanguage) {
-            if (this.state.appLanguage != nextProps.appLanguage) {
-                this.changeLanguage(+nextProps.appLanguage)
-            }
+        if (nextProps.appLanguage) {
             return({
                 ...prevState,
                 appLanguage: +nextProps.appLanguage
             });
         } else {
             if (nextProps.userLanguage) {
-                if (this.state.appLanguage != nextProps.userLanguage) {
-                    this.changeLanguage(+nextProps.userLanguage)
-                }
                 return({
                     appLanguage: +nextProps.userLanguage,
                     userLanguage: +nextProps.userLanguage
@@ -40,7 +34,7 @@ class LanguageSelector extends Component {
         return null;
     }
 
-    componentWillMount = () => {
+    componentDidMount = () => {
         let appLanguage = this.props.appLanguage;
         if (appLanguage) {
             this.setState({
@@ -49,6 +43,21 @@ class LanguageSelector extends Component {
             })
         }
     }
+
+    /* shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.appLanguage) {
+            if (this.state.appLanguage !== nextProps.appLanguage) {
+                this.changeLanguage(+nextProps.appLanguage)
+            }
+        } else {
+            if (nextProps.userLanguage) {
+                if (this.state.appLanguage != nextProps.userLanguage) {
+                    this.changeLanguage(+nextProps.userLanguage)
+                }
+            }
+        }
+        return false;
+    } */
 
     changeLanguage = (languageCode) => {
         this.props.changeAppLanguage(+languageCode);

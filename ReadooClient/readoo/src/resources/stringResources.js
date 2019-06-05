@@ -9,8 +9,8 @@ export default [
         'isnot.email': 'Write a reliable E-mail',
         'register': 'Register new user',
         'login': 'Log In',
-        'cancel.register': 'Cancelar registro',
-        'pass.arnt.same': 'Las contraseñas no coenciden'
+        'cancel.register': 'Cancel',
+        'pass.arnt.same': 'Both pass must be equal'
     },
     // Spanish
     {
@@ -23,6 +23,6 @@ export default [
         'register': 'Registrate',
         'login': 'Entrar',
         'cancel.register': 'Cancelar registro',
-        'pass.arnt.same': 'Both pass must be equal'
+        'pass.arnt.same': 'Las contraseñas no coenciden'
     }
 ]

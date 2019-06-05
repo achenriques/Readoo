@@ -122,10 +122,10 @@ const doLogin = (nickEmail, pass, language) => ({
     promise: loginApi.doLogin(nickEmail, pass)
 })
 
-const doRegister = (nickEmail, pass, language) => ({
+const doRegister = (nickEmail, pass, email, language) => ({
     type: actionTypes.DO_REGISTER,
-    payload: { preferedLanguage: language },
-    promise: loginApi.doRegister(nickEmail, pass, language)
+    payload: { nickEmail, pass, email, preferedLanguage: language },
+    promise: loginApi.doRegister(nickEmail, pass, email, language)
 })
 
 const fetchCommentaries = (bookId, nCommentaries, lastDate) => ({

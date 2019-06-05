@@ -23,7 +23,7 @@ class Connection
       {
         if(error)
         {
-          console.log('Error in the query');
+          console.log(error);
           reject(error);
         } else
         {

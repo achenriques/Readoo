@@ -75,7 +75,7 @@ const initialState = {
     filters: [],
 }
 
-const tabs = (state = initialState.tabs, { type, payload, data }) => {
+const tabs = (state = initialState.tabs, { type, payload, response }) => {
   switch (type) {
     case actionTypes.TAB_CHANGE:
       console.log('TAB_CHANGE');
@@ -89,7 +89,7 @@ const tabs = (state = initialState.tabs, { type, payload, data }) => {
   }
 }
 
-const language = (state = initialState, { type, payload, data }) => {
+const language = (state = initialState, { type, payload, response }) => {
     switch (type) {
         case actionTypes.CHANGE_LANGUAGE:
             console.log('CHANGE_LANGUAGE');
@@ -103,7 +103,7 @@ const language = (state = initialState, { type, payload, data }) => {
     }
 }
 
-const dialogs = (state = initialState.dialogs, { type, payload, data }) => {
+const dialogs = (state = initialState.dialogs, { type, payload, response }) => {
     switch (type) {
         case actionTypes.MODAL_ADD_BOOK:
         console.log('abro modal: ' + payload.isOpen)
@@ -117,7 +117,7 @@ const dialogs = (state = initialState.dialogs, { type, payload, data }) => {
     }
 }
 
-const userLogged = (state = initialState, { type, payload, data }) => {
+const userLogged = (state = initialState, { type, payload, response }) => {
     if (type === successType(actionTypes.DO_LOGIN) || type === successType(actionTypes.DO_REGISTER)){
         return {
             ...state,
@@ -132,8 +132,8 @@ const userLogged = (state = initialState, { type, payload, data }) => {
  * Reducer para el usuario actual de la aplicación. Responde al login inicial y ofrece los datos del mismo para futuras peticiones y otras
  * secciones de la aplicacion
  **/
-const user = (state = initialState.user, { type, payload, data }) => {
-    let userData = data;
+const user = (state = initialState.user, { type, payload, response }) => {
+    let userData = response.data;
     if (payload && payload.preferedLanguage != null) {
         userData.preferedLanguage = (payload.preferedLanguage) ? payload.preferedLanguage : 1
     }
@@ -144,7 +144,19 @@ const user = (state = initialState.user, { type, payload, data }) => {
 
         case successType(actionTypes.DO_REGISTER):
             console.log(actionTypes.DO_REGISTER);
-            return userData;
+            return {
+                userId: userData.id,
+                userNick: payload.nickEmail,
+                userEmail: payload.email,
+                userName: '',
+                userSurname: '',
+                userAvatarUrl: '',
+                userAboutMe: '',
+                userPass: '',
+                userKarma: 0,
+                userVisible: true,
+                preferedLanguage: payload.preferedLanguage
+            };
 
         case successType(actionTypes.FETCH_USER_DATA):
             console.log(actionTypes.FETCH_USER_DATA)
@@ -158,7 +170,7 @@ const user = (state = initialState.user, { type, payload, data }) => {
 /**
  * Reducer para los books a mostrar y operaciones de las mismas
  */
-const books = (state = initialState.books, { type, payload, data }) => {
+const books = (state = initialState.books, { type, payload, response }) => {
   switch (type) {
     case actionTypes.NEXT_BOOK:
         console.log(actionTypes.NEXT_BOOK + ': ' + state.currentBook + '- m:' + state.shownBooks.length + '- c' + state.loaded.length);
@@ -205,14 +217,14 @@ const books = (state = initialState.books, { type, payload, data }) => {
         if (payload.primeraVez) {
             return {
                 ...state,
-                shownBooks: data.data,
-                loaded: data.data,
+                shownBooks: response.data,
+                loaded: response.data,
                 success_fetch: true,
             }
         } else {
             return {
                 ...state,
-                loaded: data.data,
+                loaded: response.data,
                 success_fetch: true,
             }
         }
@@ -230,13 +242,13 @@ const books = (state = initialState.books, { type, payload, data }) => {
   }
 }
 
-const comentaries = (state = initialState.comentaries, { type, payload, data }) => {
+const comentaries = (state = initialState.comentaries, { type, payload, response }) => {
     switch (type) {
         case successType(actionTypes.FETCH_COMMENTARIES):
         console.log(successType(actionTypes.FETCH_COMMENTARIES));
         return {
             ...state,
-            bookCommentaries: data.data,
+            bookCommentaries: response.data,
         }
 
         default:
@@ -247,13 +259,13 @@ const comentaries = (state = initialState.comentaries, { type, payload, data }) 
 /**
  * Reducer para las genres a mostrar y operaciones de las mismas
  */
-const genres = (state = initialState.books, { type, payload, data }) => {
+const genres = (state = initialState.books, { type, payload, response }) => {
     switch (type) {
         case successType(actionTypes.FETCH_GENRES):
             console.log(successType(actionTypes.FETCH_GENRES));
             return {
                 ...state,
-                all: data.data,
+                all: response.data,
             }
 
         case failureType(actionTypes.FETCH_GENRES):
@@ -292,7 +304,7 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
             let currentCount = state.loading  - 1;
             if (typeString.includes('_FAILURE')) {
                 return {
-                    failure: state.failure.push(error.response),
+                    failure: state.failure.push(error),
                     loading: (currentCount < 0) ? 0 : currentCount
                 }
             } else {
@@ -336,8 +348,8 @@ export default combineReducers({
  * Es de extrema importancia cercionarse de que aquellas funciones que fueran a retornar arrays u objetos cuyos atributos fueran a ser
  * accedidos devuelvan valores por defecto para evitar crashes que no vengan a cuento. Curémonos en salud
  */
-export const getUserIsLogged = (state) => state.userIsLogged;
-export const getAppLanguage = (state) => state.appLanguage;
+export const getUserIsLogged = (state) => state.userLogged.userIsLogged;
+export const getAppLanguage = (state) => state.language.appLanguage;
 export const getUserLanguage = (state) => state.user.preferedLanguage;
 export const getCurrentTabID = (state) => state.tabs.currentTabID;
 export const getIsOpenModal = (state) => state.dialogs;

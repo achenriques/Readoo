@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
-
-const router = express.Router();
+const cors = require('cors');
+// const router = express.Router();
 const bodyParser = require('body-parser');
 
 app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
@@ -11,16 +11,16 @@ app.use(bodyParser.json());
 var serverCredentials = require('./Util/serverOptions');
 app.use(basicAuth(serverCredentials)); */
 
-let allowCrossDomain = function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  res.header('Access-Control-Allow-Headers', '*');
 
-  next();
-}
-app.use(allowCrossDomain);
-
-const middleware = require('./restModules/middlewares');
+app.use(cors({
+     origin: (origin, cb) => {
+          if (origin == 'http://localhost:3000' || origin == "http://127.0.0.1:3000") {
+               return cb(null, true);
+          }
+          return cb(new Error("Cors error"), false);
+     },
+     credentials: true,
+}));
 
 const Connection = require('./Util/dbConnection');
 const db = new Connection();
