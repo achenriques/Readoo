@@ -17,11 +17,12 @@ class LoginProvider {
     login(app) {
         let that = this;
         app.post('/login', function(req, res) {
-            if (req.body.userNickEmail && req.body.userNickEmail.trim().lenght && req.body.pass) {
-                let hashedPassword = bcrypt.hashSync(req.body.pass, 8);
-                that.loginDao.logUser(req.body.userNickEmail.trim(), hashedPassword).then(
+            if (req.body.userNickEmail && req.body.userNickEmail.trim().length && req.body.pass) {
+                let userNickEmail = req.body.userNickEmail.trim();
+                let pass = req.body.pass;
+                that.loginDao.logUser(userNickEmail, pass).then(
                     function (result) {
-                        if (hashedPassword === result.userEmail) {
+                        if (bcrypt.compareSync(pass, result.userPass)) {
                             let token = jwt.sign(
                                 { userId: result.userId },
                                 userConfig.serverCredentials.users.readooUser, // TODO: server credencials
@@ -30,7 +31,7 @@ class LoginProvider {
                             res.status(200).send({ id: result.userId, auth: true, token: token });
                             return;
                         } else {
-                            res.status(200).send({ auth: false });
+                            res.status(401).send({ auth: false });
                         }
                     }
                 ).catch(

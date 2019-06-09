@@ -31,8 +31,9 @@ class DaoManager {
                     } else {
                         if (resultHandler && typeof resultHandler === 'function') {
                             resolve(resultHandler(result));
+                        } else {
+                            resolve(result);
                         }
-                        resolve(result);
                     }
                 });
             }, function (error) {

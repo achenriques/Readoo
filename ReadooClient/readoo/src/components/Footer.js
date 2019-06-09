@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as appState from '../app_state/reducers';
-import { getPaginaActual, getIdioma } from '../utils/AppUtils'
-import '../styles/Footer.css'
+import { getPaginaActual, getIdioma } from '../utils/AppUtils';
+import '../styles/Footer.css';
 
 class Footer extends Component {
     render() {

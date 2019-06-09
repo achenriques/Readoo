@@ -23,7 +23,7 @@ const initialState = {
         isOpenAddBook: false,
     },
     appLanguage: LANGUAGE_ENGLISH,
-    userIsLogged : false,
+    userIsLogged : constants.USER_IS_LOGGED,
     user: {
         userId: '',
         userNick: '',
@@ -118,13 +118,28 @@ const dialogs = (state = initialState.dialogs, { type, payload, response }) => {
 }
 
 const userLogged = (state = initialState, { type, payload, response }) => {
-    if (type === successType(actionTypes.DO_LOGIN) || type === successType(actionTypes.DO_REGISTER)){
-        return {
-            ...state,
-            userIsLogged: true
-        }
-    } else {
-        return state;
+    switch (type) {
+        case successType(actionTypes.DO_LOGIN):
+            return {
+                ...state,
+                userIsLogged: constants.USER_IS_LOGGED
+            }
+
+        case successType(actionTypes.DO_REGISTER):
+            return {
+                ...state,
+                userIsLogged: constants.USER_FIRST_TIME_LOGGED,
+                tabs: { currentTabID: constants.PROFILE_TAB_ID }
+            }
+
+        case actionTypes.DONE_REGISTER:
+            return {
+                ...state,
+                userIsLogged: constants.USER_IS_LOGGED
+            }
+
+        default:
+            return state;
     }
 }
 
@@ -133,38 +148,43 @@ const userLogged = (state = initialState, { type, payload, response }) => {
  * secciones de la aplicacion
  **/
 const user = (state = initialState.user, { type, payload, response }) => {
-    let userData = response.data;
-    if (payload && payload.preferedLanguage != null) {
-        userData.preferedLanguage = (payload.preferedLanguage) ? payload.preferedLanguage : 1
+    if (response) {
+        let userData = response.data;
+        if (payload && payload.preferedLanguage != null) {
+            userData.preferedLanguage = (payload.preferedLanguage) ? payload.preferedLanguage : 1
+        }
+        switch (type) {
+            case successType(actionTypes.DO_LOGIN):
+                console.log(actionTypes.DO_LOGIN);
+                return userData;
+
+            case successType(actionTypes.DO_REGISTER):
+                console.log(actionTypes.DO_REGISTER);
+                return {
+                    userId: userData.id,
+                    userNick: payload.nickEmail,
+                    userEmail: payload.email,
+                    userName: '',
+                    userSurname: '',
+                    userAvatarUrl: '',
+                    userAboutMe: '',
+                    userPass: '',
+                    userKarma: 0,
+                    userVisible: true,
+                    preferedLanguage: payload.preferedLanguage
+                };
+
+            case successType(actionTypes.FETCH_USER_DATA):
+                console.log(actionTypes.FETCH_USER_DATA)
+                return userData;
+
+            default:
+                return state;
+        }
+    } else {
+        return state;
     }
-    switch (type) {
-        case successType(actionTypes.DO_LOGIN):
-            console.log(actionTypes.DO_LOGIN);
-            return userData;
-
-        case successType(actionTypes.DO_REGISTER):
-            console.log(actionTypes.DO_REGISTER);
-            return {
-                userId: userData.id,
-                userNick: payload.nickEmail,
-                userEmail: payload.email,
-                userName: '',
-                userSurname: '',
-                userAvatarUrl: '',
-                userAboutMe: '',
-                userPass: '',
-                userKarma: 0,
-                userVisible: true,
-                preferedLanguage: payload.preferedLanguage
-            };
-
-        case successType(actionTypes.FETCH_USER_DATA):
-            console.log(actionTypes.FETCH_USER_DATA)
-            return userData;
-
-        default:
-            return state;
-    }
+    
 }
 
 /**
@@ -303,8 +323,9 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
             // currentCount is used in case of SUCCESS or FAILURE to avoid concurrence errors
             let currentCount = state.loading  - 1;
             if (typeString.includes('_FAILURE')) {
+                let nextFailure = (Array.isArray(state.failure)) ? state.failure.push(error) : [error];
                 return {
-                    failure: state.failure.push(error),
+                    failure: nextFailure,
                     loading: (currentCount < 0) ? 0 : currentCount
                 }
             } else {

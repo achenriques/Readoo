@@ -1,7 +1,7 @@
 export default [
     // English
     {
-        'unique.user': 'Nick or Email: REMEMBER: they are unique',
+        'unique.user': 'Nick or Email. REMEMBER: they are unique',
         'nick.user': 'Nick: REMEMBER: it is unique',
         'your.pass': 'Type your password',
         'repeat.pass': 'Repeat your pass',

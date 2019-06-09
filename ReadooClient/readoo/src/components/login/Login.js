@@ -55,7 +55,7 @@ class Login extends Component {
             emailError = !this.checkEmail(value);
         }
 
-        // if I have to dissable or not loggin Button
+        // if I have to dissable or not login Button
         let callback = () => {
             let acceptDisabled = false;
             if (!this.state.userData.userNickEmail.trim().length || !this.state.userData.userPass.length 
@@ -126,7 +126,9 @@ class Login extends Component {
                     ...this.state.userData,
                     userRepeatPass: "",
                     userEmail: ""
-                }
+                },
+                acceptDisabled: this.state.userData.userNickEmail.trim.length > 0 
+                        && this.state.userData.userPass.length > 0 
             })
         } else {
             let logName = this.state.userData.userNickEmail.trim();

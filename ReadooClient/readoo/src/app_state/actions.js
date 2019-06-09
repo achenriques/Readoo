@@ -12,6 +12,7 @@ const actionTypes = {
     UPLOAD_BOOK: 'UPLOAD_BOOK',
     DO_LOGIN: 'DO_LOGIN',
     DO_REGISTER: 'DO_REGISTER',
+    DONE_REGISTER: 'DONE_REGISTER',
     FETCH_GENRES: 'FETCH_GENRES',
     NEXT_BOOK: 'NEXT_BOOK',
     BEFORE_BOOK: 'BEFORE_BOOK',
@@ -128,6 +129,10 @@ const doRegister = (nickEmail, pass, email, language) => ({
     promise: loginApi.doRegister(nickEmail, pass, email, language)
 })
 
+const doneRegister = () => ({
+    type: actionTypes.DONE_REGISTER
+})
+
 const fetchCommentaries = (bookId, nCommentaries, lastDate) => ({
     type: actionTypes.FETCH_COMMENTARIES,
     promise: bookApi.fetchCommentaries(bookId, nCommentaries, lastDate)
@@ -156,6 +161,7 @@ export {
     checkToken,
     doLogin,
     doRegister,
+    doneRegister,
     setIsOpenAddBook,
     uploadBook,
     fetchGenres,

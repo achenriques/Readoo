@@ -8,12 +8,12 @@ class LoginDao extends DaoManager{
     }
 
     logUser(email, pass) {
-        let statement = (email.includes("@")) ? queries.logginEmail : queries.logginNick; 
-        return this.executeStatment(statement, [email, pass], function (result) { result[0] });
+        let statement = (email.includes("@")) ? queries.loginEmail : queries.loginNick; 
+        return this.executeStatment(statement, [email, pass], function (result) { return result[0] });
     }
 
     isMeLogged(userId) {
-        let statement = queries.logginIsMe;
+        let statement = queries.loginIsMe;
         return this.executeStatment(statement, [userId]);
     }
 

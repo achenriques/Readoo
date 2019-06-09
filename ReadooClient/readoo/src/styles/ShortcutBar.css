@@ -1,0 +1,10 @@
+.countryFlagIcon {
+    display: inline-block;
+    padding-right: 5px;
+    height: 24px!important;
+    width: 24px!important;
+    margin: auto;
+    max-height: 250px;
+    max-width: 250px;
+    text-decoration-color: gray;
+}
