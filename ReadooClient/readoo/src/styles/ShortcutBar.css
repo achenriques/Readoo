@@ -8,3 +8,9 @@
     max-width: 250px;
     text-decoration-color: gray;
 }
+
+.loadingIcon {
+    height: 20px;
+    width: 20px;
+    margin: 20px;
+}

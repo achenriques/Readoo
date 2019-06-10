@@ -3,6 +3,7 @@ import * as appState from '../app_state/reducers';
 import { changeTab, changeLanguage } from '../app_state/actions';
 import { connect } from 'react-redux';
 import { BottomNavigation, BottomNavigationItem } from 'material-ui/BottomNavigation';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import Explore from 'material-ui/svg-icons/action/explore';
 import Favorite from 'material-ui/svg-icons/action/favorite';
@@ -35,7 +36,9 @@ class ShortcutBar extends Component {
         return (
             <Paper zDepth={1} style={{position: 'fixed', top: 0, left: 0, width: '100%', height: '60px', overflow: 'visible', zIndex: 1}}>
                 <Grid container spacing={2}>
-                    <Grid item sm={2} xs={0} />
+                    <Grid item sm={2} xs={0} >
+                        {(this.props.loading > 0) ? <CircularProgress className="loadingIcon" size='20' /> : <div/>}
+                    </Grid>
                     <Grid item sm={8} xs={8} >
                         <BottomNavigation selectedIndex={this.props.selectedIndex}>
                             <BottomNavigationItem
@@ -83,7 +86,8 @@ class ShortcutBar extends Component {
 export default connect(
     (state) => ({
         selectedIndex: appState.getCurrentTabID(state),
-        currengLanguage: appState.getAppLanguage(state)
+        currengLanguage: appState.getAppLanguage(state),
+        loading: appState.getLoadingStatus(state)
     }),
     (dispatch) => ({
         changeTab: (tabID) => dispatch(changeTab(tabID)),

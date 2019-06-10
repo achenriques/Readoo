@@ -3,7 +3,13 @@ export const REST_DEFAULT = 0;
 export const REST_SUCCESS = 1;
 export const REST_BD_FAIL = -2;
 
-export const PROFILE_TAB_ID = 3;
+export const pages = {
+    LOGIN: -1,
+    EXPLORE: 0,
+    FAVOURITES: 1,
+    CHAT: 2,
+    PROFILE: 3
+}
 
 export const SHORTCUT_HEIGHT_PX = 60;
 

@@ -17,13 +17,13 @@ const successType = (actionType) => `${actionType}_SUCCESS`;
  */
 const initialState = {
     tabs: {
-        currentTabID: 0
+        currentTabID: -1
     },
     dialogs: {
         isOpenAddBook: false,
     },
     appLanguage: LANGUAGE_ENGLISH,
-    userIsLogged : constants.USER_IS_LOGGED,
+    userIsLogged : constants.USER_NOT_IS_LOGGED,
     user: {
         userId: '',
         userNick: '',
@@ -129,7 +129,7 @@ const userLogged = (state = initialState, { type, payload, response }) => {
             return {
                 ...state,
                 userIsLogged: constants.USER_FIRST_TIME_LOGGED,
-                tabs: { currentTabID: constants.PROFILE_TAB_ID }
+                tabs: { currentTabID: constants.pages.PROFILE }
             }
 
         case actionTypes.DONE_REGISTER:

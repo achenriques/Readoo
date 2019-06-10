@@ -17,7 +17,7 @@ class LanguageSelector extends Component {
         this.state = { ...this.initialState };
     };
 
-    static getDerivedStateFromProps(nextProps, prevState) {
+    static getDerivedStateFromProps = (nextProps, prevState) => {
         if (nextProps.appLanguage) {
             return({
                 ...prevState,
@@ -44,20 +44,10 @@ class LanguageSelector extends Component {
         }
     }
 
-    /* shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.appLanguage) {
-            if (this.state.appLanguage !== nextProps.appLanguage) {
-                this.changeLanguage(+nextProps.appLanguage)
-            }
-        } else {
-            if (nextProps.userLanguage) {
-                if (this.state.appLanguage != nextProps.userLanguage) {
-                    this.changeLanguage(+nextProps.userLanguage)
-                }
-            }
-        }
-        return false;
-    } */
+    static returnPlainText = (msgId, defaultMsg) => {
+        return this.msg(msgId, defaultMsg);
+    }
+
 
     changeLanguage = (languageCode) => {
         this.props.changeAppLanguage(+languageCode);
