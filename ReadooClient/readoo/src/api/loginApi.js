@@ -26,6 +26,15 @@ const doRegister = (userNickEmail, pass, email, language) => axios.post(
     }
 )
 
+const checkNickIsUnique = (userNick) => axios.get(
+    `${baseURL}/login/avaliable`, {
+        params: {
+            userNickEmail: userNick
+        }
+    }
+)
+
+
 const doLogOut = () => axios.get( 
     `${baseURL}/logout`
 )
@@ -37,6 +46,7 @@ const checkToken = () => axios.get(
 export default {
     doLogin,
     doRegister,
+    checkNickIsUnique,
     doLogOut,
     checkToken
 }

@@ -1,27 +1,35 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import 'bootstrap';
+import { checkToken, changeTab } from './app_state/actions';
+import * as appState from './app_state/reducers';
 import Login from './components/login/Login';
 import ShortcutBar from './components/ShortcutBar';
 import BodyContainer from './components/BodyContainer';
 import Footer from './components/Footer';
-import { connect } from 'react-redux';
-import { checkToken } from './app_state/actions';
-import * as appState from './app_state/reducers';
+import { USER_FIRST_TIME_LOGGED, pages } from './constants/appConstants';
 
 class App extends Component {
 
-    initialState = {
-        userIsLogged: false
-    }
+    initialState = {}
 
     constructor(props) {
         super(props);
-        // this.state = {};
+        this.state = this.initialState;
     };
 
-    componentWillMount() {
+    componentDidMount() {
+        // Check if a sesson is open
         if (!this.props.userIsLogged) {
-          this.props.checkToken();
+            this.props.checkToken();
+        }
+    }
+
+    componentDidUpdate(prevProps) {
+        // Typical usage (don't forget to compare props):
+        if (this.props.userIsLogged !== prevProps.userIsLogged
+                && this.props.userIsLogged === USER_FIRST_TIME_LOGGED ) {
+            this.props.changeTab(pages.PROFILE);
         }
     }
 
@@ -42,6 +50,7 @@ export default connect(
     }),
     (dispatch) => ({
         //fetchUserData: () => dispatch(fetchUserData()),
-        checkToken: () => dispatch(checkToken())
+        checkToken: () => dispatch(checkToken()),
+        changeTab: (tabId) => dispatch(changeTab(tabId))
     })
 )(App);

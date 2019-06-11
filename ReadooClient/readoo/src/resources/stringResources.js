@@ -7,6 +7,7 @@ export default [
         'spanish': 'Spanish',
         'unique.user': 'Nick or Email. REMEMBER: they are unique',
         'nick.user': 'Nick: REMEMBER: it is unique',
+        'nick.user.exists': 'Nick: What a pitty, this Nick already exists',
         'your.pass': 'Type your password',
         'repeat.pass': 'Repeat your pass',
         'your.email': 'Type your E-mail',
@@ -20,16 +21,21 @@ export default [
         'exploring.books': 'I´m looking for something cool.',
         'refreshing.my.mind': 'There were some books I used to like it.',
         'chatting': 'I´m chatting with my neighbours',
-        'who.am.i': 'Who am I?'
+        'who.am.i': 'Who am I?',
+        'look.for.books': 'Explore books',
+        'favourites': 'My favourites',
+        'chats': 'My chats',
+        'profile': 'Profile'
     },
     // Spanish
     {
         'Readoo': 'Readoo',
-        'language': 'Idioma',
+        'language': 'Idioma : ',
         'english': 'Inglés',
         'spanish': 'Español',
         'unique.user': 'Nick o E-mail. RECUERDA: son únicos',
         'nick.user': 'Nick: RECUERDA: es único',
+        'nick.user.exists': 'Nick: Que pena, alguien se te ha adelantado',
         'your.pass': 'Tu contraseña',
         'repeat.pass': 'Repite tu contaseña',
         'your.email': 'Escribe tu E-mail',
@@ -43,6 +49,10 @@ export default [
         'exploring.books': 'Buscando algo interesante.',
         'refreshing.my.mind': 'Había algo que me gustaba por aquí.',
         'chatting': 'Solo chateando con mis vecinos',
-        'who.am.i': '¿Quién soy?'
+        'who.am.i': '¿Quién soy?',
+        'look.for.books': 'Explora libros',
+        'favourites': 'Mis favoritos',
+        'chats': 'Mis conversaciones',
+        'profile': 'Perfil'
     }
 ]

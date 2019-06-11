@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchUserData, doLogin, doRegister } from '../../app_state/actions';
+import { fetchUserData, doLogin, doRegister, checkNickIsUnique, setNickIsUniqueFalse } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import LS from '../LanguageSelector';
 import Grid from '@material-ui/core/Grid';
@@ -8,6 +8,7 @@ import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import avatarDefault from '../../resources/avatarDefault.svg';
+import '../../styles/Login.css';
 
 class Login extends Component {
 
@@ -55,6 +56,15 @@ class Login extends Component {
             emailError = !this.checkEmail(value);
         }
 
+        // If is a register we should prove that the nick does not exists yet
+        if (this.state.isARegister && name === "userNickEmail") {
+            if (value.trim().length) {
+                this.props.checkNickIsUnique(value);
+            } else {
+                this.props.setNickIsUniqueFalse();
+            }
+        }
+
         // if I have to dissable or not login Button
         let callback = () => {
             let acceptDisabled = false;
@@ -71,7 +81,6 @@ class Login extends Component {
             }
         };
 
-        // ver impletar errores en el alta de libros
         this.setState({
             ...this.state,
             emailError: emailError,
@@ -127,8 +136,8 @@ class Login extends Component {
                     userRepeatPass: "",
                     userEmail: ""
                 },
-                acceptDisabled: this.state.userData.userNickEmail.trim.length > 0 
-                        && this.state.userData.userPass.length > 0 
+                acceptDisabled: this.state.userData.userNickEmail.trim().length === 0 
+                        || this.state.userData.userPass.length === 0 
             })
         } else {
             let logName = this.state.userData.userNickEmail.trim();
@@ -143,8 +152,14 @@ class Login extends Component {
                 ...this.state,
                 isARegister: true,
                 showRepeatPass: true,
-                repeatPassError: this.state.userData.userPass !== this.state.userData.userRepeatPass,
-                acceptDisabled: true
+                repeatPassError: false,
+                acceptDisabled: true,
+                userData: {
+                    userNickEmail: "",
+                    userPass: "",
+                    userRepeatPass: "",
+                    userEmail: ""
+                },
             })
         } else {
             let logName = this.state.userData.userNickEmail.trim();
@@ -155,13 +170,18 @@ class Login extends Component {
     }
 
     render = () => {
+        let noAvaliableNick = (this.state.isARegister && this.state.userData.userNickEmail.trim().length > 0 
+                && this.props.avaliableNick === false);
+
         return (
             <div>
                 <Grid container className="gridLogin">
-                    <Grid item sm={8} className="columnaDatosPerfil">
-                        <Paper elevation={4} className="divDatosPerfil">
+                    <Grid item sm={12} className="columnaDatosPerfil">
+                        <Paper elevation={4} className="loginForm">
                             <TextField
-                                label= {(!this.state.isARegister) ? (<LS msgId='unique.user'/>) : (<LS msgId='nick.user'/>)}
+                                error={noAvaliableNick}
+                                label={(!this.state.isARegister) ? (<LS msgId='unique.user'/>) 
+                                        : (!noAvaliableNick) ? (<LS msgId='nick.user'/>) : (<LS msgId='nick.user.exists'/>) }
                                 id="loginNickEmail"
                                 name="userNickEmail"
                                 fullWidth
@@ -183,7 +203,7 @@ class Login extends Component {
                                 inputProps={{
                                     maxLength: 20,
                                 }}
-                                value={this.state.userPass}
+                                value={this.state.userData.userPass}
                                 onChange={this.oChangeInput.bind(this)}
                                 className="inputLoginData"
                             />
@@ -200,7 +220,7 @@ class Login extends Component {
                                         inputProps={{
                                             maxLength: 20,
                                         }}
-                                        value={this.state.userRepeatPass}
+                                        value={this.state.userData.userRepeatPass}
                                         onChange={this.oChangeInput.bind(this)}
                                         className="inputLoginData"
                                     />
@@ -215,7 +235,7 @@ class Login extends Component {
                                         inputProps={{
                                             maxLength: 20,
                                         }}
-                                        value={this.state.userRepeatPass}
+                                        value={this.state.userData.userEmail}
                                         onChange={this.oChangeInput.bind(this)}
                                         className="inputLoginData"
                                     />
@@ -254,11 +274,14 @@ class Login extends Component {
 
 export default connect(
     (state) => ({
-        appLanguage: appState.getAppLanguage(state)
+        appLanguage: appState.getAppLanguage(state),
+        avaliableNick: appState.getAvaliableNick(state),
     }),
     (dispatch) => ({
         fetchUserData: () => dispatch(fetchUserData()),
         doLogin: (logName, logPass, language) => dispatch(doLogin(logName, logPass, language)),
-        doRegister: (logName, logPass, email, language) => dispatch(doRegister(logName, logPass, email, language))
+        doRegister: (logName, logPass, email, language) => dispatch(doRegister(logName, logPass, email, language)),
+        setNickIsUniqueFalse: () => dispatch(setNickIsUniqueFalse()),
+        checkNickIsUnique: (nick) => dispatch(checkNickIsUnique(nick))
     })
 )(Login);

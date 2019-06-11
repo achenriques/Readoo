@@ -11,6 +11,7 @@ class LoginProvider {
         this.loginDao = new LoginDao(db);
         this.login(app); // Post
         this.isMe(app); //Get
+        this.isAvaliable(app); //Get
         this.newUser(app); // Post
     }
 
@@ -77,6 +78,30 @@ class LoginProvider {
                     }
                 );
             });
+        });
+    }
+
+    isAvaliable(app) {
+        let that = this;
+        app.get('/login/avaliable', function (req, res) {
+            if (req.query.userNickEmail) {
+                that.loginDao.getIsNickAvaliable("" + req.query.userNickEmail).then(
+                    function (result) {
+                        res.setHeader('Content-Type', 'application/json');
+                        res.status(200).send(result.length === 0);
+                    }
+                ).catch(
+                    function (err) {
+                        let reqError = functions.getRequestError(err);
+                        res.status(reqError.code)        // HTTP status 204: NotContent
+                            .send(reqError.text);
+                        return;
+                    } 
+                );
+            } else {
+                res.status(400)        // HTTP status 400: BadRequest
+                    .send('Missed Data');
+            }
         });
     }
   

@@ -13,6 +13,8 @@ const actionTypes = {
     DO_LOGIN: 'DO_LOGIN',
     DO_REGISTER: 'DO_REGISTER',
     DONE_REGISTER: 'DONE_REGISTER',
+    CHECK_NICK: 'CHECK_NICK',
+    CHECKED_NICK: 'CHECKED_NICK',
     FETCH_GENRES: 'FETCH_GENRES',
     NEXT_BOOK: 'NEXT_BOOK',
     BEFORE_BOOK: 'BEFORE_BOOK',
@@ -133,6 +135,16 @@ const doneRegister = () => ({
     type: actionTypes.DONE_REGISTER
 })
 
+const checkNickIsUnique = (nick) => ({
+    type: actionTypes.CHECK_NICK,
+    payload: { nick },
+    promise: loginApi.checkNickIsUnique(nick)
+})
+
+const setNickIsUniqueFalse = () => ({
+    type: actionTypes.CHECKED_NICK
+})
+
 const fetchCommentaries = (bookId, nCommentaries, lastDate) => ({
     type: actionTypes.FETCH_COMMENTARIES,
     promise: bookApi.fetchCommentaries(bookId, nCommentaries, lastDate)
@@ -162,6 +174,8 @@ export {
     doLogin,
     doRegister,
     doneRegister,
+    checkNickIsUnique,
+    setNickIsUniqueFalse,
     setIsOpenAddBook,
     uploadBook,
     fetchGenres,

@@ -10,7 +10,8 @@ import Favorite from 'material-ui/svg-icons/action/favorite';
 import ChatBubble from 'material-ui/svg-icons/communication/chat-bubble';
 import MapsPersonPin from 'material-ui/svg-icons/maps/person-pin';
 import Paper from 'material-ui/Paper';
-import { LANGUAGE_ENGLISH, LANGUAGE_SPANISH} from '../constants/appConstants';
+import LS from '../components/LanguageSelector';
+import { LANGUAGE_ENGLISH, LANGUAGE_SPANISH, pages } from '../constants/appConstants';
 import icon_en from '../resources/language_en.png';
 import icon_es from '../resources/language_es.png';
 import '../styles/ShortcutBar.css';
@@ -22,56 +23,58 @@ const perfil = <MapsPersonPin />;
 
 class ShortcutBar extends Component {
 
-    handleActive(tab) {
+    handleActive = (tab) => {
         this.props.changeTab(tab);
     }
 
-    handleLanguage(languageId) {
+    handleLanguage = (languageId) => {
         if (this.props.currengLanguage !== languageId) {
             this.props.changeLanguage(languageId);
         }
     }
 
-    render() {
+    render = () => {
         return (
             <Paper zDepth={1} style={{position: 'fixed', top: 0, left: 0, width: '100%', height: '60px', overflow: 'visible', zIndex: 1}}>
-                <Grid container spacing={2}>
-                    <Grid item sm={2} xs={0} >
+                <Grid container spacing={8}>
+                    <Grid item sm={2} xs={1} >
                         {(this.props.loading > 0) ? <CircularProgress className="loadingIcon" size='20' /> : <div/>}
                     </Grid>
-                    <Grid item sm={8} xs={8} >
+                    <Grid item sm={8} xs={7} >
+                        {(this.props.userIsLogged) ? (
                         <BottomNavigation selectedIndex={this.props.selectedIndex}>
                             <BottomNavigationItem
-                                label="Ver libros"
+                                label={<LS msgId='look.for.books' defaultMsg='Explora'/>}
                                 icon={explore}
-                                onClick={(tab) => this.handleActive(0)}
+                                onClick={(tab) => this.handleActive(pages.EXPLORE)}
                             />
                             <BottomNavigationItem
-                                label="Mis favoritos"
+                                label={<LS msgId='favourites' defaultMsg='Favourites'/>}
                                 icon={favoritesIcon}
-                                onClick={(tab) => this.handleActive(1)}
+                                onClick={(tab) => this.handleActive(pages.Favorite)}
                             />
                             <BottomNavigationItem
-                                label="Mis Chats"
+                                label={<LS msgId='chats' defaultMsg='Chats'/>}
                                 icon={chatBubble}
-                                onClick={(tab) => this.handleActive(2)}
+                                onClick={(tab) => this.handleActive(pages.CHAT)}
                             />
                             <BottomNavigationItem
-                                label="Perfil"
+                                label={<LS msgId='profile' defaultMsg='Me'/>}
                                 icon={perfil}
-                                onClick={(tab) => this.handleActive(3)}
+                                onClick={(tab) => this.handleActive(pages.PROFILE)}
                             />
                         </BottomNavigation>
+                        ) : (<div/>) }
                     </Grid>
                     <Grid item sm={2} xs={4} >
                         <BottomNavigation selectedIndex={this.props.currengLanguage}>
                             <BottomNavigationItem
-                                label="English"
+                                label={<LS msgId='english' defaultMsg='English'/>}
                                 icon={<img src={icon_en} className="countryFlagIcon" />}
                                 onClick={(tab) => this.handleLanguage(LANGUAGE_ENGLISH)}
                             />
                             <BottomNavigationItem
-                                label="Spanish"
+                                label={<LS msgId='spanish' defaultMsg='Español'/>}
                                 icon={<img src={icon_es} className="countryFlagIcon" />}
                                 onClick={(tab) => this.handleLanguage(LANGUAGE_SPANISH)}
                             />
@@ -87,7 +90,8 @@ export default connect(
     (state) => ({
         selectedIndex: appState.getCurrentTabID(state),
         currengLanguage: appState.getAppLanguage(state),
-        loading: appState.getLoadingStatus(state)
+        loading: appState.getLoadingStatus(state),
+        userIsLogged: appState.getUserIsLogged(state)
     }),
     (dispatch) => ({
         changeTab: (tabID) => dispatch(changeTab(tabID)),
