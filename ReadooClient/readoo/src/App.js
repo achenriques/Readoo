@@ -11,26 +11,21 @@ import { USER_FIRST_TIME_LOGGED, pages } from './constants/appConstants';
 
 class App extends Component {
 
-    initialState = {}
+    initialState = {
+        USER_FIRST_TIME_LOGGED: USER_FIRST_TIME_LOGGED
+    }
 
     constructor(props) {
         super(props);
         this.state = this.initialState;
+        this.props.checkToken();
     };
 
-    componentDidMount() {
-        // Check if a sesson is open
-        if (!this.props.userIsLogged) {
-            this.props.checkToken();
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (nextProps.userIsLogged != null && prevState.USER_FIRST_TIME_LOGGED === nextProps.userIsLogged) {
+            this.props.changeTab(pages.PROFILE); 
         }
-    }
-
-    componentDidUpdate(prevProps) {
-        // Typical usage (don't forget to compare props):
-        if (this.props.userIsLogged !== prevProps.userIsLogged
-                && this.props.userIsLogged === USER_FIRST_TIME_LOGGED ) {
-            this.props.changeTab(pages.PROFILE);
-        }
+        return null;
     }
 
     render() {

@@ -14,12 +14,17 @@ class LoginDao extends DaoManager{
 
     isMeLogged(userId) {
         let statement = queries.loginIsMe;
-        return this.executeStatment(statement, [userId]);
+        return this.executeStatment(statement, [userId], function (result) { return result[0] });
     }
 
     getIsNickAvaliable(nick) {
         let statement = queries.avaliableNick;
         return this.executeStatment(statement, [nick]);
+    }
+
+    getIsEmailAvaliable(email) {
+        let statement = queries.avaliableEmail;
+        return this.executeStatment(statement, [email]);
     }
 
     addUser(nick, pass, email, preferedLanguage) {

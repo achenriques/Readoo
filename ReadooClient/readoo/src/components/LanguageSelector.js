@@ -18,13 +18,13 @@ class LanguageSelector extends Component {
     };
 
     static getDerivedStateFromProps = (nextProps, prevState) => {
-        if (nextProps.appLanguage !== null && prevState.appLanguage !== nextProps.appLanguage) {
+        if (nextProps.appLanguage != null && prevState.appLanguage !== nextProps.appLanguage) {
             return({
                 ...prevState,
                 appLanguage: +nextProps.appLanguage
             });
         } else {
-            if (nextProps.userLanguage !== null) {
+            if (nextProps.userLanguage != null) {
                 return({
                     appLanguage: +nextProps.userLanguage,
                     userLanguage: +nextProps.userLanguage

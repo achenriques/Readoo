@@ -4,17 +4,12 @@ import { changeTab, setIsOpenAddBook } from '../app_state/actions';
 import * as appState from '../app_state/reducers';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
+import LS from './LanguageSelector';
 import ExploreView from './explore/ExploreView';
 import UploadBookModal from './explore/UploadBookModal';
-import '../styles/BodyContainer.css';
 import FavouritesView from './favourites/FavouritesView';
 import ProfileView from './profile/ProfileView';
-
-const styleButton = {
-    position: 'fixed',
-    bottom: '50px',
-    right: '50px',
-}
+import '../styles/BodyContainer.css';
 
 class BodyContainer extends Component {
 
@@ -40,7 +35,7 @@ class BodyContainer extends Component {
                 return (
                     <div className='bodyContainer'>
                         <ExploreView/>
-                        <Button variant="fab" color="primary" aria-label="añadir" onClick={this.hadleOpenAddBook.bind(this)} style={styleButton}>
+                        <Button variant="fab" color="primary" aria-label="add" onClick={this.hadleOpenAddBook.bind(this)} className='styleButton'>
                             <AddIcon />
                         </Button>
                         <UploadBookModal />
@@ -71,7 +66,11 @@ class BodyContainer extends Component {
                 );
 
             default:
-                break;
+                return (
+                    <div className='bodyContainer'>
+                        <LS msgId='something.goes.wrong'/>
+                    </div>
+                );
         }
 
     }

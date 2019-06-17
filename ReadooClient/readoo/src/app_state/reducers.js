@@ -17,7 +17,7 @@ const successType = (actionType) => `${actionType}_SUCCESS`;
  */
 const initialState = {
     tabs: {
-        currentTabID: -1
+        currentTabID: 0
     },
     dialogs: {
         isOpenAddBook: false,
@@ -26,6 +26,7 @@ const initialState = {
         appLanguage: LANGUAGE_ENGLISH,
         userIsLogged : constants.USER_NOT_IS_LOGGED,
         avaliableNick : null,
+        avaliableEmail: null
     },
     user: {
         userId: '',
@@ -116,6 +117,13 @@ const common = (state = initialState.common, { type, payload, data }) => {
                 appLanguage: payload.languageCode
             };
 
+        case successType(actionTypes.CHECK_TOKEN):
+            console.log(actionTypes.CHECK_TOKEN);
+            return {
+                ...state,
+                userIsLogged: constants.USER_IS_LOGGED
+            }
+            
         case successType(actionTypes.DO_LOGIN):
             return {
                 ...state,
@@ -125,8 +133,7 @@ const common = (state = initialState.common, { type, payload, data }) => {
         case successType(actionTypes.DO_REGISTER):
             return {
                 ...state,
-                userIsLogged: constants.USER_FIRST_TIME_LOGGED,
-                tabs: { currentTabID: constants.pages.PROFILE }
+                userIsLogged: constants.USER_FIRST_TIME_LOGGED
             }
 
         case actionTypes.DONE_REGISTER:
@@ -141,11 +148,23 @@ const common = (state = initialState.common, { type, payload, data }) => {
                 avaliableNick: (response === true),
             }
              
+        case successType(actionTypes.CHECK_EMAIL):
+                return {
+                    ...state,
+                    avaliableEmail: (response === true),
+                }
+
         case actionTypes.CHECKED_NICK:
             return {
                 ...state,
                 avaliableNick: null
             }
+
+        case actionTypes.CHECKED_EMAIL:
+                return {
+                    ...state,
+                    avaliableEmail: null
+                }
 
         default:
             return state;
@@ -159,10 +178,14 @@ const common = (state = initialState.common, { type, payload, data }) => {
 const user = (state = initialState.user, { type, payload, data }) => {
     if (data) {
         let userData = data.data;
-        if (payload && payload.preferedLanguage != null) {
+        if (userData && userData.userLanguage == null && payload && payload.preferedLanguage != null) {
             userData.preferedLanguage = (payload.preferedLanguage) ? payload.preferedLanguage : 1
         }
         switch (type) {
+            case successType(actionTypes.CHECK_TOKEN):
+                console.log(actionTypes.CHECK_TOKEN);
+                return userData;
+
             case successType(actionTypes.DO_LOGIN):
                 console.log(actionTypes.DO_LOGIN);
                 return userData;
@@ -382,6 +405,7 @@ export const getAppLanguage = (state) => state.common.appLanguage;
 export const getUserLanguage = (state) => state.user.preferedLanguage;
 export const getCurrentTabID = (state) => state.tabs.currentTabID;
 export const getAvaliableNick = (state) => state.common.avaliableNick;
+export const getAvaliableEmail = (state) => state.common.avaliableEmail;
 export const getIsOpenModal = (state) => state.dialogs;
 export const getUserId = (state) => state.user.id;
 export const getUser = (state) => state.user;

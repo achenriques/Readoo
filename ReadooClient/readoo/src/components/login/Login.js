@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchUserData, doLogin, doRegister, checkNickIsUnique, setNickIsUniqueFalse } from '../../app_state/actions';
+import { fetchUserData, doLogin, doRegister, checkNickIsUnique, setNickIsUniqueFalse,
+        checkEmailIsUnique, 
+        setEmailIsUniqueFalse} from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import LS from '../LanguageSelector';
 import Grid from '@material-ui/core/Grid';
@@ -34,7 +36,16 @@ class Login extends Component {
     };
 
     checkEmail = (val) => {
-        return /.*@[A-z]{1,15}\.[a-z]{2,3}$/.test(val);
+        let toRet = /.*@[A-z]{1,15}\.[a-z]{2,3}$/.test(val);
+        if (toRet) {
+            // If is a register we should prove that the nick does not exists yet
+            this.props.checkEmailIsUnique(val.trim());
+        } else {
+            if (this.props.avaliableEmail === false && this.state.userData.userEmail !== val) {
+                this.props.setEmailIsUniqueFalse();
+            }
+        }
+        return toRet;
     }
 
     oChangeInput = (evt) => {
@@ -173,6 +184,9 @@ class Login extends Component {
         let noAvaliableNick = (this.state.isARegister && this.state.userData.userNickEmail.trim().length > 0 
                 && this.props.avaliableNick === false);
 
+        let noAvaliableEmail = (this.state.isARegister && this.state.userData.userEmail.trim().length > 0 
+                && this.props.avaliableEmail === false);
+
         return (
             <div>
                 <Grid container className="gridLogin">
@@ -226,8 +240,9 @@ class Login extends Component {
                                     />
                                     <br/>
                                     <TextField
-                                        error={this.state.emailError}
-                                        label={(!this.state.emailError) ? (<LS msgId='your.email'/>) : (<LS msgId='isnot.email'/>)}
+                                        error={this.state.emailError || noAvaliableEmail}
+                                        label={(!this.state.emailError) ? (<LS msgId='your.email'/>) : (!noAvaliableEmail) 
+                                                ? (<LS msgId='isnot.email'/>) : (<LS msgId='email.user.exists'/>)}
                                         id="userEmail"
                                         name="userEmail"
                                         fullWidth
@@ -276,12 +291,15 @@ export default connect(
     (state) => ({
         appLanguage: appState.getAppLanguage(state),
         avaliableNick: appState.getAvaliableNick(state),
+        avaliableEmail: appState.getAvaliableEmail(state)
     }),
     (dispatch) => ({
         fetchUserData: () => dispatch(fetchUserData()),
         doLogin: (logName, logPass, language) => dispatch(doLogin(logName, logPass, language)),
         doRegister: (logName, logPass, email, language) => dispatch(doRegister(logName, logPass, email, language)),
         setNickIsUniqueFalse: () => dispatch(setNickIsUniqueFalse()),
-        checkNickIsUnique: (nick) => dispatch(checkNickIsUnique(nick))
+        setEmailIsUniqueFalse: () => dispatch(setEmailIsUniqueFalse()),
+        checkNickIsUnique: (nick) => dispatch(checkNickIsUnique(nick)),
+        checkEmailIsUnique: (email) => dispatch(checkEmailIsUnique(email)),
     })
 )(Login);

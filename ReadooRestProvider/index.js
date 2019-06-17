@@ -20,6 +20,7 @@ app.use(cors({
           return cb(new Error("Cors error"), false);
      },
      credentials: true,
+     allowedHeaders: 'Content-Type,x-access-token,Authorization'
 }));
 
 const Connection = require('./Util/dbConnection');

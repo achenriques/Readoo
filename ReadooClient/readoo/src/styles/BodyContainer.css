@@ -8,6 +8,12 @@ body {
     padding-bottom: 30px;
 }
 
+.styleButton {
+    position: 'fixed';
+    bottom: 50px;
+    right: 50px;
+}
+
 .bodyFavoritos {
     margin-top: 70px;
     padding-bottom: 30px;

@@ -14,7 +14,9 @@ const actionTypes = {
     DO_REGISTER: 'DO_REGISTER',
     DONE_REGISTER: 'DONE_REGISTER',
     CHECK_NICK: 'CHECK_NICK',
+    CHECK_EMAIL: 'CHECK_EMAIL',
     CHECKED_NICK: 'CHECKED_NICK',
+    CHECKED_EMAIL: 'CHECKED_EMAIL',
     FETCH_GENRES: 'FETCH_GENRES',
     NEXT_BOOK: 'NEXT_BOOK',
     BEFORE_BOOK: 'BEFORE_BOOK',
@@ -141,8 +143,18 @@ const checkNickIsUnique = (nick) => ({
     promise: loginApi.checkNickIsUnique(nick)
 })
 
+const checkEmailIsUnique = (email) => ({
+    type: actionTypes.CHECK_EMAIL,
+    payload: { email },
+    promise: loginApi.checkEmailIsUnique(email)
+})
+
 const setNickIsUniqueFalse = () => ({
     type: actionTypes.CHECKED_NICK
+})
+
+const setEmailIsUniqueFalse = () => ({
+    type: actionTypes.CHECKED_EMAIL
 })
 
 const fetchCommentaries = (bookId, nCommentaries, lastDate) => ({
@@ -175,7 +187,9 @@ export {
     doRegister,
     doneRegister,
     checkNickIsUnique,
+    checkEmailIsUnique,
     setNickIsUniqueFalse,
+    setEmailIsUniqueFalse,
     setIsOpenAddBook,
     uploadBook,
     fetchGenres,

@@ -34,19 +34,28 @@ const checkNickIsUnique = (userNick) => axios.get(
     }
 )
 
+const checkEmailIsUnique = (email) => axios.get(
+    `${baseURL}/login/avaliableEmail`, {
+        params: {
+            email: email
+        }
+    }
+)
+
 
 const doLogOut = () => axios.get( 
     `${baseURL}/logout`
 )
 
 const checkToken = () => axios.get(
-    `${baseURL}/login/isme`
+    `${baseURL}/login/isme`, { withCredentials: true }
 )
 
 export default {
     doLogin,
     doRegister,
     checkNickIsUnique,
+    checkEmailIsUnique,
     doLogOut,
     checkToken
 }
