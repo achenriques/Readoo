@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import * as appState from '../app_state/reducers';
-import { changeTab, changeLanguage } from '../app_state/actions';
+import { changeTab, changeLanguage, doLogOut } from '../app_state/actions';
 import { connect } from 'react-redux';
 import { BottomNavigation, BottomNavigationItem } from 'material-ui/BottomNavigation';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -8,6 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import Explore from 'material-ui/svg-icons/action/explore';
 import Favorite from 'material-ui/svg-icons/action/favorite';
 import ChatBubble from 'material-ui/svg-icons/communication/chat-bubble';
+import LogOut from 'material-ui/svg-icons/action/power-settings-new';
 import MapsPersonPin from 'material-ui/svg-icons/maps/person-pin';
 import Paper from 'material-ui/Paper';
 import LS from '../components/LanguageSelector';
@@ -20,6 +21,7 @@ const explore = <Explore />;
 const favoritesIcon = <Favorite />;
 const chatBubble = <ChatBubble />;
 const perfil = <MapsPersonPin />;
+const logOutIcon = <LogOut />;
 
 class ShortcutBar extends Component {
 
@@ -31,6 +33,10 @@ class ShortcutBar extends Component {
         if (this.props.currengLanguage !== languageId) {
             this.props.changeLanguage(languageId);
         }
+    }
+
+    handleLogOut = () => {
+        this.props.doLogOut();
     }
 
     render = () => {
@@ -66,7 +72,7 @@ class ShortcutBar extends Component {
                         </BottomNavigation>
                         ) : (<div/>) }
                     </Grid>
-                    <Grid item sm={2} xs={4} >
+                    <Grid item sm={1} xs={4} >
                         <BottomNavigation selectedIndex={this.props.currengLanguage}>
                             <BottomNavigationItem
                                 label={<LS msgId='english' defaultMsg='English'/>}
@@ -79,6 +85,15 @@ class ShortcutBar extends Component {
                                 onClick={(tab) => this.handleLanguage(LANGUAGE_SPANISH)}
                             />
                         </BottomNavigation>
+                    </Grid>
+                    <Grid item sm={1} xs={4} >
+                        {(this.props.userIsLogged) ? (
+                            <BottomNavigationItem
+                                label={<LS msgId='log.out' defaultMsg='Log Out'/>}
+                                icon={logOutIcon}
+                                onClick={(tab) => this.handleLogOut()}
+                            />
+                        ) : (<div/>) }
                     </Grid>
                 </Grid>
             </Paper >
@@ -96,5 +111,6 @@ export default connect(
     (dispatch) => ({
         changeTab: (tabID) => dispatch(changeTab(tabID)),
         changeLanguage: (languageId) => dispatch(changeLanguage(languageId)),
+        doLogOut: () => dispatch(doLogOut())
     })
 )(ShortcutBar);

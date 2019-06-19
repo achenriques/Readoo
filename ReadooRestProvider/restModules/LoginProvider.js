@@ -11,6 +11,7 @@ class LoginProvider {
         this.loginDao = new LoginDao(db);
         this.login(app);                // Post
         this.isMe(app);                 //Get
+        this.logOut(app);                 //Get
         this.isAvaliable(app);          //Get
         this.isAvaliableEmail(app);     // Get
         this.newUser(app);              // Post
@@ -30,24 +31,24 @@ class LoginProvider {
                                 userConfig.serverCredentials.users.readooUser, // TODO: server credencials
                                 { expiresIn: '24h' } // expires in 24 hours 
                             );
-                            res.cookie('token', token, { httpOnly: true }).status(200).json({
+                            return res.cookie('token', token, { httpOnly: true }).status(200).json({
                                         success: true,
                                         message: 'Authentication successful!',
                                         token: token
                                     });
                         } else {
-                            res.status(401).send({ auth: false });
+                            return res.status(401).send({ auth: false });
                         }
                     }
                 ).catch(
                     function (err) {
                         let reqError = functions.getRequestError(err);
-                        res.status(reqError.code)        // HTTP status 204: NotContent
+                        return res.status(reqError.code)        // HTTP status 204: NotContent
                             .send(reqError.text);
                     }
                 );
             } else {
-                res.status(400)        // HTTP status 400: BadRequest
+                return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Data');
             }
         });
@@ -58,7 +59,49 @@ class LoginProvider {
         let that = this;
         app.get('/login/isme', function (req, res) {
             let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
-            if (token === undefined) {
+            if (token === undefined && req.headers.cookie !== undefined) {
+                let stringFromCookie = req.headers.cookie;
+                let cookieTokenValues = new RegExp('token' + "=([^;]+)").exec(stringFromCookie);
+                if (cookieTokenValues.length) {
+                    token = cookieTokenValues[1];
+                }
+            }
+
+            if (!token) {
+                return res.status(401).send({ auth: false, message: 'No token provided!' });
+            } else {
+                // No util info
+                if (token.startsWith('Bearer ')) {
+                    // Remove Bearer from string
+                    token = token.slice(7, token.length);
+                }
+            }
+            
+            jwt.verify(token, userConfig.serverCredentials.users.readooUser, function(err, decoded) {
+                if (err) {
+                    return res.status(500).send({ auth: false, message: 'Failed to authenticate token!' });
+                }
+                that.loginDao.isMeLogged(decoded.userId).then(
+                    function (result) {
+                        res.setHeader('Content-Type', 'application/json');
+                        return res.status(200).json(result);
+                    }
+                ).catch(
+                    function (err) {
+                        let reqError = functions.getRequestError(err);
+                        return res.status(reqError.code)        // HTTP status 204: NotContent
+                            .send(reqError.text);
+                    }
+                );
+            });
+        });
+    }
+
+    logOut(app) {
+        let that = this;
+        app.get('/login/logout', function (req, res) {
+            let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
+            if (token === undefined && req.headers.cookie !== undefined) {
                 let stringFromCookie = req.headers.cookie;
                 let cookieTokenValues = new RegExp('token' + "=([^;]+)").exec(stringFromCookie);
                 if (cookieTokenValues.length) {
@@ -74,18 +117,17 @@ class LoginProvider {
                 if (err) {
                     return res.status(500).send({ auth: false, message: 'Failed to authenticate token!' });
                 }
-                that.loginDao.isMeLogged(decoded.userId).then(
-                    function (result) {
-                        res.setHeader('Content-Type', 'application/json');
-                        res.status(200).json(result);
-                    }
-                ).catch(
-                    function (err) {
-                        let reqError = functions.getRequestError(err);
-                        res.status(reqError.code)        // HTTP status 204: NotContent
-                            .send(reqError.text);
-                    }
+                let token = jwt.sign(
+                    { userId: decoded.userId },
+                    userConfig.serverCredentials.users.readooUser, // TODO: server credencials
+                    { expiresIn: '0s' } // We set the cookie not valid
                 );
+                // We send an expired token...
+                return res.cookie('token', token, { httpOnly: true }).status(200).json({
+                            success: true,
+                            message: 'Logged out successful!',
+                            token: token
+                        });
             });
         });
     }

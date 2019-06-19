@@ -2,8 +2,6 @@ import { combineReducers } from 'redux';
 import * as constants from '../constants/appConstants';
 import isEmpty from '../resources/isEmpty.png';
 import noInternet from '../resources/noInternet.png';
-import { LANGUAGE_ENGLISH, LANGUAGE_SPANISH } from '../constants/appConstants';
-
 import { actionTypes } from './actions';
 // Asi puedo tener varios modulos
 
@@ -23,7 +21,7 @@ const initialState = {
         isOpenAddBook: false,
     },
     common: {
-        appLanguage: LANGUAGE_ENGLISH,
+        appLanguage: constants.LANGUAGE_ENGLISH,
         userIsLogged : constants.USER_NOT_IS_LOGGED,
         avaliableNick : null,
         avaliableEmail: null
@@ -75,22 +73,36 @@ const initialState = {
     controllerStatus: {
         loading: 0,
         failure: []
-    },
-    filters: [],
+    }
+}
+
+// This is a reducer that managers all reducers from the top level
+const rootReducer = (state = initialState, { type, payload, data, err }) => {
+    let expiredSessionState = initialState;
+    // In this case if we recibe that a token has expired we reset the app.
+    if (err && err.response && err.response.status === constants.ERROR_403) {
+        expiredSessionState.common.userIsLogged = constants.USER_HAS_EXPIRED;
+        return expiredSessionState;
+    } else {
+        if (type === successType(actionTypes.DO_LOG_OUT)) {
+            return expiredSessionState;
+        }
+    }
+    return state;
 }
 
 const tabs = (state = initialState.tabs, { type, payload, data }) => {
   switch (type) {
-    case actionTypes.TAB_CHANGE:
-      console.log('TAB_CHANGE');
-      return {
-        ...state,
-        currentTabID: payload.newTabID
-      };
+        case actionTypes.TAB_CHANGE:
+        console.log('TAB_CHANGE');
+        return {
+            ...state,
+            currentTabID: payload.newTabID
+        };
 
-    default:
-      return state;
-  }
+        default:
+        return state;
+    }
 }
 
 const dialogs = (state = initialState.dialogs, { type, payload, data }) => {
@@ -128,6 +140,12 @@ const common = (state = initialState.common, { type, payload, data }) => {
             return {
                 ...state,
                 userIsLogged: constants.USER_IS_LOGGED
+            }
+
+        case successType(actionTypes.DO_LOG_OUT):
+            return {
+                ...state,
+                userIsLogged: constants.USER_NOT_IS_LOGGED
             }
 
         case successType(actionTypes.DO_REGISTER):
@@ -189,6 +207,9 @@ const user = (state = initialState.user, { type, payload, data }) => {
             case successType(actionTypes.DO_LOGIN):
                 console.log(actionTypes.DO_LOGIN);
                 return userData;
+
+            case successType(actionTypes.DO_LOG_OUT):
+                return initialState.user;
 
             case successType(actionTypes.DO_REGISTER):
                 console.log(actionTypes.DO_REGISTER);
@@ -335,7 +356,7 @@ const genres = (state = initialState.books, { type, payload, data }) => {
 /**
  * Reducer para los estados inherentes a mostrar operaciones REST
  */
-const controllerStatus = (state = initialState.controllerStatus, { type, payload, error }) => {
+const controllerStatus = (state = initialState.controllerStatus, { type, payload, data, err }) => {
     // If the type listened from action is from a promise failed...
     let typeString = new String(type);
     switch (typeString) {
@@ -355,7 +376,7 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
             // currentCount is used in case of SUCCESS or FAILURE to avoid concurrence errors
             let currentCount = state.loading  - 1;
             if (typeString.includes('_FAILURE')) {
-                let nextFailure = (Array.isArray(state.failure)) ? state.failure.push(error) : [error];
+                let nextFailure = (Array.isArray(state.failure)) ? state.failure.push(err) : [err];
                 return {
                     failure: nextFailure,
                     loading: (currentCount < 0) ? 0 : currentCount
@@ -385,6 +406,7 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
  * El export por defecto es para redux para que sea aceptado correctamente por index.js
  */
 export default combineReducers({
+    rootReducer,
     tabs,
     common,
     user,

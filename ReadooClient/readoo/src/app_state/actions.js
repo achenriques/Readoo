@@ -11,6 +11,7 @@ const actionTypes = {
     MODAL_ADD_BOOK: 'MODAL_ADD_BOOK',
     UPLOAD_BOOK: 'UPLOAD_BOOK',
     DO_LOGIN: 'DO_LOGIN',
+    DO_LOG_OUT: 'DO_LOG_OUT',
     DO_REGISTER: 'DO_REGISTER',
     DONE_REGISTER: 'DONE_REGISTER',
     CHECK_NICK: 'CHECK_NICK',
@@ -127,6 +128,11 @@ const doLogin = (nickEmail, pass, language) => ({
     promise: loginApi.doLogin(nickEmail, pass)
 })
 
+const doLogOut = () => ({
+    type: actionTypes.DO_LOG_OUT,
+    promise: loginApi.doLogOut()
+})
+
 const doRegister = (nickEmail, pass, email, language) => ({
     type: actionTypes.DO_REGISTER,
     payload: { nickEmail, pass, email, preferedLanguage: language },
@@ -184,6 +190,7 @@ export {
     changeLanguage,
     checkToken,
     doLogin,
+    doLogOut,
     doRegister,
     doneRegister,
     checkNickIsUnique,

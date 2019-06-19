@@ -22,9 +22,12 @@ export const DISPLAY_NONE = {
 export const ROWS_PER_PAGE = 3;
 export const BOOKS_PER_PAGE = 9;
 
+export const USER_HAS_EXPIRED = -1;
 export const USER_NOT_IS_LOGGED = 0;
 export const USER_IS_LOGGED = 1;
 export const USER_FIRST_TIME_LOGGED = 2;
 
 export const LANGUAGE_ENGLISH = 0;
 export const LANGUAGE_SPANISH = 1;
+
+export const ERROR_403 = 403;

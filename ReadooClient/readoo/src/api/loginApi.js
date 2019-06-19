@@ -44,7 +44,7 @@ const checkEmailIsUnique = (email) => axios.get(
 
 
 const doLogOut = () => axios.get( 
-    `${baseURL}/logout`
+    `${baseURL}/login/logout`
 )
 
 const checkToken = () => axios.get(
