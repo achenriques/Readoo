@@ -5,6 +5,12 @@ import { changeLanguage } from '../app_state/actions';
 import stringResources from '../resources/stringResources';
 import { LANGUAGE_ENGLISH } from '../constants/appConstants';
 
+/*
+ * This class is a class that return strings depending of the selected language in the APP.
+ * The messages are duplicated for each language existing in the APP.
+ * Remember: This class is a component. The fomat is <LS msgId="the selected mesage from stringResources.js" defaultMsg="default mesage provider if the string does not exists" 
+ *      params=["Array of strings, each position replaces {0} in the original string, where the 0 or others are the position in the params array"] />
+*/
 class LanguageSelector extends Component {
 
     initialState = {
@@ -44,8 +50,8 @@ class LanguageSelector extends Component {
         }
     }
 
-    static returnPlainText = (msgId, defaultMsg) => {
-        return this.msg(msgId, defaultMsg);
+    static returnPlainText = (msgId, defaultMsg, params) => {
+        return this.msg(msgId, defaultMsg, params);
     }
 
 
@@ -57,16 +63,22 @@ class LanguageSelector extends Component {
         return this.state.appLanguage;
     }
 
-    msg = (msgId, defaultMsg) => {
+    msg = (msgId, defaultMsg, params) => {
         let toRet = stringResources[this.state.appLanguage][msgId];
         if (!toRet) {
             toRet = (defaultMsg) ? defaultMsg : "";
         }
+        if(params != null && params.length > 0) {
+            params.forEach((element, index, list) => {
+                toRet = toRet.replace("{" + index + "}", element);
+            });
+        }
+
         return toRet;
     }
 
     render = () => {
-        return (<span>{ this.msg(this.props.msgId, this.props.defaultMsg) }</span>);
+        return (<span>{ this.msg(this.props.msgId, this.props.defaultMsg, this.props.params) }</span>);
     }
 }
 

@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchUserData, doLogin, doRegister, checkNickIsUnique, setNickIsUniqueFalse,
-        checkEmailIsUnique, 
-        setEmailIsUniqueFalse} from '../../app_state/actions';
+        checkEmailIsUnique, setEmailIsUniqueFalse} from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import LS from '../LanguageSelector';
 import Grid from '@material-ui/core/Grid';
@@ -241,7 +240,7 @@ class Login extends Component {
                                     <br/>
                                     <TextField
                                         error={this.state.emailError || noAvaliableEmail}
-                                        label={(!this.state.emailError) ? (<LS msgId='your.email'/>) : (!noAvaliableEmail) 
+                                        label={(!this.state.emailError && !noAvaliableEmail) ? (<LS msgId='your.email'/>) : (!noAvaliableEmail) 
                                                 ? (<LS msgId='isnot.email'/>) : (<LS msgId='email.user.exists'/>)}
                                         id="userEmail"
                                         name="userEmail"
@@ -300,6 +299,6 @@ export default connect(
         setNickIsUniqueFalse: () => dispatch(setNickIsUniqueFalse()),
         setEmailIsUniqueFalse: () => dispatch(setEmailIsUniqueFalse()),
         checkNickIsUnique: (nick) => dispatch(checkNickIsUnique(nick)),
-        checkEmailIsUnique: (email) => dispatch(checkEmailIsUnique(email)),
+        checkEmailIsUnique: (email) => dispatch(checkEmailIsUnique(email))
     })
 )(Login);

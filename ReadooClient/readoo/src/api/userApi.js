@@ -9,11 +9,7 @@ axios.defaults.withCredentials = true;
 //axios.defaults.headers.common['Authorization'] = bAuth.bUser;
 
 const fetchUserData = (userId) => axios.get(
-    `${baseURL}/user`,
-    {
-        params: {
-            id: userId
-        }
+    `${baseURL}/user?id=${userId}`,{
     }
 )
 

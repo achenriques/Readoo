@@ -1,3 +1,6 @@
+const jwt = require('jsonwebtoken');
+const userConfig = require('../util/serverOptions');
+
 module.exports = {
     checkToken : function (req, res, next) {
         let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
@@ -13,7 +16,7 @@ module.exports = {
                 // Remove Bearer from string
                 token = token.slice(7, token.length);
             }
-            jwt.verify(token, readooUserPass, (err, decoded) => {
+            jwt.verify(token, userConfig.serverCredentials.users.readooUser, (err, decoded) => {
                 if (err) {
                     return res.json({
                         success: false,
@@ -51,7 +54,7 @@ module.exports = {
             token = token.slice(7, token.length);
         }
       
-        jwt.verify(token, readooUserPass, function(err, decoded) {
+        jwt.verify(token, userConfig.serverCredentials.users.readooUser, function(err, decoded) {
             if (err) {
                 // We send 403 to identify when the session has expired
                 return res.status(403).send({ auth: false, message: 'Failed to authenticate token.' });

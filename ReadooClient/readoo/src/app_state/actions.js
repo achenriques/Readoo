@@ -28,8 +28,8 @@ const actionTypes = {
     FETCH_USER_DATA: 'FETCH_USER_DATA',
     SAVE_USER_DATA: 'SAVE_USER_DATA',
     SEND_COMMENTARY: 'SEND_COMMENTARY',
-    RESET_LOADING: 'RESET_LOADING',
-    RESET_FAILURE: 'RESET_FAILURE'
+    RESET_LOADS: 'RESET_LOADS',
+    RESET_ERRORS: 'RESET_ERRORS'
 }
 
 /* //ACTION CREATORS
@@ -52,9 +52,16 @@ const changeTab = (newTabID) => ({
 })
 
 const resetErrLog = () => ({
-    type: actionTypes.RESET_FAILURE,
+    type: actionTypes.RESET_ERRORS,
     payload: {
         err: []
+    }
+})
+
+const resetLoadLog = () => ({
+    type: actionTypes.RESET_LOADS,
+    payload: {
+        load: []
     }
 })
 

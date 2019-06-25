@@ -1,6 +1,6 @@
 module.exports = {
-    loginEmail: "SELECT userId, userPass FROM AppUser WHERE userEmail = ? ;",
-    loginNick: "SELECT userId, userPass FROM AppUser WHERE userNick = ? ;",
+    loginEmail: "SELECT * FROM AppUser WHERE userEmail = ? ;",
+    loginNick: "SELECT * FROM AppUser WHERE userNick = ? ;",
     loginIsMe: "SELECT *, '' AS userPass FROM AppUser WHERE userId = ? ;",
     avaliableEmail: "SELECT userId FROM AppUser WHERE userEmail = ? ;",
     avaliableNick: "SELECT userId FROM AppUser WHERE userNick = ? ;",

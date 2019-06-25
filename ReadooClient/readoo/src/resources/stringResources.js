@@ -12,8 +12,11 @@ export default [
         'email.user.exists': 'E-mail: What a pitty, this E-mail already exists',
         'your.pass': 'Type your password',
         'repeat.pass': 'Repeat your pass',
+        'old.pass': 'You have to write the current pass before change it',
         'your.email': 'Type your E-mail',
         'isnot.email': 'Write a reliable E-mail',
+        'your.name': 'Write your name',
+        'your.surname': 'Write your surname',
         'register': 'Register new user',
         'login': 'Log In',
         'cancel.register': 'Cancel',
@@ -27,7 +30,13 @@ export default [
         'look.for.books': 'Explore books',
         'favourites': 'My favourites',
         'chats': 'My chats',
-        'profile': 'Profile'
+        'profile': 'Profile',
+        'user.image.avatar': 'User presentation image',
+        'add.portrait.image': 'Add image as portrait',
+        'about.you': 'Write something to share about you. (MAX: {0})',
+        'delete.profile': 'Delete your own profile!',
+        'save': 'Save',
+        'no.changes': '* No changes detected. No it is necessary save anything!'
     },
     // Spanish
     {
@@ -42,6 +51,7 @@ export default [
         'email.user.exists': 'E-mail: Oh oh... este E-mail ya ha sido registrado',
         'your.pass': 'Tu contraseña',
         'repeat.pass': 'Repite tu contaseña',
+        'old.pass': 'Tienes que escribir tu contraseña actual si pretendes cambiarla.',
         'your.email': 'Escribe tu E-mail',
         'isnot.email': 'Escribe una dirección de correo creíble',
         'register': 'Registrate',
@@ -57,6 +67,12 @@ export default [
         'look.for.books': 'Explora libros',
         'favourites': 'Mis favoritos',
         'chats': 'Mis conversaciones',
-        'profile': 'Perfil'
+        'profile': 'Perfil',
+        'user.image.avatar': 'Imagen de presentación',
+        'add.portrait.image': 'Añadir imagen como retrato',
+        'about.you': 'Escribe algo sobre tí para darte a conocer. (MAX: {0})',
+        'delete.profile': '¡Eliminar tu perfil!',
+        'save': 'Guardar',
+        'no.changes': '* No se han detectado cambios. No es necesario guardar.'
     }
 ]

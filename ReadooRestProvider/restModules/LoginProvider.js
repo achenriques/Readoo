@@ -18,7 +18,7 @@ class LoginProvider {
     }
 
     login(app) {
-        let that = this;
+        const that = this;
         app.post('/login', function(req, res) {
             if (req.body.userNickEmail && req.body.userNickEmail.trim().length && req.body.pass) {
                 let userNickEmail = req.body.userNickEmail.trim();
@@ -31,10 +31,12 @@ class LoginProvider {
                                 userConfig.serverCredentials.users.readooUser, // TODO: server credencials
                                 { expiresIn: '24h' } // expires in 24 hours 
                             );
+                            result.userPass = '';
                             return res.cookie('token', token, { httpOnly: true }).status(200).json({
                                         success: true,
                                         message: 'Authentication successful!',
-                                        token: token
+                                        userId: result.userId,
+                                        userData: result
                                     });
                         } else {
                             return res.status(401).send({ auth: false });
@@ -56,7 +58,7 @@ class LoginProvider {
 
     // Check the actual token and returns user info
     isMe(app) {
-        let that = this;
+        const that = this;
         app.get('/login/isme', function (req, res) {
             let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
             if (token === undefined && req.headers.cookie !== undefined) {
@@ -98,7 +100,7 @@ class LoginProvider {
     }
 
     logOut(app) {
-        let that = this;
+        const that = this;
         app.get('/login/logout', function (req, res) {
             let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
             if (token === undefined && req.headers.cookie !== undefined) {
@@ -133,53 +135,53 @@ class LoginProvider {
     }
 
     isAvaliable(app) {
-        let that = this;
+        const that = this;
         app.get('/login/avaliable', function (req, res) {
             if (req.query.userNickEmail) {
                 that.loginDao.getIsNickAvaliable("" + req.query.userNickEmail).then(
                     function (result) {
                         res.setHeader('Content-Type', 'application/json');
-                        res.status(200).send(result.length === 0);
+                        return res.status(200).send(result.length === 0);
                     }
                 ).catch(
                     function (err) {
                         let reqError = functions.getRequestError(err);
-                        res.status(reqError.code)        // HTTP status 204: NotContent
+                        return res.status(reqError.code)        // HTTP status 204: NotContent
                             .send(reqError.text);
                     } 
                 );
             } else {
-                res.status(400)        // HTTP status 400: BadRequest
+                return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Data');
             }
         });
     }
 
     isAvaliableEmail(app) {
-        let that = this;
+        const that = this;
         app.get('/login/avaliableEmail', function (req, res) {
             if (req.query.email) {
                 that.loginDao.getIsEmailAvaliable("" + req.query.email.trim()).then(
                     function (result) {
                         res.setHeader('Content-Type', 'application/json');
-                        res.status(200).send(result.length === 0);
+                        return res.status(200).send(result.length === 0);
                     }
                 ).catch(
                     function (err) {
                         let reqError = functions.getRequestError(err);
-                        res.status(reqError.code)        // HTTP status 204: NotContent
+                        return res.status(reqError.code)        // HTTP status 204: NotContent
                             .send(reqError.text);
                     } 
                 );
             } else {
-                res.status(400)        // HTTP status 400: BadRequest
+                return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Data');
             }
         });
     }
   
     newUser(app) {
-        let that = this;
+        const that = this;
         app.post('/login/new', function (req, res) {
             console.log("Estoy insertando " + req.body.userNickEmail);     
             if (req.body.userNickEmail && req.body.pass && req.body.email) {
@@ -198,18 +200,18 @@ class LoginProvider {
                                 userConfig.serverCredentials.users.readooUser, {    // TODO: server credencials
                                 expiresIn: '24h' // expires in 24 hours
                             });
-                            res.status(200).send({ id:result.insertId, auth: true, token: token });
+                            return res.status(200).send({ id:result.insertId, auth: true, token: token });
                         }
                     }
                 ).catch(
                     function (err) {
                         let reqError = functions.getRequestError(err);
-                        res.status(reqError.code)        // HTTP status 204: NotContent
+                        return res.status(reqError.code)        // HTTP status 204: NotContent
                             .send(reqError.text);
                     }
                 );
             } else {
-                res.status(400)        // HTTP status 400: BadRequest
+                return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Data');
             }
         });

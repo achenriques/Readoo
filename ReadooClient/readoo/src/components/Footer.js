@@ -22,10 +22,13 @@ class Footer extends Component {
 
     static getDerivedStateFromProps = (nextProps, prevState) => {
         console.log("eih");
-        if(nextProps.enviarNuevoComentarioSuccess) {
+        if(nextProps.errorListener != null && nextProps.errorListener.length) {
             let errorMsg = "";
-            nextProps.enviarNuevoComentarioSuccess.each((err) => {
-                return errorMsg += err + " / ";
+            nextProps.errorListener.forEach((err, index, array) => {
+                if (index > 0) {
+                    errorMsg += errorMsg + ' / ';
+                }
+                return errorMsg = errorMsg += err;
             }, this);
             return({
                 ...prevState,
@@ -108,7 +111,6 @@ class Footer extends Component {
 export default connect(
     (state) => ({
         selectedIndex: appState.getCurrentTabID(state),
-        petitionFailed: appState.getFailingStatus(state),
         errorListener: appState.getFailingStatus(state),
         appLanguage: appState.getAppLanguage(state)
     }),

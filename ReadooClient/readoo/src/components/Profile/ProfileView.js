@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchUserData } from '../../app_state/actions';
+import { fetchUserData, checkEmailIsUnique, setEmailIsUniqueFalse } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import LS from '../LanguageSelector';
 import avatarDefault from '../../resources/avatarDefault.svg';
 import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT } from '../../constants/appConstants';
 
@@ -28,17 +29,52 @@ class ProfileView extends Component {
         userEmail: "",
         userName: "",
         userSurname: "",
+        userAboutMe: "",
         avatarImage: "",
-        loadingProfile: null,
-        showOldPass: false
+        loadingProfile: 0,
+        showOldPass: false,
+        emailError: false,
+        acceptDisabled: false,
+        noChanges: false
     };
 
     constructor(props) {
         super(props);
         this.state = { ...this.initialState };
         // TODO 
-        this.props.fetchUserData();
+        this.props.fetchUserData(this.props.userId);
     };
+
+    static getDerivedStateFromProps = (nextProps, prevState) => {
+        if(nextProps.userData != null && nextProps.userData.userId) {
+            return {
+                ...prevState,
+                loadingProfile: null,
+                userData: nextProps.userData,
+                avatarImage: nextProps.userData.userAvatarUrl,
+                userNick: nextProps.userData.userNick,
+                userPass: "******",
+                userEmail: nextProps.userData.userEmail,
+                userName: nextProps.userData.userName,
+                userSurname: nextProps.userData.userSurname,
+                userAboutMe: nextProps.userData.userAboutMe
+            }
+        }        
+        return null;
+    }
+
+    checkEmail = (val) => {
+        let toRet = /.*@[A-z]{1,15}\.[a-z]{2,3}$/.test(val);
+        if (toRet) {
+            // If is a register we should prove that the nick does not exists yet
+            this.props.checkEmailIsUnique(val.trim());
+        } else {
+            if (this.props.avaliableEmail === false && this.state.userEmail !== val) {
+                this.props.setEmailIsUniqueFalse();
+            }
+        }
+        return toRet;
+    }
 
     oChangeInput = (evt) => {
         const value = evt.target.value;
@@ -53,10 +89,17 @@ class ProfileView extends Component {
                 });
             }
         }
+
+        let emailError = this.state.emailError;
+        if (name === "userEmail") {
+            emailError = !this.checkEmail(value);
+        }
+
         // ver impletar errores en el alta de libros
         this.setState({
             ...this.state,
-            [name]: value
+            [name]: value,
+            noChanges: false
         }, callback);
     }
 
@@ -91,7 +134,37 @@ class ProfileView extends Component {
     }
 
     acceptSaveProfile = (evt) => {
-        // TODO
+        let newUserData = {
+            userAvatar: (this.state.avatarImage !== "" && this.state.avatarImage !== this.state.userData.userAvatar) ? this.state.userAvatar : "",
+            userNick: (this.state.userNick !== this.state.userData.userNick) ? this.state.userNick : "",
+            userPass: (this.state.userPass !== "" && this.state.userPass !== this.state.userData.userPass) ? this.state.userPass : "",
+            userEmail:(this.state.userEmail !== "" && this.state.userEmail !== this.state.userData.userEmail) ? this.state.userEmail : "",
+            userName: (this.state.userName !== "" && this.state.userName !== this.state.userData.userName) ? this.state.userName : "",
+            userSurname: (this.state.userSurname != "" && this.state.userSurname !== this.state.userData.userSurname) ? this.state.userSurname : "",
+            userAboutMe: (this.state.userAboutMe !== this.state.userData.userAboutMe) ? this.state.userAboutMe : ""
+        }
+
+        if (newUserData.userAvatar || newUserData.userNick || newUserData.userPass || newUserData.userEmail || newUserData.userName ||
+                newUserData.userSurname || newUserData.userAboutMe) {
+            let dataToSend = {
+                newUserData
+            }
+            if (newUserData.userPass.length) {
+                dataToSend.oldUserPass = this.state.oldUserPass;
+            }
+
+            this.setState({
+                ...this.state,
+                acceptDisabled: true
+            })
+            this.props.saveProfile(dataToSend);
+        } else {
+            this.setState({
+                ...this.state,
+                noChanges: true
+            })
+        }
+        
     }
 
     acceptDeleteProfile = (evt) => {
@@ -99,6 +172,9 @@ class ProfileView extends Component {
     }
 
     render = () => {
+        let noAvaliableEmail = (this.state.isARegister && this.state.userData.userEmail.trim().length > 0 
+                && this.props.avaliableEmail === false);
+
         switch (this.state.loadingProfile) {
             case -1:
                 return (
@@ -120,7 +196,7 @@ class ProfileView extends Component {
                             <Grid item sm={4} className="profileAvatarColumn">
                                     <div style={{ position: "relative"}}>
                                         <Paper elevation={4} className="divProfileAvatar">
-                                            <img src={this.state.userData.userAvatar} alt="Imagen de presentación de usuario" className="profileAvatarImage"/>
+                                            <img src={this.state.userData.userAvatar} alt="TODO  : 'user.image.avatar' " className="profileAvatarImage"/>
                                         </Paper>
                                     </div>
                                     <div className="divUploadAvatarButton">
@@ -134,7 +210,7 @@ class ProfileView extends Component {
                                         />
                                         <label htmlFor="uploadAvatarButton">
                                             <Button variant="outlined" component="span" className="uploadProfileAvatar" fullWidth>
-                                                AÑADE UNA IMAGEN DE PORTADA
+                                                <LS msgId='add.portrait.image' defaultMsg='Add image'/>
                                             </Button>
                                         </label>
                                     </div>
@@ -142,20 +218,22 @@ class ProfileView extends Component {
                             <Grid item sm={8} className="columnaDatosPerfil">
                                 <Paper elevation={4} className="divDatosPerfil">
                                     <TextField
-                                        label="Nick de tu Usuario, es único recuerda"
+                                        label={<LS msgId='nick.user' defaultMsg='Nick'/>}
                                         id="userNick"
                                         name="userNick"
                                         fullWidth
                                         inputProps={{
                                             maxLength: 45,
                                         }}
+                                        disabled
                                         value={this.state.userNick}
                                         onChange={this.oChangeInput.bind(this)}
                                         className="inputProfileData"
                                     />
                                     <br/>
                                     <TextField
-                                        label="Nombre de usuario"
+                                        error={this.state.userName.length === 0}
+                                        label={<LS msgId='your.name' defaultMsg='Name'/>}
                                         id="userName"
                                         name="userName"
                                         fullWidth
@@ -168,7 +246,8 @@ class ProfileView extends Component {
                                     />
                                     <br/>
                                     <TextField
-                                        label="Tus apellidos"
+                                        error={this.state.userSurname.length === 0}
+                                        label={<LS msgId='your.surname' defaultMsg='Surname'/>}
                                         id="userSurname"
                                         name="userSurname"
                                         fullWidth
@@ -181,7 +260,9 @@ class ProfileView extends Component {
                                     />
                                     <br/>
                                     <TextField
-                                        label="Tu E-mail"
+                                        error={this.state.emailError || noAvaliableEmail}
+                                        label={(!this.state.emailError && !noAvaliableEmail) ? (<LS msgId='your.email'/>) : (!noAvaliableEmail) 
+                                                ? (<LS msgId='isnot.email'/>) : (<LS msgId='email.user.exists'/>)}
                                         id="userEmail"
                                         name="userEmail"
                                         fullWidth
@@ -194,7 +275,7 @@ class ProfileView extends Component {
                                     />
                                     <br/>
                                     <TextField
-                                        label="Algo sobre tí mismo"
+                                        label={<LS msgId='about.you' params={(this.state.userAboutMe != null) ? [140 - this.state.userAboutMe.length] : [140]}/>}
                                         id="userAboutMe"
                                         name="userAboutMe"
                                         multiline
@@ -210,7 +291,8 @@ class ProfileView extends Component {
                                     {(this.state.showOldPass)? (
                                         <div>
                                             <TextField
-                                                label="Tu antigüa contraseña"
+                                                error={this.state.oldUserPass.length === 0}
+                                                label={<LS msgId='old.pass' defaultMsg="Current pass"/>}
                                                 id="oldUserPass"
                                                 name="oldUserPass"
                                                 fullWidth
@@ -226,7 +308,8 @@ class ProfileView extends Component {
                                         </div>
                                     ): (<div/>)}
                                     <TextField
-                                        label="Tu contraseña"
+                                        error={this.state.userPass.length === 0}
+                                        label={<LS msgId='your.pass' defaultMsg='Password'/>}
                                         id="userPass"
                                         name="userPass"
                                         fullWidth
@@ -243,22 +326,23 @@ class ProfileView extends Component {
                             </Grid>
                         </Grid>
                         <Grid container alignItems="flex-end">
-                        <Grid item sm={12}>
-                            <div className="saveProfileButton">
-                                <Button variant="flat" color="secondary" 
-                                    onClick={this.acceptDeleteProfile.bind(this)}
-                                    disabled={(this.props.savingUserData !== REST_DEFAULT)}
-                                >
-                                    ELIMINAR MI PERFIL
-                                </Button>
-                                <Button variant="flat" color="primary" 
-                                    onClick={this.acceptSaveProfile.bind(this)}
-                                    disabled={(this.props.savingUserData !== REST_DEFAULT)}
-                                >
-                                    GUARDAR
-                                </Button>
-                            </div>
-                        </Grid>
+                            <Grid item sm={12}>
+                                {(this.state.noChanges) ? (<div className="redInfo"><LS msgId='no.changes' defaultMsg='No changes to save'/></div>) : (<div/>)}
+                                <div className="saveProfileButton">
+                                    <Button variant="flat" color="secondary" 
+                                        onClick={this.acceptDeleteProfile.bind(this)}
+                                        disabled
+                                    >
+                                        <LS msgId='delete.profile' defaultMsg='Delete profile!'/>
+                                    </Button>
+                                    <Button variant="flat" color="primary" 
+                                        onClick={this.acceptSaveProfile.bind(this)}
+                                        disabled={this.state.acceptDisabled}
+                                    >
+                                        <LS msgId='save' defaultMsg='Save'/>
+                                    </Button>
+                                </div>
+                            </Grid>
                         </Grid>
                     </div>
                 )
@@ -268,9 +352,13 @@ class ProfileView extends Component {
 
 export default connect(
     (state) => ({
+        userId: appState.getUserId(state),
         userData: appState.getUser(state),
+        avaliableEmail: appState.getAvaliableEmail(state)
     }),
     (dispatch) => ({
-        fetchUserData: () => dispatch(fetchUserData())
+        fetchUserData: (userId) => dispatch(fetchUserData(userId)),
+        setEmailIsUniqueFalse: () => dispatch(setEmailIsUniqueFalse()),
+        checkEmailIsUnique: (email) => dispatch(checkEmailIsUnique(email))
     })
 )(ProfileView);

@@ -21,12 +21,12 @@ class App extends Component {
         this.props.checkToken();
     };
 
-    static getDerivedStateFromProps(nextProps, prevState) {
+    /* static getDerivedStateFromProps(nextProps, prevState) {
         if (nextProps.userIsLogged != null && prevState.USER_FIRST_TIME_LOGGED === nextProps.userIsLogged) {
             this.props.changeTab(pages.PROFILE); 
         }
         return null;
-    }
+    } */
 
     render() {
         return (

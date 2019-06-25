@@ -1,6 +1,6 @@
 module.exports = {
     allUsers: "SELECT * FROM appUser ;",
-    oneUser: "SELECT * FROM appUser WHERE userId = ? ; ",
+    oneUser: "SELECT *, '' as userPass FROM appUser WHERE userId = ? ; ",
     updateUser: "UPDATE appUser SET userName = ? , userSurname = ? , userNick = ? , " + 
         "userPass = ? , userEmail = ? , userAboutMe = ? , userAvatarUrl = ? WHERE userId = ? ;",
     insertUser: "INSERT INTO appUser (userName, userSurname, userNick, userPass, userEmail, userAboutMe, userKarma, userAvatarUrl, userVisible)" + 

@@ -94,11 +94,17 @@ const rootReducer = (state = initialState, { type, payload, data, err }) => {
 const tabs = (state = initialState.tabs, { type, payload, data }) => {
   switch (type) {
         case actionTypes.TAB_CHANGE:
-        console.log('TAB_CHANGE');
-        return {
-            ...state,
-            currentTabID: payload.newTabID
-        };
+            console.log('TAB_CHANGE');
+            return {
+                ...state,
+                currentTabID: payload.newTabID
+            };
+
+        case successType(actionTypes.DO_REGISTER):
+            return {
+                ...state,
+                currentTabID: constants.pages.PROFILE
+            }
 
         default:
         return state;
@@ -196,8 +202,11 @@ const common = (state = initialState.common, { type, payload, data }) => {
 const user = (state = initialState.user, { type, payload, data }) => {
     if (data) {
         let userData = data.data;
+        if (userData.userData !== undefined) {
+            userData = userData.userData; // this case is when user logs in the APP. We recive more params than userData..
+        }
         if (userData && userData.userLanguage == null && payload && payload.preferedLanguage != null) {
-            userData.preferedLanguage = (payload.preferedLanguage) ? payload.preferedLanguage : 1
+            userData.userLanguage = payload.preferedLanguage;
         }
         switch (type) {
             case successType(actionTypes.CHECK_TOKEN):
@@ -223,8 +232,8 @@ const user = (state = initialState.user, { type, payload, data }) => {
                     userAboutMe: '',
                     userPass: '',
                     userKarma: 0,
-                    userVisible: true,
-                    preferedLanguage: payload.preferedLanguage
+                    userLanguage: userData.userLanguage,
+                    userVisible: true
                 };
 
             case successType(actionTypes.FETCH_USER_DATA):
@@ -360,13 +369,13 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
     // If the type listened from action is from a promise failed...
     let typeString = new String(type);
     switch (typeString) {
-        case actionTypes.RESET_LOADING:
+        case actionTypes.RESET_LOADS:
             return {
                 ...state,
                 loading: 0
             }
 
-        case actionTypes.RESET_FAILURE:
+        case actionTypes.RESET_ERRORS:
             return {
                 ...state,
                 failure: []
@@ -376,7 +385,8 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
             // currentCount is used in case of SUCCESS or FAILURE to avoid concurrence errors
             let currentCount = state.loading  - 1;
             if (typeString.includes('_FAILURE')) {
-                let nextFailure = (Array.isArray(state.failure)) ? state.failure.push(err) : [err];
+                let nextFailure = (Array.isArray(state.failure)) ? state.failure.slice(0) : []; // Clone array to not modify original
+                nextFailure.push(err);
                 return {
                     failure: nextFailure,
                     loading: (currentCount < 0) ? 0 : currentCount
@@ -429,7 +439,7 @@ export const getCurrentTabID = (state) => state.tabs.currentTabID;
 export const getAvaliableNick = (state) => state.common.avaliableNick;
 export const getAvaliableEmail = (state) => state.common.avaliableEmail;
 export const getIsOpenModal = (state) => state.dialogs;
-export const getUserId = (state) => state.user.id;
+export const getUserId = (state) => state.user.userId;
 export const getUser = (state) => state.user;
 export const getGenres = (state) => state.genres.all;
 export const getUserGenres = (state) => state.genres.userGenres;
