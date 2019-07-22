@@ -367,7 +367,7 @@ const genres = (state = initialState.books, { type, payload, data }) => {
  */
 const controllerStatus = (state = initialState.controllerStatus, { type, payload, data, err }) => {
     // If the type listened from action is from a promise failed...
-    let typeString = new String(type);
+    let typeString = "" + type;
     switch (typeString) {
         case actionTypes.RESET_LOADS:
             return {

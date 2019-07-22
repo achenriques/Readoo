@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { resetErrLog } from '../app_state/actions';
 import * as appState from '../app_state/reducers';
 import LS from './LanguageSelector';
-import Snackbar from '@material-ui/core/Snackbar';
-import Button from '@material-ui/core/Button';
 import { pages, LANGUAGE_ENGLISH, LANGUAGE_SPANISH } from '../constants/appConstants';
 import '../styles/Footer.css';
 
@@ -21,7 +18,6 @@ class Footer extends Component {
     };
 
     static getDerivedStateFromProps = (nextProps, prevState) => {
-        console.log("eih");
         if(nextProps.errorListener != null && nextProps.errorListener.length) {
             let errorMsg = "";
             nextProps.errorListener.forEach((err, index, array) => {
@@ -83,17 +79,6 @@ class Footer extends Component {
     render() {
         return (
             <div>
-                <Snackbar
-                    open={this.state.openSnackBar}
-                    message={this.state.snackBarMsg}                            
-                    autoHideDuration={5000 /*ms*/}
-                    onClose={this.handleSnakRequestClose.bind(this)}
-                    action={[
-                        <Button key="close" color="secondary" size="small" onClick={() => {this.handleSnakRequestClose}}>
-                            <LS msgId="close" defaultMsg="Close"/>
-                        </Button>
-                        ]}
-                />
                 <div className="Back-Color">
                     <div className="displayed-left">
                         <LS msgId="status" defaultMsg=""/> {this.getCurrentStatus(this.props.selectedIndex)}
@@ -114,8 +99,6 @@ export default connect(
         errorListener: appState.getFailingStatus(state),
         appLanguage: appState.getAppLanguage(state)
     }),
-    (dispatch) => ({
-        resetErrLog: () => dispatch(resetErrLog())
-    })
+    (dispatch) => ({})
 )(Footer);
 

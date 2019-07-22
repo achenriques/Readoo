@@ -13,7 +13,7 @@ const fetchUserData = (userId) => axios.get(
     }
 )
 
-const saveUserData = (userData) => axios.post(
+const saveUserData = (userData) => axios.put(
     `${baseURL}/user`,
     {
         userData

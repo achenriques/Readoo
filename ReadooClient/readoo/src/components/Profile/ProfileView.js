@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchUserData, checkEmailIsUnique, setEmailIsUniqueFalse } from '../../app_state/actions';
+import { fetchUserData, checkEmailIsUnique, setEmailIsUniqueFalse, saveUserData } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -14,7 +14,7 @@ class ProfileView extends Component {
 
     initialState = {
         userData: {
-            userAvatar: avatarDefault,
+            userAvatarUrl: "",
             userNick: "",
             userPass: "******",
             userEmail: "",
@@ -30,7 +30,7 @@ class ProfileView extends Component {
         userName: "",
         userSurname: "",
         userAboutMe: "",
-        avatarImage: "",
+        avatarImage: avatarDefault,
         loadingProfile: 0,
         showOldPass: false,
         emailError: false,
@@ -51,15 +51,28 @@ class ProfileView extends Component {
                 ...prevState,
                 loadingProfile: null,
                 userData: nextProps.userData,
-                avatarImage: nextProps.userData.userAvatarUrl,
+                avatarImage: (nextProps.userData.userAvatarUrl != null) ? nextProps.userData.userAvatarUrl : avatarDefault,
                 userNick: nextProps.userData.userNick,
                 userPass: "******",
                 userEmail: nextProps.userData.userEmail,
-                userName: nextProps.userData.userName,
-                userSurname: nextProps.userData.userSurname,
-                userAboutMe: nextProps.userData.userAboutMe
+                userName: (nextProps.userData.userName != null) ? nextProps.userData.userName : "",
+                userSurname: (nextProps.userData.userSurname != null) ? nextProps.userData.userSurname : "",
+                userAboutMe: (nextProps.userData.userAboutMe != null) ? nextProps.userData.userAboutMe : ""
             }
-        }        
+        }
+        if (nextProps.loadingStatus === 0) {
+            if (prevState.loadingProfile === 0) {
+                setTimeout(function() {
+                    //your code to be executed after 3 second
+                    if (prevState.userData.userNick === "") {
+                        return {
+                            ...prevState,
+                            loadingProfile: -1
+                        }
+                    }
+                }, 3000);
+            }
+        }
         return null;
     }
 
@@ -135,36 +148,32 @@ class ProfileView extends Component {
 
     acceptSaveProfile = (evt) => {
         let newUserData = {
-            userAvatar: (this.state.avatarImage !== "" && this.state.avatarImage !== this.state.userData.userAvatar) ? this.state.userAvatar : "",
-            userNick: (this.state.userNick !== this.state.userData.userNick) ? this.state.userNick : "",
-            userPass: (this.state.userPass !== "" && this.state.userPass !== this.state.userData.userPass) ? this.state.userPass : "",
-            userEmail:(this.state.userEmail !== "" && this.state.userEmail !== this.state.userData.userEmail) ? this.state.userEmail : "",
-            userName: (this.state.userName !== "" && this.state.userName !== this.state.userData.userName) ? this.state.userName : "",
-            userSurname: (this.state.userSurname != "" && this.state.userSurname !== this.state.userData.userSurname) ? this.state.userSurname : "",
-            userAboutMe: (this.state.userAboutMe !== this.state.userData.userAboutMe) ? this.state.userAboutMe : ""
+            userAvatarUrl: (this.state.avatarImage !== "" && this.state.avatarImage !== avatarDefault) ? this.state.userAvatar : null,
+            userNick: (this.state.userNick !== this.state.userData.userNick) ? this.state.userNick : null,
+            userPass: (this.state.userPass !== "" && this.state.userPass !== "******"  && this.state.userPass !== this.state.userData.userPass) ? this.state.userPass : null,
+            userEmail:(this.state.userEmail !== "" && this.state.userEmail !== this.state.userData.userEmail) ? this.state.userEmail : null,
+            userName: (this.state.userName !== "" && this.state.userName !== this.state.userData.userName) ? this.state.userName : null,
+            userSurname: (this.state.userSurname != "" && this.state.userSurname !== this.state.userData.userSurname) ? this.state.userSurname : null,
+            userAboutMe: (this.state.userAboutMe !== this.state.userData.userAboutMe) ? this.state.userAboutMe : null
         }
 
         if (newUserData.userAvatar || newUserData.userNick || newUserData.userPass || newUserData.userEmail || newUserData.userName ||
                 newUserData.userSurname || newUserData.userAboutMe) {
-            let dataToSend = {
-                newUserData
-            }
-            if (newUserData.userPass.length) {
+            let dataToSend = newUserData;
+            if (newUserData.userPass !== null && newUserData.userPass.length) {
                 dataToSend.oldUserPass = this.state.oldUserPass;
             }
-
             this.setState({
                 ...this.state,
                 acceptDisabled: true
             })
-            this.props.saveProfile(dataToSend);
+            this.props.saveUserData(dataToSend);
         } else {
             this.setState({
                 ...this.state,
                 noChanges: true
             })
         }
-        
     }
 
     acceptDeleteProfile = (evt) => {
@@ -196,7 +205,7 @@ class ProfileView extends Component {
                             <Grid item sm={4} className="profileAvatarColumn">
                                     <div style={{ position: "relative"}}>
                                         <Paper elevation={4} className="divProfileAvatar">
-                                            <img src={this.state.userData.userAvatar} alt="TODO  : 'user.image.avatar' " className="profileAvatarImage"/>
+                                            <img src={this.state.avatarImage} alt="TODO  : 'user.image.avatar' " className="profileAvatarImage"/>
                                         </Paper>
                                     </div>
                                     <div className="divUploadAvatarButton">
@@ -354,11 +363,13 @@ export default connect(
     (state) => ({
         userId: appState.getUserId(state),
         userData: appState.getUser(state),
-        avaliableEmail: appState.getAvaliableEmail(state)
+        avaliableEmail: appState.getAvaliableEmail(state),
+        loadingStatus: appState.getLoadingStatus(state)
     }),
     (dispatch) => ({
         fetchUserData: (userId) => dispatch(fetchUserData(userId)),
         setEmailIsUniqueFalse: () => dispatch(setEmailIsUniqueFalse()),
-        checkEmailIsUnique: (email) => dispatch(checkEmailIsUnique(email))
+        checkEmailIsUnique: (email) => dispatch(checkEmailIsUnique(email)),
+        saveUserData: (userData) => dispatch(saveUserData(userData))
     })
 )(ProfileView);

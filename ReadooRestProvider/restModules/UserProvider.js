@@ -13,7 +13,7 @@ class UserProvider {
         this.insertOne(app);        // Post
     }
     
-      getAll(app) {
+    getAll(app) {
         const that = this;
         app.get('/user/all', function (req, res) {
             that.userDao.getAllUser().then(
@@ -61,13 +61,15 @@ class UserProvider {
     modifyOne(app) {
         const that = this;
         app.put('/user', middleware.verifyToken, function (req, res) {
-            let userToUpdate = req.body.user;
+            let userToUpdate = req.body.userData;
             console.log("Estoy modificando " + userToUpdate);     
-            if (userToUpdate && userToUpdate.userName && userToUpdate.userSurname && userToUpdate.userNick && userToUpdate.userPass && userToUpdate.userEmail && 
-                    userToUpdate.userAboutMe && userToUpdate.userAvatarUrl && userToUpdate.userId) {
-                let hashedPassword = bcrypt.hashSync(userToUpdate.userPass, 8);
-                that.userDao.updateOneUser(userToUpdate.userName.trim(), userToUpdate.userSurname.trim(), userToUpdate.userNick.trim(), hashedPassword, userToUpdate.userEmail.trim(), 
-                        userToUpdate.userAboutMe.trim(), userToUpdate.userAvatarUrl, +userToUpdate.userId).then(
+            if (userToUpdate && userToUpdate.userName !== undefined && userToUpdate.userSurname !== undefined && userToUpdate.userNick !== undefined
+                    && userToUpdate.userPass !== undefined && userToUpdate.userEmail !== undefined && userToUpdate.userAboutMe  !== undefined
+                    && userToUpdate.userAvatarUrl !== undefined) {
+                let hashedPassword = (userToUpdate.userPass !== null) ? bcrypt.hashSync(userToUpdate.userPass, 8) : null;
+                that.userDao.updateOneUser((userToUpdate.userName !== null) ? userToUpdate.userName.trim() : null, (userToUpdate.userSurname !== null) ? userToUpdate.userSurname.trim() : null, 
+                        (userToUpdate.userNick) ? userToUpdate.userNick.trim() : null, hashedPassword, (userToUpdate.userEmail != null) ? userToUpdate.userEmail.trim() : null, 
+                        (userToUpdate.userAboutMe !== null) ? userToUpdate.userAboutMe.trim() : null, userToUpdate.userAvatarUrl).then(
                     function (result) {
                         res.setHeader('Content-Type', 'application/json');
                         return res.status(200).json(result);

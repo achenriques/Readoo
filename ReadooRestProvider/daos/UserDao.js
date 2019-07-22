@@ -19,7 +19,8 @@ class UserDao extends DaoManager {
 
     updateOneUser(userName, userSurname, userNick, userPass, userEmail, userAboutMe, userAvatarUrl, userId) {
         let statement = queries.updateUser;
-        return this.executeStatment(statement, [userName, userSurname, userNick, userPass, userEmail, userAboutMe, userAvatarUrl, userId]);
+        return this.executeStatment(statement, [userName, userName, userSurname, userSurname, userNick, userNick, 
+                userPass, userPass, userEmail, userEmail, userAboutMe, userAboutMe, userAvatarUrl, userAvatarUrl, userId]);
     }
 
     insertOneUser(userName, userSurname, userNick, userPass, userEmail, userAboutMe, userAvatarUrl) {
