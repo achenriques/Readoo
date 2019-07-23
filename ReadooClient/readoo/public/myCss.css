@@ -11,7 +11,7 @@
     border-right: 1px solid black;
 }
 
-.columnaDatosPerfil {
+.perfilDataColumn {
     position: relative;
     height: 100%;
     width: 80%;
@@ -27,6 +27,23 @@
     display: flex; 
     vertical-align: middle; 
     text-align: center;
+}
+
+.profileNickColumn {
+    padding-right: 10px;
+    border-right: 1px solid black;
+}
+
+.profileKarmaColumn {
+    padding: 0px 10px 0px 10px;
+}
+
+.profileKarmaIconColumn {
+    margin: auto;
+}
+
+.helpKarma {
+    max-width: 15em;
 }
 
 .divDatosPerfil {

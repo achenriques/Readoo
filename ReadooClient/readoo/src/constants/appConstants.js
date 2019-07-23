@@ -30,4 +30,5 @@ export const USER_FIRST_TIME_LOGGED = 2;
 export const LANGUAGE_ENGLISH = 0;
 export const LANGUAGE_SPANISH = 1;
 
+export const ERROR_401 = 401;
 export const ERROR_403 = 403;

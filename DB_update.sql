@@ -28,12 +28,13 @@ CREATE TABLE IF NOT EXISTS `readoo_db`.`AppUser` (
   `userName` VARCHAR(20) NOT NULL,
   `userSurname` VARCHAR(45) NOT NULL,
   `userNick` VARCHAR(20) NOT NULL,
-  `pass` VARCHAR(50) NOT NULL,
-  `email` VARCHAR(50) NOT NULL,
+  `userPass` VARCHAR(50) NOT NULL,
+  `userEmail` VARCHAR(50) NOT NULL,
   `userAboutMe` VARCHAR(140) NULL DEFAULT NULL,
-  `karma` INT(10) ZEROFILL NULL,
-  `avatarUrl` VARCHAR(50) NULL DEFAULT NULL,
-  `visible` BOOLEAN NOT NULL,
+  `userKarma` INT(10) ZEROFILL NULL,
+  `userAvatarUrl` VARCHAR(50) NULL DEFAULT NULL,
+  `userLanguage` INT(10) NOT NULL,
+  `userVisible` BOOLEAN NOT NULL,
   PRIMARY KEY (`userId`)
   -- INDEX `indexName` (`userId` ASC) VISIBLE,
   )
@@ -72,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `readoo_db`.`Book` (
   `bookCoverUrl` VARCHAR(50) NULL DEFAULT NULL,
   `userId` INT(10) NOT NULL,
   `genreId` INT(10) UNSIGNED NOT NULL,
-  `visible` BOOLEAN NOT NULL,
+  `bookVisible` BOOLEAN NOT NULL,
   PRIMARY KEY (`bookId`),
   -- INDEX indexName (`genreId` ASC) VISIBLE,
   -- INDEX `indexName` (`userId` ASC) VISIBLE,
@@ -284,3 +285,6 @@ DEFAULT CHARACTER SET = utf8;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
+-- ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '1234';

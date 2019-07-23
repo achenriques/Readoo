@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { changeTab, setIsOpenAddBook } from '../app_state/actions';
 import * as appState from '../app_state/reducers';
 import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
+import AddIcon from 'material-ui/svg-icons/content/add';
 import LS from './LanguageSelector';
 import ExploreView from './explore/ExploreView';
 import UploadBookModal from './explore/UploadBookModal';

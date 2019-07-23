@@ -21,16 +21,37 @@ class LanguageSelector extends Component {
     constructor(props) {
         super(props);
         this.state = { ...this.initialState };
+        LanguageSelector.staticLanguageId = LANGUAGE_ENGLISH;
     };
+
+    static getStringMsg = (msgId, defaultMsg, params) => {
+        let langId = (LanguageSelector.staticLanguageId !== undefined && stringResources[LanguageSelector.staticLanguageId] !== undefined)
+                ? LanguageSelector.staticLanguageId
+                : LANGUAGE_ENGLISH;
+        let toRet = (stringResources[langId] !== undefined)
+                ? stringResources[langId][msgId]
+                : "";
+        if (!toRet) {
+            toRet = (defaultMsg) ? defaultMsg : "";
+        }
+        if(params != null && params.length > 0) {
+            params.forEach((element, index, list) => {
+                toRet = toRet.replace("{" + index + "}", element);
+            });
+        }
+        return toRet;
+    }
 
     static getDerivedStateFromProps = (nextProps, prevState) => {
         if (nextProps.appLanguage != null && prevState.appLanguage !== nextProps.appLanguage) {
+            LanguageSelector.staticLanguageId = +nextProps.appLanguage;
             return({
                 ...prevState,
                 appLanguage: +nextProps.appLanguage
             });
         } else {
             if (nextProps.userLanguage != null) {
+                LanguageSelector.staticLanguageId = +nextProps.userLanguage;
                 return({
                     appLanguage: +nextProps.userLanguage,
                     userLanguage: +nextProps.userLanguage
@@ -64,7 +85,9 @@ class LanguageSelector extends Component {
     }
 
     msg = (msgId, defaultMsg, params) => {
-        let toRet = stringResources[this.state.appLanguage][msgId];
+        let toRet = (stringResources[this.state.appLanguage] !== undefined)
+                ? stringResources[this.state.appLanguage][msgId]
+                : "";
         if (!toRet) {
             toRet = (defaultMsg) ? defaultMsg : "";
         }
@@ -81,6 +104,8 @@ class LanguageSelector extends Component {
         return (<span>{ this.msg(this.props.msgId, this.props.defaultMsg, this.props.params) }</span>);
     }
 }
+
+export const getStringMsg = LanguageSelector.getStringMsg;
 
 export default connect(
     (state) => ({

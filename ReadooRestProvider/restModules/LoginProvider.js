@@ -23,23 +23,35 @@ class LoginProvider {
             if (req.body.userNickEmail && req.body.userNickEmail.trim().length && req.body.pass) {
                 let userNickEmail = req.body.userNickEmail.trim();
                 let pass = req.body.pass;
-                that.loginDao.logUser(userNickEmail, pass).then(
+                that.loginDao.logUser(userNickEmail).then(
                     function (result) {
-                        if (bcrypt.compareSync(pass, result.userPass)) {
-                            let token = jwt.sign(
-                                { userId: result.userId },
-                                userConfig.serverCredentials.users.readooUser, // TODO: server credencials
-                                { expiresIn: '24h' } // expires in 24 hours 
-                            );
-                            result.userPass = '';
-                            return res.cookie('token', token, { httpOnly: true }).status(200).json({
-                                        success: true,
-                                        message: 'Authentication successful!',
-                                        userId: result.userId,
-                                        userData: result
-                                    });
+                        if (result !== undefined) {
+                            if (bcrypt.compareSync(pass, result.userPass)) {
+                                let token = jwt.sign(
+                                    { userId: result.userId },
+                                    userConfig.serverCredentials.users.readooUser, // TODO: server credencials
+                                    { expiresIn: '24h' } // expires in 24 hours 
+                                );
+                                result.userPass = '';
+                                // Save date of login of all users.
+                                that.loginDao.registerLog(+result.userId).then(
+                                    function (resultLog) {
+                                        console.log("Registered user with ID: " + result.userId + " logged at " + new Date().toString());
+                                    }
+                                ).catch(function (err) {
+                                    console.log("Error at saving log register: " + err);
+                                });
+                                return res.cookie('token', token, { httpOnly: true }).status(200).json({
+                                            success: true,
+                                            message: 'Authentication successful!',
+                                            userId: result.userId,
+                                            userData: result
+                                        });
+                            } else {
+                                return res.status(401).send({ auth: false });
+                            }
                         } else {
-                            return res.status(401).send({ auth: false });
+                            return res.status(401).send({ auth: false, info: 'no.user.exists'});
                         }
                     }
                 ).catch(

@@ -189,7 +189,7 @@ class Login extends Component {
         return (
             <div>
                 <Grid container className="gridLogin">
-                    <Grid item sm={12} className="columnaDatosPerfil">
+                    <Grid item sm={12} className="perfilDataColumn">
                         <Paper elevation={4} className="loginForm">
                             <TextField
                                 error={noAvaliableNick}

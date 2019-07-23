@@ -46,7 +46,7 @@ module.exports = {
         }
 
         if (!token) {
-            return res.status(403).send({ auth: false, message: 'No token provided.' });
+            return res.status(403).send({ auth: false, info: 'no.token.provided', message: 'No token provided.' });
         }
         // No util info
         if (token.startsWith('Bearer ')) {

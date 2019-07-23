@@ -7,9 +7,9 @@ class LoginDao extends DaoManager{
         super(db);
     }
 
-    logUser(email, pass) {
-        let statement = (email.includes("@")) ? queries.loginEmail : queries.loginNick; 
-        return this.executeStatment(statement, [email, pass], function (result) { return result[0] });
+    logUser(emailOrNick) {
+        let statement = (emailOrNick.includes("@")) ? queries.loginEmail : queries.loginNick; 
+        return this.executeStatment(statement, [emailOrNick], function (result) { return result[0] });
     }
 
     isMeLogged(userId) {
@@ -31,7 +31,11 @@ class LoginDao extends DaoManager{
         let statement = queries.addUser;
         return this.executeStatment(statement, [nick, pass, email, preferedLanguage]);
     }
-            
+
+    registerLog(userId) {
+        let statement = queries.registerLog;
+        return this.executeStatment(statement, [userId]);
+    }
             
 }
 

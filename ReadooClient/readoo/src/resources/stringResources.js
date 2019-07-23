@@ -6,6 +6,7 @@ export default [
         'english': 'English',
         'spanish': 'Spanish',
         'something.goes.wrong': 'SOMETHING GOES WRONG! Try reolading page',
+        'no.user.logged': 'No user logged yet. Please log in or register to have some fun!',
         'unique.user': 'Nick or E-mail. REMEMBER: they are unique',
         'nick.user': 'Nick: REMEMBER: it is unique',
         'nick.user.exists': 'Nick: What a pitty, this Nick already exists',
@@ -34,9 +35,14 @@ export default [
         'user.image.avatar': 'User presentation image',
         'add.portrait.image': 'Add image as portrait',
         'about.you': 'Write something to share about you. (MAX: {0})',
+        'karma': 'Your karma',
+        'what.is.karma': 'The karma o level of karma is the amount of likes of your publications. This means that when more karma you own, more popular you are in Readoo.',
         'delete.profile': 'Delete your own profile!',
         'save': 'Save',
-        'no.changes': '* No changes detected. No it is necessary save anything!'
+        'no.changes': '* No changes detected. No it is necessary save anything!',
+        // Errors
+        'no.user.exists': 'The user doesn´t exist.',
+        'no.token.provided': 'It seems the sesson has been expired. Please, refresh the application and log in to continue.'
     },
     // Spanish
     {
@@ -45,6 +51,7 @@ export default [
         'english': 'Inglés',
         'spanish': 'Español',
         'something.goes.wrong': '¡Algo ha ido mal! Prueba a recargar la página',
+        'no.user.logged': '¿No estás has entrado todavía? Entra o registrate para usar la aplicación.',
         'unique.user': 'Nick o E-mail. RECUERDA: son únicos',
         'nick.user': 'Nick: RECUERDA: es único',
         'nick.user.exists': 'Nick: Que pena, alguien se te ha adelantado',
@@ -71,8 +78,13 @@ export default [
         'user.image.avatar': 'Imagen de presentación',
         'add.portrait.image': 'Añadir imagen como retrato',
         'about.you': 'Escribe algo sobre tí para darte a conocer. (MAX: {0})',
+        'karma': 'Tu karma',
+        'what.is.karma': 'El karma o nivel de Karma es el número de likes totales que tienen tus pubicaciones, cuanto más karma significa que eres más popular en Readoo.',
         'delete.profile': '¡Eliminar tu perfil!',
         'save': 'Guardar',
-        'no.changes': '* No se han detectado cambios. No es necesario guardar.'
+        'no.changes': '* No se han detectado cambios. No es necesario guardar.',
+        // Errores
+        'no.user.exists': 'El usuario informado no existe.',
+        'no.token.provided': 'La sesión parece haber expirado. Por favor, refresca la pagina y vuelve a entrar para continuar.'
     }
 ]

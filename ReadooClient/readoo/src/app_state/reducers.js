@@ -3,6 +3,7 @@ import * as constants from '../constants/appConstants';
 import isEmpty from '../resources/isEmpty.png';
 import noInternet from '../resources/noInternet.png';
 import { actionTypes } from './actions';
+import { getStringMsg } from '../components/LanguageSelector'
 // Asi puedo tener varios modulos
 
 const failureType = (actionType) => `${actionType}_FAILURE`;
@@ -21,6 +22,7 @@ const initialState = {
         isOpenAddBook: false,
     },
     common: {
+
         appLanguage: constants.LANGUAGE_ENGLISH,
         userIsLogged : constants.USER_NOT_IS_LOGGED,
         avaliableNick : null,
@@ -363,7 +365,7 @@ const genres = (state = initialState.books, { type, payload, data }) => {
 }
 
 /**
- * Reducer para los estados inherentes a mostrar operaciones REST
+ * Reducer to controller Rest operations and show err messages or warnings if necessary
  */
 const controllerStatus = (state = initialState.controllerStatus, { type, payload, data, err }) => {
     // If the type listened from action is from a promise failed...
@@ -385,8 +387,32 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
             // currentCount is used in case of SUCCESS or FAILURE to avoid concurrence errors
             let currentCount = state.loading  - 1;
             if (typeString.includes('_FAILURE')) {
-                let nextFailure = (Array.isArray(state.failure)) ? state.failure.slice(0) : []; // Clone array to not modify original
-                nextFailure.push(err);
+                let nextFailure = [];
+                // Its me failing... No user connected
+                if (err.response !== undefined) {
+                        let info = (err.response.data !== undefined) ? err.response.data.info : "";
+                    switch (err.response) {
+                        case constants.ERROR_401:
+                            if (info) {
+                                nextFailure.push(getStringMsg(err.response.data.info, 'Error at log portal.'));
+                            } else {
+                                nextFailure.push(getStringMsg('no.user.logged', 'No user logged yet, Please Log or Register!'));
+                            }
+                            break;
+                    
+                        case constants.ERROR_403:
+                            nextFailure.push(getStringMsg((info) ? info : 'no.token.provided', 'The sesson has expired. Please refresh the page and log in to continue!'));
+                            break;
+                        default:
+                            nextFailure = (Array.isArray(state.failure)) ? state.failure.slice(0) : []; // Clone array to not modify original
+                            nextFailure.push(err);
+                            break;
+                    }    
+                } else {
+                    nextFailure = (Array.isArray(state.failure)) ? state.failure.slice(0) : []; // Clone array to not modify original
+                    nextFailure.push(err);
+                }
+                
                 return {
                     failure: nextFailure,
                     loading: (currentCount < 0) ? 0 : currentCount

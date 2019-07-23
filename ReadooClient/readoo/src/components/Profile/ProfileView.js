@@ -6,9 +6,15 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import IconButton from '@material-ui/core/IconButton';
+import Popper from '@material-ui/core/Popper';
+import Help from 'material-ui/svg-icons/action/help';
 import LS from '../LanguageSelector';
 import avatarDefault from '../../resources/avatarDefault.svg';
 import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT } from '../../constants/appConstants';
+import { throws } from 'assert';
+
+const iconHelp = <Help/>;
 
 class ProfileView extends Component {
 
@@ -21,6 +27,7 @@ class ProfileView extends Component {
             userName: "",
             userSurname: "",
             userAboutMe: "",
+            userKarma: 0,
             myGenres: []
         },
         userNick: "",
@@ -30,16 +37,19 @@ class ProfileView extends Component {
         userName: "",
         userSurname: "",
         userAboutMe: "",
+        userKarma: 0,
         avatarImage: avatarDefault,
         loadingProfile: 0,
         showOldPass: false,
         emailError: false,
         acceptDisabled: false,
-        noChanges: false
+        noChanges: false,
+        helpKarmaOpen: false
     };
 
     constructor(props) {
         super(props);
+        this.helpIconRef = null;
         this.state = { ...this.initialState };
         // TODO 
         this.props.fetchUserData(this.props.userId);
@@ -57,7 +67,8 @@ class ProfileView extends Component {
                 userEmail: nextProps.userData.userEmail,
                 userName: (nextProps.userData.userName != null) ? nextProps.userData.userName : "",
                 userSurname: (nextProps.userData.userSurname != null) ? nextProps.userData.userSurname : "",
-                userAboutMe: (nextProps.userData.userAboutMe != null) ? nextProps.userData.userAboutMe : ""
+                userAboutMe: (nextProps.userData.userAboutMe != null) ? nextProps.userData.userAboutMe : "",
+                userKarma: +nextProps.userData.userKarma
             }
         }
         if (nextProps.loadingStatus === 0) {
@@ -94,11 +105,22 @@ class ProfileView extends Component {
         const name = evt.target.name;
 
         let callback = () => {};
+        // Hide old pass field
         if (name === "userPass" && !this.state.showOldPass) {
             callback = () => {
                 this.setState({
                     ...this.state,
                     showOldPass: true
+                });
+            }
+        }
+
+        // Close help karma
+        if ((name === "userName" || name === "userSurname") && this.state.helpKarmaOpen) {
+            callback = () => {
+                this.setState({
+                    ...this.state,
+                    helpKarmaOpen: false
                 });
             }
         }
@@ -180,6 +202,16 @@ class ProfileView extends Component {
         // TODO
     }
 
+    showKarmaHelp = (evt) => {
+        if (this.helpIconRef === null) {
+            this.helpIconRef = evt.currentTarget;
+        }
+        this.setState({
+            ...this.state,
+            helpKarmaOpen: !this.state.helpKarmaOpen
+        });
+    }
+
     render = () => {
         let noAvaliableEmail = (this.state.isARegister && this.state.userData.userEmail.trim().length > 0 
                 && this.props.avaliableEmail === false);
@@ -224,22 +256,47 @@ class ProfileView extends Component {
                                         </label>
                                     </div>
                             </Grid>
-                            <Grid item sm={8} className="columnaDatosPerfil">
+                            <Grid item sm={8} className="perfilDataColumn">
                                 <Paper elevation={4} className="divDatosPerfil">
-                                    <TextField
-                                        label={<LS msgId='nick.user' defaultMsg='Nick'/>}
-                                        id="userNick"
-                                        name="userNick"
-                                        fullWidth
-                                        inputProps={{
-                                            maxLength: 45,
-                                        }}
-                                        disabled
-                                        value={this.state.userNick}
-                                        onChange={this.oChangeInput.bind(this)}
-                                        className="inputProfileData"
-                                    />
-                                    <br/>
+                                    <Grid container>
+                                        <Grid item sm={6} className='profileNickColumn'>
+                                            <TextField
+                                                label={<LS msgId='nick.user' defaultMsg='Nick'/>}
+                                                id="userNick"
+                                                name="userNick"
+                                                fullWidth
+                                                inputProps={{
+                                                    maxLength: 45,
+                                                }}
+                                                disabled
+                                                value={this.state.userNick}
+                                                className="inputProfileData"
+                                            />
+                                        </Grid>
+                                        <Grid item sm={5} className='profileKarmaColumn'>
+                                            <TextField
+                                                label={<LS msgId='karma' defaultMsg='Karma'/>}
+                                                id="userKarma"
+                                                name="userKarma"
+                                                fullWidth
+                                                disabled
+                                                value={this.state.userKarma}
+                                                className="inputProfileData"
+                                            />
+                                        </Grid>
+                                        <Grid item sm={1} className='profileKarmaIconColumn'>
+                                            <div>
+                                                <IconButton ref={this.helpIconRef} onClick={this.showKarmaHelp.bind(this)}>
+                                                    {iconHelp}
+                                                </IconButton>
+                                                <Popper id="helpIconPooper" anchorEl={this.helpIconRef} open={this.state.helpKarmaOpen}>
+                                                    <Paper className="helpKarma">
+                                                        <LS msgId='what.is.karma' defaultMsg='Karma?'/>
+                                                    </Paper>
+                                                </Popper>
+                                            </div>
+                                        </Grid>
+                                    </Grid>
                                     <TextField
                                         error={this.state.userName.length === 0}
                                         label={<LS msgId='your.name' defaultMsg='Name'/>}

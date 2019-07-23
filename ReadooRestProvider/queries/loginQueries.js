@@ -5,5 +5,6 @@ module.exports = {
     avaliableEmail: "SELECT userId FROM AppUser WHERE userEmail = ? ;",
     avaliableNick: "SELECT userId FROM AppUser WHERE userNick = ? ;",
     addUser: "INSERT INTO AppUser (userId, userNick, userPass, userEmail, userName, userSurname, " + 
-        "userKarma, userLanguage, userAvatarUrl, userVisible) VALUES (0, ?, ?, ?, '', '', 0, ?, NULL, 1) ;"
+        "userKarma, userLanguage, userAvatarUrl, userVisible) VALUES (0, ?, ?, ?, '', '', 0, ?, NULL, 1) ;",
+    informLog: "INSERT INTO LoginRegister (userId, loginRegisterDate) VALUES (?, CURRENT_TIMESTAMP()) ;"
 }
