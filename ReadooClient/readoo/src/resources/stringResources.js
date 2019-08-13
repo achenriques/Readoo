@@ -5,6 +5,7 @@ export default [
         'language': 'Language : ',
         'english': 'English',
         'spanish': 'Spanish',
+        'loading': 'Loading...',
         'something.goes.wrong': 'SOMETHING GOES WRONG! Try reolading page',
         'no.user.logged': 'No user logged yet. Please log in or register to have some fun!',
         'unique.user': 'Nick or E-mail. REMEMBER: they are unique',
@@ -41,6 +42,7 @@ export default [
         'save': 'Save',
         'no.changes': '* No changes detected. No it is necessary save anything!',
         // Errors
+        'timeout.error': 'Timeout while loading the page. Check your net connection. If the problem still existing could be a problem with the application server :-/',
         'no.user.exists': 'The user doesn´t exist.',
         'no.token.provided': 'It seems the sesson has been expired. Please, refresh the application and log in to continue.'
     },
@@ -50,6 +52,7 @@ export default [
         'language': 'Idioma : ',
         'english': 'Inglés',
         'spanish': 'Español',
+        'loading': 'Cargando...',
         'something.goes.wrong': '¡Algo ha ido mal! Prueba a recargar la página',
         'no.user.logged': '¿No estás has entrado todavía? Entra o registrate para usar la aplicación.',
         'unique.user': 'Nick o E-mail. RECUERDA: son únicos',
@@ -84,6 +87,7 @@ export default [
         'save': 'Guardar',
         'no.changes': '* No se han detectado cambios. No es necesario guardar.',
         // Errores
+        'timeout.error': 'Exceso de tiempo durante la carga. Comprueba tu conexión a la red. Si el problema persiste puede ser un fallo del servidor :-/',
         'no.user.exists': 'El usuario informado no existe.',
         'no.token.provided': 'La sesión parece haber expirado. Por favor, refresca la pagina y vuelve a entrar para continuar.'
     }

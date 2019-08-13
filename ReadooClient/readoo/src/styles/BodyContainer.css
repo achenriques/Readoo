@@ -8,6 +8,10 @@ body {
     padding-bottom: 30px;
 }
 
+.marginAuto {
+    margin: auto;
+}
+
 .styleButton {
     position: 'fixed';
     bottom: 50px;

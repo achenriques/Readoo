@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import RootRef from '@material-ui/core/RootRef';
 import { fetchUserData, checkEmailIsUnique, setEmailIsUniqueFalse, saveUserData } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Grid from '@material-ui/core/Grid';
@@ -12,7 +13,6 @@ import Help from 'material-ui/svg-icons/action/help';
 import LS from '../LanguageSelector';
 import avatarDefault from '../../resources/avatarDefault.svg';
 import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT } from '../../constants/appConstants';
-import { throws } from 'assert';
 
 const iconHelp = <Help/>;
 
@@ -44,19 +44,23 @@ class ProfileView extends Component {
         emailError: false,
         acceptDisabled: false,
         noChanges: false,
-        helpKarmaOpen: false
+        helpKarmaOpen: false,
+        alreadyLoadedTab: false
     };
 
     constructor(props) {
         super(props);
         this.helpIconRef = null;
+        this.profileDataGridRef = React.createRef();
+        this.profileDataGridHeight = 0;
+        this.profileDataGridWidth = 0;
         this.state = { ...this.initialState };
         // TODO 
         this.props.fetchUserData(this.props.userId);
     };
 
     static getDerivedStateFromProps = (nextProps, prevState) => {
-        if(nextProps.userData != null && nextProps.userData.userId) {
+        if(!prevState.alreadyLoadedTab && nextProps.userData != null && nextProps.userData.userId) {
             return {
                 ...prevState,
                 loadingProfile: null,
@@ -68,7 +72,8 @@ class ProfileView extends Component {
                 userName: (nextProps.userData.userName != null) ? nextProps.userData.userName : "",
                 userSurname: (nextProps.userData.userSurname != null) ? nextProps.userData.userSurname : "",
                 userAboutMe: (nextProps.userData.userAboutMe != null) ? nextProps.userData.userAboutMe : "",
-                userKarma: +nextProps.userData.userKarma
+                userKarma: +nextProps.userData.userKarma,
+                alreadyLoadedTab: true
             }
         }
         if (nextProps.loadingStatus === 0) {
@@ -81,7 +86,7 @@ class ProfileView extends Component {
                             loadingProfile: -1
                         }
                     }
-                }, 3000);
+                }, 10000);
             }
         }
         return null;
@@ -179,12 +184,22 @@ class ProfileView extends Component {
             userAboutMe: (this.state.userAboutMe !== this.state.userData.userAboutMe) ? this.state.userAboutMe : null
         }
 
+        // Sets the user Id in the object sent to back
+        newUserData.userId = this.props.userId;
+
         if (newUserData.userAvatar || newUserData.userNick || newUserData.userPass || newUserData.userEmail || newUserData.userName ||
                 newUserData.userSurname || newUserData.userAboutMe) {
             let dataToSend = newUserData;
             if (newUserData.userPass !== null && newUserData.userPass.length) {
                 dataToSend.oldUserPass = this.state.oldUserPass;
             }
+            // Size of PAPER DomElement from user data settings.
+            // This info is used to overload a new paper over the old one with the same dimensions.
+            this.profileDataGridTop = this.profileDataGridRef.current.getBoundingClientRect().top;
+            this.profileDataGridLeft = this.profileDataGridRef.current.getBoundingClientRect().left;
+            this.profileDataGridHeight = this.profileDataGridRef.current.getBoundingClientRect().height;
+            this.profileDataGridWidth = this.profileDataGridRef.current.getBoundingClientRect().width;
+
             this.setState({
                 ...this.state,
                 acceptDisabled: true
@@ -220,13 +235,13 @@ class ProfileView extends Component {
             case -1:
                 return (
                     <div className="loadingCommentaries">
-                        <h3>Error en la carga de los datos de usuario. Puede ser un problema de red o fallo del servidor...</h3>
+                        <h3><LS msgId='timeout.error' defaultMsg='Add image'/></h3>
                     </div>
                 )
             case 0:
                 return (
                     <div className="loadingCommentaries">
-                        <h3>Cargando...</h3>
+                        <h3><LS msgId='loading' defaultMsg='Loading...'/></h3>
                     </div>
                 )
         
@@ -257,138 +272,153 @@ class ProfileView extends Component {
                                     </div>
                             </Grid>
                             <Grid item sm={8} className="perfilDataColumn">
-                                <Paper elevation={4} className="divDatosPerfil">
-                                    <Grid container>
-                                        <Grid item sm={6} className='profileNickColumn'>
-                                            <TextField
-                                                label={<LS msgId='nick.user' defaultMsg='Nick'/>}
-                                                id="userNick"
-                                                name="userNick"
-                                                fullWidth
-                                                inputProps={{
-                                                    maxLength: 45,
-                                                }}
-                                                disabled
-                                                value={this.state.userNick}
-                                                className="inputProfileData"
-                                            />
-                                        </Grid>
-                                        <Grid item sm={5} className='profileKarmaColumn'>
-                                            <TextField
-                                                label={<LS msgId='karma' defaultMsg='Karma'/>}
-                                                id="userKarma"
-                                                name="userKarma"
-                                                fullWidth
-                                                disabled
-                                                value={this.state.userKarma}
-                                                className="inputProfileData"
-                                            />
-                                        </Grid>
-                                        <Grid item sm={1} className='profileKarmaIconColumn'>
-                                            <div>
-                                                <IconButton ref={this.helpIconRef} onClick={this.showKarmaHelp.bind(this)}>
-                                                    {iconHelp}
-                                                </IconButton>
-                                                <Popper id="helpIconPooper" anchorEl={this.helpIconRef} open={this.state.helpKarmaOpen}>
-                                                    <Paper className="helpKarma">
-                                                        <LS msgId='what.is.karma' defaultMsg='Karma?'/>
-                                                    </Paper>
-                                                </Popper>
-                                            </div>
-                                        </Grid>
-                                    </Grid>
-                                    <TextField
-                                        error={this.state.userName.length === 0}
-                                        label={<LS msgId='your.name' defaultMsg='Name'/>}
-                                        id="userName"
-                                        name="userName"
-                                        fullWidth
-                                        inputProps={{
-                                            maxLength: 45,
-                                        }}
-                                        value={this.state.userName}
-                                        onChange={this.oChangeInput.bind(this)}
-                                        className="inputProfileData"
-                                    />
-                                    <br/>
-                                    <TextField
-                                        error={this.state.userSurname.length === 0}
-                                        label={<LS msgId='your.surname' defaultMsg='Surname'/>}
-                                        id="userSurname"
-                                        name="userSurname"
-                                        fullWidth
-                                        inputProps={{
-                                            maxLength: 45,
-                                        }}
-                                        value={this.state.userSurname}
-                                        onChange={this.oChangeInput.bind(this)}
-                                        className="inputProfileData"
-                                    />
-                                    <br/>
-                                    <TextField
-                                        error={this.state.emailError || noAvaliableEmail}
-                                        label={(!this.state.emailError && !noAvaliableEmail) ? (<LS msgId='your.email'/>) : (!noAvaliableEmail) 
-                                                ? (<LS msgId='isnot.email'/>) : (<LS msgId='email.user.exists'/>)}
-                                        id="userEmail"
-                                        name="userEmail"
-                                        fullWidth
-                                        inputProps={{
-                                            maxLength: 45,
-                                        }}
-                                        value={this.state.userEmail}
-                                        onChange={this.oChangeInput.bind(this)}
-                                        className="inputProfileData"
-                                    />
-                                    <br/>
-                                    <TextField
-                                        label={<LS msgId='about.you' params={(this.state.userAboutMe != null) ? [140 - this.state.userAboutMe.length] : [140]}/>}
-                                        id="userAboutMe"
-                                        name="userAboutMe"
-                                        multiline
-                                        rowsMax="4"
-                                        fullWidth
-                                        inputProps={{
-                                            maxLength: 140,
-                                        }}
-                                        value={this.state.userAboutMe}
-                                        onChange={this.oChangeInput.bind(this)}
-                                        className="inputProfileData"
-                                    />
-                                    {(this.state.showOldPass)? (
-                                        <div>
-                                            <TextField
-                                                error={this.state.oldUserPass.length === 0}
-                                                label={<LS msgId='old.pass' defaultMsg="Current pass"/>}
-                                                id="oldUserPass"
-                                                name="oldUserPass"
-                                                fullWidth
-                                                type="password"
-                                                inputProps={{
-                                                    maxLength: 20,
-                                                }}
-                                                value={this.state.oldUserPass}
-                                                onChange={this.oChangeInput.bind(this)}
-                                                className="inputProfileData"
-                                            />
-                                            <br/>
-                                        </div>
-                                    ): (<div/>)}
-                                    <TextField
-                                        error={this.state.userPass.length === 0}
-                                        label={<LS msgId='your.pass' defaultMsg='Password'/>}
-                                        id="userPass"
-                                        name="userPass"
-                                        fullWidth
-                                        type="password"
-                                        inputProps={{
-                                            maxLength: 20,
-                                        }}
-                                        value={this.state.userPass}
-                                        onChange={this.oChangeInput.bind(this)}
-                                        className="inputProfileData"
-                                    />
-                                    <br/>
+                                <Paper elevation={16}
+                                    style={(this.state.acceptDisabled) 
+                                            ? { position: 'absolute', 
+                                                zIndex: 10, 
+                                                textAlign: 'center', 
+                                                height: this.profileDataGridHeight, 
+                                                width: this.profileDataGridWidth,
+                                                marginLeft: '50px',
+                                                marginRight: '90px'
+                                              } 
+                                            : DISPLAY_NONE}>
+                                    <h3 className="marginAuto"><LS msgId='loading' defaultMsg='Loading...'/></h3>
                                 </Paper>
+                                <RootRef rootRef={this.profileDataGridRef}>
+                                    <Paper elevation={4} className="divDatosPerfil">
+                                        <Grid container>
+                                            <Grid item sm={6} className='profileNickColumn'>
+                                                <TextField
+                                                    label={<LS msgId='nick.user' defaultMsg='Nick'/>}
+                                                    id="userNick"
+                                                    name="userNick"
+                                                    fullWidth
+                                                    inputProps={{
+                                                        maxLength: 45,
+                                                    }}
+                                                    disabled
+                                                    value={this.state.userNick}
+                                                    className="inputProfileData"
+                                                />
+                                            </Grid>
+                                            <Grid item sm={5} className='profileKarmaColumn'>
+                                                <TextField
+                                                    label={<LS msgId='karma' defaultMsg='Karma'/>}
+                                                    id="userKarma"
+                                                    name="userKarma"
+                                                    fullWidth
+                                                    disabled
+                                                    value={this.state.userKarma}
+                                                    className="inputProfileData"
+                                                />
+                                            </Grid>
+                                            <Grid item sm={1} className='profileKarmaIconColumn'>
+                                                <div>
+                                                    <IconButton ref={this.helpIconRef} onClick={this.showKarmaHelp.bind(this)}>
+                                                        {iconHelp}
+                                                    </IconButton>
+                                                    <Popper id="helpIconPooper" anchorEl={this.helpIconRef} open={this.state.helpKarmaOpen}>
+                                                        <Paper className="helpKarma">
+                                                            <LS msgId='what.is.karma' defaultMsg='Karma?'/>
+                                                        </Paper>
+                                                    </Popper>
+                                                </div>
+                                            </Grid>
+                                        </Grid>
+                                        <TextField
+                                            error={this.state.userName.length === 0}
+                                            label={<LS msgId='your.name' defaultMsg='Name'/>}
+                                            id="userName"
+                                            name="userName"
+                                            fullWidth
+                                            inputProps={{
+                                                maxLength: 45,
+                                            }}
+                                            value={this.state.userName}
+                                            onChange={this.oChangeInput.bind(this)}
+                                            className="inputProfileData"
+                                        />
+                                        <br/>
+                                        <TextField
+                                            error={this.state.userSurname.length === 0}
+                                            label={<LS msgId='your.surname' defaultMsg='Surname'/>}
+                                            id="userSurname"
+                                            name="userSurname"
+                                            fullWidth
+                                            inputProps={{
+                                                maxLength: 45,
+                                            }}
+                                            value={this.state.userSurname}
+                                            onChange={this.oChangeInput.bind(this)}
+                                            className="inputProfileData"
+                                        />
+                                        <br/>
+                                        <TextField
+                                            error={this.state.emailError || noAvaliableEmail}
+                                            label={(!this.state.emailError && !noAvaliableEmail) ? (<LS msgId='your.email'/>) : (!noAvaliableEmail) 
+                                                    ? (<LS msgId='isnot.email'/>) : (<LS msgId='email.user.exists'/>)}
+                                            id="userEmail"
+                                            name="userEmail"
+                                            fullWidth
+                                            inputProps={{
+                                                maxLength: 45,
+                                            }}
+                                            value={this.state.userEmail}
+                                            onChange={this.oChangeInput.bind(this)}
+                                            className="inputProfileData"
+                                        />
+                                        <br/>
+                                        <TextField
+                                            label={<LS msgId='about.you' params={(this.state.userAboutMe != null) ? [140 - this.state.userAboutMe.length] : [140]}/>}
+                                            id="userAboutMe"
+                                            name="userAboutMe"
+                                            multiline
+                                            rowsMax="4"
+                                            fullWidth
+                                            inputProps={{
+                                                maxLength: 140,
+                                            }}
+                                            value={this.state.userAboutMe}
+                                            onChange={this.oChangeInput.bind(this)}
+                                            className="inputProfileData"
+                                        />
+                                        {(this.state.showOldPass)? (
+                                            <div>
+                                                <TextField
+                                                    error={this.state.oldUserPass.length === 0}
+                                                    label={<LS msgId='old.pass' defaultMsg="Current pass"/>}
+                                                    id="oldUserPass"
+                                                    name="oldUserPass"
+                                                    fullWidth
+                                                    type="password"
+                                                    inputProps={{
+                                                        maxLength: 20,
+                                                    }}
+                                                    value={this.state.oldUserPass}
+                                                    onChange={this.oChangeInput.bind(this)}
+                                                    className="inputProfileData"
+                                                />
+                                                <br/>
+                                            </div>
+                                        ): (<div/>)}
+                                        <TextField
+                                            error={this.state.userPass.length === 0}
+                                            label={<LS msgId='your.pass' defaultMsg='Password'/>}
+                                            id="userPass"
+                                            name="userPass"
+                                            fullWidth
+                                            type="password"
+                                            inputProps={{
+                                                maxLength: 20,
+                                            }}
+                                            value={this.state.userPass}
+                                            onChange={this.oChangeInput.bind(this)}
+                                            className="inputProfileData"
+                                        />
+                                        <br/>
+                                    </Paper>
+                                </RootRef>
                             </Grid>
                         </Grid>
                         <Grid container alignItems="flex-end">
@@ -397,7 +427,7 @@ class ProfileView extends Component {
                                 <div className="saveProfileButton">
                                     <Button variant="flat" color="secondary" 
                                         onClick={this.acceptDeleteProfile.bind(this)}
-                                        disabled
+                                        disabled={this.state.acceptDisabled}
                                     >
                                         <LS msgId='delete.profile' defaultMsg='Delete profile!'/>
                                     </Button>
@@ -421,7 +451,8 @@ export default connect(
         userId: appState.getUserId(state),
         userData: appState.getUser(state),
         avaliableEmail: appState.getAvaliableEmail(state),
-        loadingStatus: appState.getLoadingStatus(state)
+        loadingStatus: appState.getLoadingStatus(state),
+        userDataLastRequestStatus: appState.getUserDataReqCode(state)   // Return the las request status Code (0 dont search again user data, 1 search again)
     }),
     (dispatch) => ({
         fetchUserData: (userId) => dispatch(fetchUserData(userId)),

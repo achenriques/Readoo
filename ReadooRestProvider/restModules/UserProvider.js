@@ -65,14 +65,19 @@ class UserProvider {
             console.log("Estoy modificando " + userToUpdate);     
             if (userToUpdate && userToUpdate.userName !== undefined && userToUpdate.userSurname !== undefined && userToUpdate.userNick !== undefined
                     && userToUpdate.userPass !== undefined && userToUpdate.userEmail !== undefined && userToUpdate.userAboutMe  !== undefined
-                    && userToUpdate.userAvatarUrl !== undefined) {
+                    && userToUpdate.userAvatarUrl !== undefined && userToUpdate.userId != null) {
                 let hashedPassword = (userToUpdate.userPass !== null) ? bcrypt.hashSync(userToUpdate.userPass, 8) : null;
                 that.userDao.updateOneUser((userToUpdate.userName !== null) ? userToUpdate.userName.trim() : null, (userToUpdate.userSurname !== null) ? userToUpdate.userSurname.trim() : null, 
                         (userToUpdate.userNick) ? userToUpdate.userNick.trim() : null, hashedPassword, (userToUpdate.userEmail != null) ? userToUpdate.userEmail.trim() : null, 
-                        (userToUpdate.userAboutMe !== null) ? userToUpdate.userAboutMe.trim() : null, userToUpdate.userAvatarUrl).then(
+                        (userToUpdate.userAboutMe !== null) ? userToUpdate.userAboutMe.trim() : null, userToUpdate.userAvatarUrl, +userToUpdate.userId).then(
                     function (result) {
                         res.setHeader('Content-Type', 'application/json');
-                        return res.status(200).json(result);
+                        if (result.changedRows > 0) {
+                            return res.status(200).json(result);
+                        } else {
+                            // Acepted but no changes commited
+                            return res.status(202).json(result);
+                        }
                     }
                 ).catch(
                     function (err) {
@@ -83,7 +88,7 @@ class UserProvider {
                 );
             } else {
                 res.status(400)        // HTTP status 400: BadRequest
-                    .send('Missed Id');
+                    .send('Missed Data');
             }
         });
     }

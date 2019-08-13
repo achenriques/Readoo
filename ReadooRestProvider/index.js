@@ -1,9 +1,16 @@
+// Read .env file
+const dotenv = require('dotenv').config();
+if (dotenv.error) {
+     console.log("Something goes wrong at reading .env file: " + dotenv.error);
+}
+// Express
 const express = require('express');
 const app = express();
+// Cors
 const cors = require('cors');
 // const router = express.Router();
 const bodyParser = require('body-parser');
-
+// Url encoder for photos and other data
 app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
 app.use(bodyParser.json());
 
@@ -11,7 +18,7 @@ app.use(bodyParser.json());
 var serverCredentials = require('./Util/serverOptions');
 app.use(basicAuth(serverCredentials)); */
 
-
+// Using cors
 app.use(cors({
      origin: (origin, cb) => {
           if (origin == 'http://localhost:3000' || origin == "http://127.0.0.1:3000") {
@@ -23,9 +30,11 @@ app.use(cors({
      allowedHeaders: 'Content-Type,x-access-token,Authorization'
 }));
 
+// Create a dbConnection
 const Connection = require('./Util/dbConnection');
 const db = new Connection();
 
+// Crating rest services
 const LoginProvider = require('./restModules/LoginProvider');
 new LoginProvider(app, db);
 
@@ -56,6 +65,7 @@ new UserReportsCommentaryProvider(app, db);
 const UserReportsBookProvider = require('./restModules/UserReportsBookProvider');
 new UserReportsBookProvider(app, db);
 
+// All services are now listening in the port 3030
 app.listen(3030, function () {
   console.log('App is listening on port 3030!');
 });

@@ -26,7 +26,7 @@ const initialState = {
         appLanguage: constants.LANGUAGE_ENGLISH,
         userIsLogged : constants.USER_NOT_IS_LOGGED,
         avaliableNick : null,
-        avaliableEmail: null
+        avaliableEmail: null,
     },
     user: {
         userId: '',
@@ -74,7 +74,8 @@ const initialState = {
     },
     controllerStatus: {
         loading: 0,
-        failure: []
+        failure: [],
+        last_save_user_code: null
     }
 }
 
@@ -370,19 +371,29 @@ const genres = (state = initialState.books, { type, payload, data }) => {
 const controllerStatus = (state = initialState.controllerStatus, { type, payload, data, err }) => {
     // If the type listened from action is from a promise failed...
     let typeString = "" + type;
+    // Save user request code to know when recharge userData if it was necessary
+    let saveUserReqCode = state.saveUserReqCode; 
     switch (typeString) {
         case actionTypes.RESET_LOADS:
             return {
                 ...state,
                 loading: 0
-            }
+            };
 
         case actionTypes.RESET_ERRORS:
             return {
                 ...state,
                 failure: []
-            }
+            };
 
+        case failureType(actionTypes.SAVE_USER_DATA):
+            saveUserReqCode = constants.REST_FAILURE;
+
+        case successType(actionTypes.SAVE_USER_DATA):
+            if (data !== undefined && data.status) {
+                saveUserReqCode = (constants.CODE_203 === +data.status) ? constants.REST_DEFAULT : constants.REST_SUCCESS;
+            }
+            // Do not break code at this part of the switch
         default:
             // currentCount is used in case of SUCCESS or FAILURE to avoid concurrence errors
             let currentCount = state.loading  - 1;
@@ -412,25 +423,25 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
                     nextFailure = (Array.isArray(state.failure)) ? state.failure.slice(0) : []; // Clone array to not modify original
                     nextFailure.push(err);
                 }
-                
                 return {
                     failure: nextFailure,
-                    loading: (currentCount < 0) ? 0 : currentCount
-                }
+                    loading: (currentCount < 0) ? 0 : currentCount,
+                    last_save_user_code: saveUserReqCode
+                };
             } else {
                 // Loading is a counter of rest petitions. If they are solver or they failed the counter goes down.
                 if (typeString.includes('_SUCCESS')) {
-                    
                     return {
                         ...state,
-                        loading: (currentCount < 0) ? 0 : currentCount
-                    }
+                        loading: (currentCount < 0) ? 0 : currentCount,
+                        last_save_user_code: saveUserReqCode
+                    };
                 } else {
                     if (typeString.includes('_LOADING')) {
                         return {
                             ...state,
                             loading: state.loading + 1
-                        }
+                        };
                     }
                 }
             }
@@ -472,5 +483,6 @@ export const getUserGenres = (state) => state.genres.userGenres;
 export const getBookIndex = (state) => state.books.currentBook;
 export const getBooks = (state) => state.books.shownBooks;
 export const getCommentaries = (state) => state.comentaries.bookCommentaries;
+export const getUserDataReqCode = (state) => state.controllerStatus.last_save_user_code;
 export const getLoadingStatus = (state) => state.controllerStatus.loading;
 export const getFailingStatus = (state) => state.controllerStatus.failure;
