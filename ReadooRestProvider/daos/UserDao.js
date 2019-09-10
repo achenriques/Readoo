@@ -17,6 +17,11 @@ class UserDao extends DaoManager {
         return this.executeStatment(statement, [userId], function (result) { return result[0] });
     }
 
+    getOneUserPass(userId) {
+        let statement = queries.oneUserPass;
+        return this.executeStatment(statement, [userId], function (result) { return result[0] });
+    }
+
     updateOneUser(userName, userSurname, userNick, userPass, userEmail, userAboutMe, userAvatarUrl, userId) {
         let statement = "UPDATE appUser SET ";
         let params = [];

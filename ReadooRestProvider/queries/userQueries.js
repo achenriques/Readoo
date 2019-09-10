@@ -1,6 +1,7 @@
 module.exports = {
     allUsers: "SELECT * FROM appUser ;",
     oneUser: "SELECT *, '' as userPass FROM appUser WHERE userId = ? ; ",
+    oneUserPass: "SELECT userPass FROM appUser WHERE userId = ? ; ",
 /*    
     updateUser: "UPDATE appUser SET userName = (case when ? IS NULL then userName else ? end), userSurname = (case when ? IS NULL then userSurname else ? end), " + 
         "userNick = (case when ? IS NULL then userNick else ? end) , userPass = (case when ? IS NULL then userPass else ? end) , " + 

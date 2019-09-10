@@ -44,7 +44,8 @@ export default [
         // Errors
         'timeout.error': 'Timeout while loading the page. Check your net connection. If the problem still existing could be a problem with the application server :-/',
         'no.user.exists': 'The user doesn´t exist.',
-        'no.token.provided': 'It seems the sesson has been expired. Please, refresh the application and log in to continue.'
+        'no.token.provided': 'It seems the sesson has been expired. Please, refresh the application and log in to continue.',
+        'no.pass.coincidence': 'The old password doesn´t coencide with the password in use.'
     },
     // Spanish
     {
@@ -89,6 +90,7 @@ export default [
         // Errores
         'timeout.error': 'Exceso de tiempo durante la carga. Comprueba tu conexión a la red. Si el problema persiste puede ser un fallo del servidor :-/',
         'no.user.exists': 'El usuario informado no existe.',
-        'no.token.provided': 'La sesión parece haber expirado. Por favor, refresca la pagina y vuelve a entrar para continuar.'
+        'no.token.provided': 'La sesión parece haber expirado. Por favor, refresca la pagina y vuelve a entrar para continuar.',
+        'no.pass.coincidence': 'La contraseña antigüa no coencide con la contraseña ahora en uso.'
     }
 ]

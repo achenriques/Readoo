@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const middleware = require('./middlewares');
 const UserDao = require('../daos/UserDao');
 
@@ -62,32 +63,54 @@ class UserProvider {
         const that = this;
         app.put('/user', middleware.verifyToken, function (req, res) {
             let userToUpdate = req.body.userData;
+            let oldUserPass = (userToUpdate.oldUserPass != null) ? "" + userToUpdate.oldUserPass.trim() : null;
             console.log("Estoy modificando " + userToUpdate);     
             if (userToUpdate && userToUpdate.userName !== undefined && userToUpdate.userSurname !== undefined && userToUpdate.userNick !== undefined
                     && userToUpdate.userPass !== undefined && userToUpdate.userEmail !== undefined && userToUpdate.userAboutMe  !== undefined
                     && userToUpdate.userAvatarUrl !== undefined && userToUpdate.userId != null) {
                 let hashedPassword = (userToUpdate.userPass !== null) ? bcrypt.hashSync(userToUpdate.userPass, 8) : null;
-                that.userDao.updateOneUser((userToUpdate.userName !== null) ? userToUpdate.userName.trim() : null, (userToUpdate.userSurname !== null) ? userToUpdate.userSurname.trim() : null, 
-                        (userToUpdate.userNick) ? userToUpdate.userNick.trim() : null, hashedPassword, (userToUpdate.userEmail != null) ? userToUpdate.userEmail.trim() : null, 
-                        (userToUpdate.userAboutMe !== null) ? userToUpdate.userAboutMe.trim() : null, userToUpdate.userAvatarUrl, +userToUpdate.userId).then(
+                that.userDao.getOneUserPass(+userToUpdate.userId).then(
                     function (result) {
-                        res.setHeader('Content-Type', 'application/json');
-                        if (result.changedRows > 0) {
-                            return res.status(200).json(result);
+                        if (result !== undefined) {
+                            if (bcrypt.compareSync(oldUserPass, result.userPass)) {
+                                that.userDao.updateOneUser((userToUpdate.userName !== null) ? userToUpdate.userName.trim() : null, 
+                                        (userToUpdate.userSurname !== null) ? userToUpdate.userSurname.trim() : null, 
+                                        (userToUpdate.userNick) ? userToUpdate.userNick.trim() : null, hashedPassword, 
+                                        (userToUpdate.userEmail != null) ? userToUpdate.userEmail.trim() : null, 
+                                        (userToUpdate.userAboutMe !== null) ? userToUpdate.userAboutMe.trim() : null, 
+                                        userToUpdate.userAvatarUrl, +userToUpdate.userId).then(
+                                    function (result) {
+                                        res.setHeader('Content-Type', 'application/json');
+                                        if (result.changedRows > 0) {
+                                            return res.status(200).json(result);
+                                        } else {
+                                            // Acepted but no changes commited
+                                            return res.status(202).json(result);
+                                        }
+                                    }
+                                ).catch(
+                                    function (err) {
+                                        let reqError = functions.getRequestError(err);
+                                        return res.status(reqError.code)        
+                                            .send(reqError.text);
+                                    }
+                                );
+                            } else {
+                                return res.status(401).send({ auth: false, info: 'no.pass.coincidence'});
+                            }
                         } else {
-                            // Acepted but no changes commited
-                            return res.status(202).json(result);
+                            return res.status(401).send({ auth: false, info: 'no.user.exists'});
                         }
                     }
                 ).catch(
                     function (err) {
                         let reqError = functions.getRequestError(err);
-                        return res.status(reqError.code)        
+                        return res.status(reqError.code)        // HTTP status 204: NotContent
                             .send(reqError.text);
                     }
                 );
             } else {
-                res.status(400)        // HTTP status 400: BadRequest
+                return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Data');
             }
         });

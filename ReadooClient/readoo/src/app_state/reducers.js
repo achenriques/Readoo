@@ -4,6 +4,7 @@ import isEmpty from '../resources/isEmpty.png';
 import noInternet from '../resources/noInternet.png';
 import { actionTypes } from './actions';
 import { getStringMsg } from '../components/LanguageSelector'
+import { element } from 'prop-types';
 // Asi puedo tener varios modulos
 
 const failureType = (actionType) => `${actionType}_FAILURE`;
@@ -74,8 +75,10 @@ const initialState = {
     },
     controllerStatus: {
         loading: 0,
-        failure: [],
-        last_save_user_code: null
+        loading_processes: [],
+        failed_processes: [],
+        succeed_processes: [],
+        failure: []
     }
 }
 
@@ -374,6 +377,17 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
     // Save user request code to know when recharge userData if it was necessary
     let saveUserReqCode = state.saveUserReqCode; 
     switch (typeString) {
+        case actionTypes.RESET_PROCCESS:
+            let failed_processes1 = state.failed_processes.filter(element => element !== payload.nameOfProcess);
+            let loading_processes1 = state.loading_processes.filter(element => element !== payload.nameOfProcess);
+            let succeed_processes1 = state.succeed_processes.filter(element => element !== payload.nameOfProcess);
+            return {
+                ...state,
+                failed_processes: failed_processes1,
+                loading_process: loading_processes1,
+                succeed_processes: succeed_processes1
+            }
+
         case actionTypes.RESET_LOADS:
             return {
                 ...state,
@@ -386,66 +400,85 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
                 failure: []
             };
 
-        case failureType(actionTypes.SAVE_USER_DATA):
-            saveUserReqCode = constants.REST_FAILURE;
-
-        case successType(actionTypes.SAVE_USER_DATA):
-            if (data !== undefined && data.status) {
-                saveUserReqCode = (constants.CODE_203 === +data.status) ? constants.REST_DEFAULT : constants.REST_SUCCESS;
-            }
-            // Do not break code at this part of the switch
         default:
             // currentCount is used in case of SUCCESS or FAILURE to avoid concurrence errors
-            let currentCount = state.loading  - 1;
+            let currentCount = state.loading - 1;
+            let petitionStatus = null;
             if (typeString.includes('_FAILURE')) {
-                let nextFailure = [];
-                // Its me failing... No user connected
-                if (err.response !== undefined) {
-                        let info = (err.response.data !== undefined) ? err.response.data.info : "";
-                    switch (err.response) {
-                        case constants.ERROR_401:
-                            if (info) {
-                                nextFailure.push(getStringMsg(err.response.data.info, 'Error at log portal.'));
-                            } else {
-                                nextFailure.push(getStringMsg('no.user.logged', 'No user logged yet, Please Log or Register!'));
-                            }
-                            break;
-                    
-                        case constants.ERROR_403:
-                            nextFailure.push(getStringMsg((info) ? info : 'no.token.provided', 'The sesson has expired. Please refresh the page and log in to continue!'));
-                            break;
-                        default:
-                            nextFailure = (Array.isArray(state.failure)) ? state.failure.slice(0) : []; // Clone array to not modify original
-                            nextFailure.push(err);
-                            break;
-                    }    
-                } else {
-                    nextFailure = (Array.isArray(state.failure)) ? state.failure.slice(0) : []; // Clone array to not modify original
-                    nextFailure.push(err);
-                }
-                return {
-                    failure: nextFailure,
-                    loading: (currentCount < 0) ? 0 : currentCount,
-                    last_save_user_code: saveUserReqCode
-                };
+                petitionStatus = constants.REST_FAILURE;
+            } else if (typeString.includes('_LOADING')) {
+                let petitionStatus = constants.REST_DEFAULT;
+            } else if (typeString.includes('_SUCCESS')) {
+                let petitionStatus = constants.REST_SUCCESS;
             } else {
-                // Loading is a counter of rest petitions. If they are solver or they failed the counter goes down.
-                if (typeString.includes('_SUCCESS')) {
+                // If no coencidences must return the prev state
+                return state;
+            }
+            
+            let nameOfProcess = typeString.slice(0, typeString.length - constants.PROCCESS_STATUS_WORD_LENGTH);
+            // The collection has to include the name of the process, so first of all it is neccessary to remove for avoid repeats
+            let failed_processes2 = state.failed_processes.filter(element => element !== nameOfProcess);
+            let loading_processes2 = state.loading_processes.filter(element => element !== nameOfProcess);
+            let succeed_processes2 = state.succeed_processes.filter(element => element !== nameOfProcess);
+
+            switch (petitionStatus) {
+                case constants.REST_FAILURE:
+                    let nextFailure = [];
+                    failed_processes2.push(nameOfProcess);
+                    // Its me failing... No user connected
+                    if (err.response !== undefined) {
+                            let info = (err.response.data !== undefined) ? err.response.data.info : "";
+                        switch (err.response) {
+                            case constants.ERROR_401:
+                                if (info) {
+                                    nextFailure.push(getStringMsg(info, 'Error at log portal.'));
+                                } else {
+                                    nextFailure.push(getStringMsg('no.user.logged', 'No user logged yet, Please Log or Register!'));
+                                }
+                                break;
+                            case constants.ERROR_403:
+                                nextFailure.push(getStringMsg((info) ? info : 'no.token.provided', 'The sesson has expired. Please refresh the page and log in to continue!'));
+                                break;
+                            default:
+                                nextFailure = (Array.isArray(state.failure)) ? state.failure.slice(0) : []; // Clone array to not modify original
+                                if (info) {
+                                    nextFailure.push(getStringMsg(info, "" + err));
+                                } else {
+                                    nextFailure.push(err);
+                                }
+                                break;
+                        }    
+                    } else {
+                        nextFailure = (Array.isArray(state.failure)) ? state.failure.slice(0) : []; // Clone array to not modify original
+                        nextFailure.push(err);
+                    }
                     return {
                         ...state,
-                        loading: (currentCount < 0) ? 0 : currentCount,
-                        last_save_user_code: saveUserReqCode
+                        failed_processes: failed_processes2,
+                        failure: nextFailure,
+                        loading: (currentCount < 0) ? 0 : currentCount
                     };
-                } else {
-                    if (typeString.includes('_LOADING')) {
-                        return {
-                            ...state,
-                            loading: state.loading + 1
-                        };
-                    }
-                }
+
+                case constants.REST_DEFAULT:
+                    loading_processes2.push(nameOfProcess);
+                    return {
+                        ...state,
+                        loading_process: loading_processes2,
+                        loading: state.loading + 1
+                    };
+
+                case constants.REST_SUCCESS:
+                    succeed_processes2.push(nameOfProcess);
+                    return {
+                        ...state,
+                        succeed_processes: succeed_processes2,
+                        loading: state.loading + 1
+                    };
+            
+                default:
+                    // If no coencidences must return the prev state
+                    return state;
             }
-            return state;
     }    
 }
 
@@ -483,6 +516,8 @@ export const getUserGenres = (state) => state.genres.userGenres;
 export const getBookIndex = (state) => state.books.currentBook;
 export const getBooks = (state) => state.books.shownBooks;
 export const getCommentaries = (state) => state.comentaries.bookCommentaries;
-export const getUserDataReqCode = (state) => state.controllerStatus.last_save_user_code;
 export const getLoadingStatus = (state) => state.controllerStatus.loading;
 export const getFailingStatus = (state) => state.controllerStatus.failure;
+export const getFailedProcesses = (state) => state.controllerStatus.failed_processes;
+export const getLoadingProcesses = (state) => state.controllerStatus.loading_processes;
+export const getSucceedProcesses = (state) => state.controllerStatus.succeed_processes;

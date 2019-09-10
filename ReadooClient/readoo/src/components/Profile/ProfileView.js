@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import RootRef from '@material-ui/core/RootRef';
-import { fetchUserData, checkEmailIsUnique, setEmailIsUniqueFalse, saveUserData } from '../../app_state/actions';
+import { actionTypes, fetchUserData, checkEmailIsUnique, setEmailIsUniqueFalse, saveUserData, resetProccess } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -12,9 +12,14 @@ import Popper from '@material-ui/core/Popper';
 import Help from 'material-ui/svg-icons/action/help';
 import LS from '../LanguageSelector';
 import avatarDefault from '../../resources/avatarDefault.svg';
-import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT } from '../../constants/appConstants';
+import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
+import { getProccessStatus } from '../../utils/AppUtils';
 
 const iconHelp = <Help/>;
+
+const LOADING_PROFILE = 0;
+const RUNNING_PROFILE = 1;
+const ERROR_PROFILE = -1;
 
 class ProfileView extends Component {
 
@@ -39,7 +44,7 @@ class ProfileView extends Component {
         userAboutMe: "",
         userKarma: 0,
         avatarImage: avatarDefault,
-        loadingProfile: 0,
+        loadingProfile: LOADING_PROFILE,
         showOldPass: false,
         emailError: false,
         acceptDisabled: false,
@@ -60,10 +65,11 @@ class ProfileView extends Component {
     };
 
     static getDerivedStateFromProps = (nextProps, prevState) => {
-        if(!prevState.alreadyLoadedTab && nextProps.userData != null && nextProps.userData.userId) {
+        if(prevState.loadingProfile !== RUNNING_PROFILE && !prevState.alreadyLoadedTab 
+                && nextProps.userData != null && nextProps.userData.userId) {
             return {
                 ...prevState,
-                loadingProfile: null,
+                loadingProfile: RUNNING_PROFILE,
                 userData: nextProps.userData,
                 avatarImage: (nextProps.userData.userAvatarUrl != null) ? nextProps.userData.userAvatarUrl : avatarDefault,
                 userNick: nextProps.userData.userNick,
@@ -73,20 +79,29 @@ class ProfileView extends Component {
                 userSurname: (nextProps.userData.userSurname != null) ? nextProps.userData.userSurname : "",
                 userAboutMe: (nextProps.userData.userAboutMe != null) ? nextProps.userData.userAboutMe : "",
                 userKarma: +nextProps.userData.userKarma,
-                alreadyLoadedTab: true
+                alreadyLoadedTab: true,
+                helpKarmaOpen: false
             }
         }
-        if (nextProps.loadingStatus === 0) {
-            if (prevState.loadingProfile === 0) {
-                setTimeout(function() {
-                    //your code to be executed after 3 second
-                    if (prevState.userData.userNick === "") {
-                        return {
-                            ...prevState,
-                            loadingProfile: -1
-                        }
+        if (prevState.acceptDisabled && (nextProps.failedProcesses && nextProps.succeedProcesses && nextProps.loadingProcesses)) {
+            let statusOfSaveBook = getProccessStatus(actionTypes.SAVE_USER_DATA, nextProps.loadingProcesses, nextProps.failedProcesses, nextProps.succeedProcesses, resetProccess);
+            switch (statusOfSaveBook) {
+                case REST_SUCCESS:
+                    return {
+                        ...prevState,
+                        loadingProfile: RUNNING_PROFILE,
+                        acceptDisabled: false
                     }
-                }, 10000);
+/*
+                case REST_FAILURE:
+                    return {
+                        ...prevState,
+                        loadingProfile: ERROR_PROFILE,
+                        acceptDisabled: false
+                    }
+*/            
+                default:
+                    break;
             }
         }
         return null;
@@ -109,25 +124,17 @@ class ProfileView extends Component {
         const value = evt.target.value;
         const name = evt.target.name;
 
+        let showOldPass = this.state.showOldPass;
         let callback = () => {};
         // Hide old pass field
-        if (name === "userPass" && !this.state.showOldPass) {
-            callback = () => {
-                this.setState({
-                    ...this.state,
-                    showOldPass: true
-                });
-            }
+        if (name === "userPass" && !showOldPass) {
+            showOldPass = true;
         }
 
+        let helpKarmaOpen = this.state.helpKarmaOpen;
         // Close help karma
-        if ((name === "userName" || name === "userSurname") && this.state.helpKarmaOpen) {
-            callback = () => {
-                this.setState({
-                    ...this.state,
-                    helpKarmaOpen: false
-                });
-            }
+        if ((name === "userName" || name === "userSurname") && helpKarmaOpen) {
+            helpKarmaOpen = false;
         }
 
         let emailError = this.state.emailError;
@@ -139,7 +146,9 @@ class ProfileView extends Component {
         this.setState({
             ...this.state,
             [name]: value,
-            noChanges: false
+            noChanges: false,
+            showOldPass: showOldPass,
+            helpKarmaOpen: helpKarmaOpen
         }, callback);
     }
 
@@ -202,6 +211,7 @@ class ProfileView extends Component {
 
             this.setState({
                 ...this.state,
+                //loadingProfile: LOADING_PROFILE,
                 acceptDisabled: true
             })
             this.props.saveUserData(dataToSend);
@@ -232,13 +242,13 @@ class ProfileView extends Component {
                 && this.props.avaliableEmail === false);
 
         switch (this.state.loadingProfile) {
-            case -1:
+            case ERROR_PROFILE:
                 return (
                     <div className="loadingCommentaries">
-                        <h3><LS msgId='timeout.error' defaultMsg='Add image'/></h3>
+                        <h3><LS msgId='timeout.error' defaultMsg='An error has ocurred...'/></h3>
                     </div>
                 )
-            case 0:
+            case LOADING_PROFILE:
                 return (
                     <div className="loadingCommentaries">
                         <h3><LS msgId='loading' defaultMsg='Loading...'/></h3>
@@ -451,8 +461,9 @@ export default connect(
         userId: appState.getUserId(state),
         userData: appState.getUser(state),
         avaliableEmail: appState.getAvaliableEmail(state),
-        loadingStatus: appState.getLoadingStatus(state),
-        userDataLastRequestStatus: appState.getUserDataReqCode(state)   // Return the las request status Code (0 dont search again user data, 1 search again)
+        loadingProcesses: appState.getLoadingProcesses(state),
+        succeedProcesses: appState.getSucceedProcesses(state),
+        failedProcesses: appState.getFailedProcesses(state)
     }),
     (dispatch) => ({
         fetchUserData: (userId) => dispatch(fetchUserData(userId)),

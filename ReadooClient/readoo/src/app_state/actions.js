@@ -29,7 +29,8 @@ const actionTypes = {
     SAVE_USER_DATA: 'SAVE_USER_DATA',
     SEND_COMMENTARY: 'SEND_COMMENTARY',
     RESET_LOADS: 'RESET_LOADS',
-    RESET_ERRORS: 'RESET_ERRORS'
+    RESET_ERRORS: 'RESET_ERRORS',
+    RESET_PROCCESS: 'RESET_PROCCESS'
 }
 
 /* //ACTION CREATORS
@@ -62,6 +63,13 @@ const resetLoadLog = () => ({
     type: actionTypes.RESET_LOADS,
     payload: {
         load: []
+    }
+})
+
+const resetProccess = (proccessName) => ({
+    type: actionTypes.RESET_PROCCESS,
+    payload: {
+        nameOfProcess: proccessName
     }
 })
 
@@ -194,6 +202,8 @@ export {
     actionTypes,
     changeTab,
     resetErrLog,
+    resetLoadLog,
+    resetProccess,
     changeLanguage,
     checkToken,
     doLogin,
