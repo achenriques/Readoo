@@ -27,10 +27,12 @@ const actionTypes = {
     FETCH_COMMENTARIES: 'FETCH_COMMENTARIES',
     FETCH_USER_DATA: 'FETCH_USER_DATA',
     SAVE_USER_DATA: 'SAVE_USER_DATA',
+    DELETE_USER: 'DELETE_USER',
     SEND_COMMENTARY: 'SEND_COMMENTARY',
     RESET_LOADS: 'RESET_LOADS',
     RESET_ERRORS: 'RESET_ERRORS',
-    RESET_PROCCESS: 'RESET_PROCCESS'
+    RESET_PROCCESS: 'RESET_PROCCESS',
+    REPORT_ERROR_MESSAGE: 'REPORT_ERROR_MESSAGE'
 }
 
 /* //ACTION CREATORS
@@ -193,9 +195,19 @@ const saveUserData = (userData) => ({
     promise: userApi.saveUserData(userData)
 })
 
+const deleteUser = (userId) => ({
+    type: actionTypes.DELETE_USER,
+    promise: userApi.deleteUser(userId)
+})
+
 const sendComment = (commentId, bookId, userId, comentText, commentFatherId) => ({
     type: actionTypes.SEND_COMMENTARY,
     promise: bookApi.sendComment(commentId, bookId, userId, comentText, commentFatherId)
+})
+
+const reportErrorMessage = (errorMsg) => ({
+    type: actionTypes.REPORT_ERROR_MESSAGE,
+    payload: { errorMsg }
 })
 
 export {
@@ -226,5 +238,7 @@ export {
     fetchMoreBooks,
     fetchUserData,
     sendComment,
-    saveUserData
+    saveUserData,
+    deleteUser,
+    reportErrorMessage
 }

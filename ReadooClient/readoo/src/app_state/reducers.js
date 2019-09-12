@@ -3,9 +3,7 @@ import * as constants from '../constants/appConstants';
 import isEmpty from '../resources/isEmpty.png';
 import noInternet from '../resources/noInternet.png';
 import { actionTypes } from './actions';
-import { getStringMsg } from '../components/LanguageSelector'
-import { element } from 'prop-types';
-// Asi puedo tener varios modulos
+import { getStringMsg } from '../components/LanguageSelector';
 
 const failureType = (actionType) => `${actionType}_FAILURE`;
 const loadingType = (actionType) => `${actionType}_LOADING`;
@@ -23,7 +21,6 @@ const initialState = {
         isOpenAddBook: false,
     },
     common: {
-
         appLanguage: constants.LANGUAGE_ENGLISH,
         userIsLogged : constants.USER_NOT_IS_LOGGED,
         avaliableNick : null,
@@ -294,9 +291,7 @@ const books = (state = initialState.books, { type, payload, data }) => {
 
     case successType(actionTypes.I_LIKE_BOOK):
         console.log(actionTypes.I_LIKE_BOOK);
-        // No necesito hacer nada para mantener el estado visualmente
-        // Si llega a base de datos bien y sino en la proxinma recarga se perderá
-        // en olvido.
+        // In this case it isnt necessary do an action
         break;
       
 
@@ -400,16 +395,24 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
                 failure: []
             };
 
+        case actionTypes.REPORT_ERROR_MESSAGE:
+            let newFailure = state.failure.slice();
+            if (payload.errorMsg !== undefined && payload.errorMsg !== "") {
+                newFailure.push(payload.errorMsg);
+            }
+            return {
+                ...state,
+                failure: newFailure
+            }
+            
         default:
-            // currentCount is used in case of SUCCESS or FAILURE to avoid concurrence errors
-            let currentCount = state.loading - 1;
             let petitionStatus = null;
             if (typeString.includes('_FAILURE')) {
                 petitionStatus = constants.REST_FAILURE;
             } else if (typeString.includes('_LOADING')) {
-                let petitionStatus = constants.REST_DEFAULT;
+                petitionStatus = constants.REST_DEFAULT;
             } else if (typeString.includes('_SUCCESS')) {
-                let petitionStatus = constants.REST_SUCCESS;
+                petitionStatus = constants.REST_SUCCESS;
             } else {
                 // If no coencidences must return the prev state
                 return state;
@@ -456,7 +459,7 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
                         ...state,
                         failed_processes: failed_processes2,
                         failure: nextFailure,
-                        loading: (currentCount < 0) ? 0 : currentCount
+                        loading: (state.loading < 0) ? 0 : state.loading - 1
                     };
 
                 case constants.REST_DEFAULT:
@@ -472,7 +475,7 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
                     return {
                         ...state,
                         succeed_processes: succeed_processes2,
-                        loading: state.loading + 1
+                        loading: (state.loading < 0) ? 0 : state.loading - 1
                     };
             
                 default:

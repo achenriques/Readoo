@@ -72,7 +72,7 @@ class UserProvider {
                 that.userDao.getOneUserPass(+userToUpdate.userId).then(
                     function (result) {
                         if (result !== undefined) {
-                            if (bcrypt.compareSync(oldUserPass, result.userPass)) {
+                            if (oldUserPass == null || bcrypt.compareSync(oldUserPass, result.userPass)) {
                                 that.userDao.updateOneUser((userToUpdate.userName !== null) ? userToUpdate.userName.trim() : null, 
                                         (userToUpdate.userSurname !== null) ? userToUpdate.userSurname.trim() : null, 
                                         (userToUpdate.userNick) ? userToUpdate.userNick.trim() : null, hashedPassword, 

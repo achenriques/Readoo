@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import RootRef from '@material-ui/core/RootRef';
-import { actionTypes, fetchUserData, checkEmailIsUnique, setEmailIsUniqueFalse, saveUserData, resetProccess } from '../../app_state/actions';
+import { actionTypes, fetchUserData, checkEmailIsUnique, setEmailIsUniqueFalse, saveUserData, deleteUser, resetProccess, doLogOut } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -10,7 +10,9 @@ import TextField from '@material-ui/core/TextField';
 import IconButton from '@material-ui/core/IconButton';
 import Popper from '@material-ui/core/Popper';
 import Help from 'material-ui/svg-icons/action/help';
+import Modal from '@material-ui/core/Modal';
 import LS from '../LanguageSelector';
+import ContinueModal from '../common/ContinueModal';
 import avatarDefault from '../../resources/avatarDefault.svg';
 import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
 import { getProccessStatus } from '../../utils/AppUtils';
@@ -48,9 +50,11 @@ class ProfileView extends Component {
         showOldPass: false,
         emailError: false,
         acceptDisabled: false,
+        acceptDisabledText: 'loading',
         noChanges: false,
         helpKarmaOpen: false,
-        alreadyLoadedTab: false
+        alreadyLoadedTab: false,
+        openContinueDeleteProfile: false
     };
 
     constructor(props) {
@@ -64,47 +68,90 @@ class ProfileView extends Component {
         this.props.fetchUserData(this.props.userId);
     };
 
-    static getDerivedStateFromProps = (nextProps, prevState) => {
-        if(prevState.loadingProfile !== RUNNING_PROFILE && !prevState.alreadyLoadedTab 
-                && nextProps.userData != null && nextProps.userData.userId) {
-            return {
-                ...prevState,
-                loadingProfile: RUNNING_PROFILE,
-                userData: nextProps.userData,
-                avatarImage: (nextProps.userData.userAvatarUrl != null) ? nextProps.userData.userAvatarUrl : avatarDefault,
-                userNick: nextProps.userData.userNick,
-                userPass: "******",
-                userEmail: nextProps.userData.userEmail,
-                userName: (nextProps.userData.userName != null) ? nextProps.userData.userName : "",
-                userSurname: (nextProps.userData.userSurname != null) ? nextProps.userData.userSurname : "",
-                userAboutMe: (nextProps.userData.userAboutMe != null) ? nextProps.userData.userAboutMe : "",
-                userKarma: +nextProps.userData.userKarma,
-                alreadyLoadedTab: true,
-                helpKarmaOpen: false
+    componentDidUpdate = (prevProps, prevState, snapshot) => {
+        if(this.state.loadingProfile !== RUNNING_PROFILE && !this.state.alreadyLoadedTab 
+                && this.props.userData != null) {
+            if (this.props.userData.userId != null) {
+                this.setState({
+                    ...this.state,
+                    loadingProfile: RUNNING_PROFILE,
+                    userData: this.props.userData,
+                    avatarImage: (this.props.userData.userAvatarUrl != null) ? this.props.userData.userAvatarUrl : avatarDefault,
+                    userNick: this.props.userData.userNick,
+                    userPass: "******",
+                    userEmail: this.props.userData.userEmail,
+                    userName: (this.props.userData.userName != null) ? this.props.userData.userName : "",
+                    userSurname: (this.props.userData.userSurname != null) ? this.props.userData.userSurname : "",
+                    userAboutMe: (this.props.userData.userAboutMe != null) ? this.props.userData.userAboutMe : "",
+                    userKarma: +this.props.userData.userKarma,
+                    alreadyLoadedTab: true,
+                    helpKarmaOpen: false
+                });
+            } else {
+                this.setState({
+                    ...this.state,
+                    loadingProfile: ERROR_PROFILE,
+                });
             }
+            
         }
-        if (prevState.acceptDisabled && (nextProps.failedProcesses && nextProps.succeedProcesses && nextProps.loadingProcesses)) {
-            let statusOfSaveBook = getProccessStatus(actionTypes.SAVE_USER_DATA, nextProps.loadingProcesses, nextProps.failedProcesses, nextProps.succeedProcesses, resetProccess);
-            switch (statusOfSaveBook) {
+        if (this.state.acceptDisabled && this.state.acceptDisabledText === 'loading' && this.props.failedProcesses && this.props.succeedProcesses && this.props.loadingProcesses) {
+            let statusOfSaveUser = getProccessStatus(actionTypes.SAVE_USER_DATA, this.props.loadingProcesses, this.props.failedProcesses, this.props.succeedProcesses, resetProccess);
+            switch (statusOfSaveUser) {
                 case REST_SUCCESS:
-                    return {
-                        ...prevState,
-                        loadingProfile: RUNNING_PROFILE,
-                        acceptDisabled: false
+                    let callbackFunction = () => { 
+                        setTimeout(() => {
+                            this.setState({
+                                ...this.state,
+                                acceptDisabledText: 'loading',
+                                acceptDisabled: false
+                            })
+                        }, 3000); // Hide message after 3 seconds
                     }
-/*
+
+                    this.setState({
+                        ...this.state,
+                        loadingProfile: RUNNING_PROFILE,
+                        acceptDisabledText: 'saved.successfully'
+                    }, /*CALLBACK*/ callbackFunction);
+                break;
+
                 case REST_FAILURE:
-                    return {
-                        ...prevState,
+                    this.setState({
+                        ...this.state,
                         loadingProfile: ERROR_PROFILE,
                         acceptDisabled: false
+                    });
+           
+                default:
+                    break;
+            }
+            let statusOfDeleteUser = getProccessStatus(actionTypes.DELETE_USER, this.props.loadingProcesses, this.props.failedProcesses, this.props.succeedProcesses, resetProccess);
+            switch (statusOfDeleteUser) {
+                case REST_SUCCESS:
+                    let callbackFunction = () => { 
+                        this.props.doLogOut();
                     }
-*/            
+
+                    this.setState({
+                        ...this.state,
+                        loadingProfile: RUNNING_PROFILE,
+                        acceptDisabledText: 'saved.successfully'
+                    }, /*CALLBACK*/ callbackFunction);
+                break;
+
+                case REST_FAILURE:
+                    this.setState({
+                        ...this.state,
+                        loadingProfile: ERROR_PROFILE,
+                        acceptDisabled: false
+                    });
+           
                 default:
                     break;
             }
         }
-        return null;
+        return;
     }
 
     checkEmail = (val) => {
@@ -213,8 +260,7 @@ class ProfileView extends Component {
                 ...this.state,
                 //loadingProfile: LOADING_PROFILE,
                 acceptDisabled: true
-            })
-            this.props.saveUserData(dataToSend);
+            }, () => { this.props.saveUserData(dataToSend); })
         } else {
             this.setState({
                 ...this.state,
@@ -223,8 +269,25 @@ class ProfileView extends Component {
         }
     }
 
-    acceptDeleteProfile = (evt) => {
-        // TODO
+    openDeleteProfile = (evt) => {
+        this.setState({
+            openContinueDeleteProfile: true
+        });
+        
+    }
+
+    acceptDeleteProfile = (selectedOption) => {
+        if (selectedOption) {
+            if (this.props.userId !== null) {
+                this.props.deleteUser(this.props.userId)
+            } else {
+                this.props.showErrorLog(LS.getStringMsg('user.id.not.provided', 'No userId found, please reload and try again.'))
+            }
+        } else {
+            this.setState({
+                openContinueDeleteProfile: false
+            });
+        }
     }
 
     showKarmaHelp = (evt) => {
@@ -293,7 +356,7 @@ class ProfileView extends Component {
                                                 marginRight: '90px'
                                               } 
                                             : DISPLAY_NONE}>
-                                    <h3 className="marginAuto"><LS msgId='loading' defaultMsg='Loading...'/></h3>
+                                    <h3 className="marginAuto"><LS msgId={this.state.acceptDisabledText} defaultMsg='Loading...'/></h3>
                                 </Paper>
                                 <RootRef rootRef={this.profileDataGridRef}>
                                     <Paper elevation={4} className="divDatosPerfil">
@@ -436,7 +499,7 @@ class ProfileView extends Component {
                                 {(this.state.noChanges) ? (<div className="redInfo"><LS msgId='no.changes' defaultMsg='No changes to save'/></div>) : (<div/>)}
                                 <div className="saveProfileButton">
                                     <Button variant="flat" color="secondary" 
-                                        onClick={this.acceptDeleteProfile.bind(this)}
+                                        onClick={this.openDeleteProfile.bind(this)}
                                         disabled={this.state.acceptDisabled}
                                     >
                                         <LS msgId='delete.profile' defaultMsg='Delete profile!'/>
@@ -450,6 +513,7 @@ class ProfileView extends Component {
                                 </div>
                             </Grid>
                         </Grid>
+                        <ContinueModal open={this.state.openContinueDeleteProfile} closeCallback={this.acceptDeleteProfile} />
                     </div>
                 )
         }
@@ -469,6 +533,9 @@ export default connect(
         fetchUserData: (userId) => dispatch(fetchUserData(userId)),
         setEmailIsUniqueFalse: () => dispatch(setEmailIsUniqueFalse()),
         checkEmailIsUnique: (email) => dispatch(checkEmailIsUnique(email)),
-        saveUserData: (userData) => dispatch(saveUserData(userData))
+        saveUserData: (userData) => dispatch(saveUserData(userData)),
+        deleteUser: (userId) => dispatch(deleteUser(userId)),
+        // Do logOut in case of delete user success...
+        doLogOut: () => dispatch(doLogOut())
     })
 )(ProfileView);

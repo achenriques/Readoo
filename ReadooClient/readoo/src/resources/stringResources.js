@@ -41,7 +41,9 @@ export default [
         'delete.profile': 'Delete your own profile!',
         'save': 'Save',
         'no.changes': '* No changes detected. No it is necessary save anything!',
+        'saved.successfully': 'Saved successfully',
         // Errors
+        'user.id.not.provided': 'User Id not provided, please reload and try again',
         'timeout.error': 'Timeout while loading the page. Check your net connection. If the problem still existing could be a problem with the application server :-/',
         'no.user.exists': 'The user doesn´t exist.',
         'no.token.provided': 'It seems the sesson has been expired. Please, refresh the application and log in to continue.',
@@ -87,7 +89,9 @@ export default [
         'delete.profile': '¡Eliminar tu perfil!',
         'save': 'Guardar',
         'no.changes': '* No se han detectado cambios. No es necesario guardar.',
+        'saved.successfully': 'Se han guardado los datos correctamente',
         // Errores
+        'user.id.not.provided': 'Falta el ID de Usuario. Por favor, recarga el módulo y vuelve a intentarlo.',
         'timeout.error': 'Exceso de tiempo durante la carga. Comprueba tu conexión a la red. Si el problema persiste puede ser un fallo del servidor :-/',
         'no.user.exists': 'El usuario informado no existe.',
         'no.token.provided': 'La sesión parece haber expirado. Por favor, refresca la pagina y vuelve a entrar para continuar.',

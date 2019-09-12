@@ -20,6 +20,13 @@ const saveUserData = (userData) => axios.put(
     }
 )
 
+const deleteUser = (userId) => axios.put(
+    `${baseURL}/user`,
+    {
+        userId
+    }
+)
+
 // ---- RELATED WITH USERS -----
 const doLikeBook = (bookId, userId) => axios.post(
     `${baseURL}/userLikesBook`,
@@ -44,6 +51,7 @@ const doDislikeBook = (bookId, userId) => axios.delete(
 export default {
     fetchUserData,
     saveUserData,
+    deleteUser,
     doLikeBook,
     doDislikeBook
 }

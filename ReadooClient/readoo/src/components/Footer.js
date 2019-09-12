@@ -35,14 +35,6 @@ class Footer extends Component {
         return null;
     }
 
-    handleSnakRequestClose = () => {
-        this.props.resetErrLog();
-        this.setState({
-            ...this.state,
-            openSnackBar: false,
-        });
-    };
-
     getCurrentStatus(status) {
         switch (status) {
             case pages.LOGIN:
