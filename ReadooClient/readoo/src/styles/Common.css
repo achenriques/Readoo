@@ -1,0 +1,12 @@
+.continueModal {
+    background-color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-height: 125px;
+    height: auto;
+    width: auto;
+    max-width: 300px;
+    text-align: center;
+}

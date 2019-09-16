@@ -103,14 +103,12 @@ class ExploreView extends Component {
             this.setState({
                 ...this.state,
                 isPreviousBook: false,
-            }, () => { this.loadCurrentBookFromProps (this.props) });
+            }, () => { this.loadCurrentBookFromProps(this.props) });
         } else {
             this.setState({
                 ...this.state,
                 previousBook: this.state.currentBook
-            }, () => {
-                this.props.nextBook();
-            });
+            }, () => { this.props.nextBook(); });
         }
     }
 

@@ -1,5 +1,4 @@
 import axios from 'axios';
-import {} from '../constants/appConstants';
 const baseURL = 'http://localhost:3030';
 
 // Setted for evict cross-sitting error

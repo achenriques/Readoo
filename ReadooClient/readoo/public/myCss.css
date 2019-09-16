@@ -54,8 +54,7 @@
 
 .profileAvatarImage {
     position: relative;
-    margin-left: auto;
-    margin-right: auto;
+    margin: auto;
     max-width: 95%;
     max-height: 95%;
 }

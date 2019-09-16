@@ -15,13 +15,14 @@ const fetchUserData = (userId) => axios.get(
 
 const saveUserData = (userData) => axios.put(
     `${baseURL}/user`,
+    userData.form,
     {
-        userData
+        headers: { 'Content-Type': 'multipart/form-data' }
     }
 )
 
-const deleteUser = (userId) => axios.put(
-    `${baseURL}/user`,
+const dissableUser = (userId) => axios.post(
+    `${baseURL}/dissableUser`,
     {
         userId
     }
@@ -51,7 +52,7 @@ const doDislikeBook = (bookId, userId) => axios.delete(
 export default {
     fetchUserData,
     saveUserData,
-    deleteUser,
+    dissableUser,
     doLikeBook,
     doDislikeBook
 }

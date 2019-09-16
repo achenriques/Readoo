@@ -5,7 +5,7 @@ const functions = require('../util/functions');
 const middleware = require('./middlewares');
 const BookDao = require('../daos/BookDao');
 
-const storage = multer.diskStorage({
+const bookStorage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './ReadooRestProvider/Uploads/Portadas')
     },
@@ -23,9 +23,9 @@ const storage = multer.diskStorage({
     }
 })
 
-const upload = multer({ storage: storage });
+const bookCoverUpload = multer({ storage: bookStorage });
 
-class LibroProvider {
+class BookProvider {
 
     constructor(app, db) {
         this.bookDao = new BookDao(db);
@@ -122,7 +122,7 @@ class LibroProvider {
 
     insertOne(app) {
         const that = this;
-        app.post('/book/new', [middleware.verifyToken, upload.single('bookCover')], function (req, res) { // TODO: have a look to multiple middleware
+        app.post('/book/new', [middleware.verifyToken, bookCoverUpload.single('bookCover')], function (req, res) { // TODO: have a look to multiple middleware
             console.log("Estoy insertando libro");
             let bookInfo = req.body;
             if (bookInfo && bookInfo.bookTitle && bookInfo.bookAuthor && bookInfo.bookDescription && bookInfo.bookReview
@@ -198,4 +198,4 @@ class LibroProvider {
     };
 }
 
-module.exports = LibroProvider;
+module.exports = BookProvider;

@@ -2,12 +2,7 @@ import React, { Component } from 'react';
 import Modal from '@material-ui/core/Modal';
 import Button from '@material-ui/core/Button';
 import LS from '../LanguageSelector';
-
-const modalStyle = {
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)'
-};
+import '../../styles/Common.css';
 
 class ContinueModal extends Component {
 
@@ -29,7 +24,7 @@ class ContinueModal extends Component {
     handleClose = (selectedOption) => {
         // Calback onClose
         if (this.props.closeCallback !== undefined) {
-            this.props.closeCallback(selectedOption);
+            this.props.closeCallback(selectedOption === true);
         }
     };
 
@@ -41,7 +36,7 @@ class ContinueModal extends Component {
                 open={this.props.open}
                 onClose={this.handleClose}
             >
-                <div style={modalStyle}>
+                <div className="continueModal">
                     <h2 id="simple-modal-title"><LS msgId='continue.modal.title' defaultMsg='Continue?'/></h2>
                     <p id="simple-modal-description">
                         <Button variant="flat" color="secondary" 

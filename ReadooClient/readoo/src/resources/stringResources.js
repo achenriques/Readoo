@@ -45,9 +45,13 @@ export default [
         // Errors
         'user.id.not.provided': 'User Id not provided, please reload and try again',
         'timeout.error': 'Timeout while loading the page. Check your net connection. If the problem still existing could be a problem with the application server :-/',
+        'failed.save': 'Something went wrong. Please keep calm. Here is the number of hope: {0}.',
         'no.user.exists': 'The user doesn´t exist.',
+        'wrong.pass': 'Not a valid password. Try again Hackerman.',
         'no.token.provided': 'It seems the sesson has been expired. Please, refresh the application and log in to continue.',
-        'no.pass.coincidence': 'The old password doesn´t coencide with the password in use.'
+        'no.pass.coincidence': 'The old password doesn´t coencide with the password in use.',
+        'no.image.preview': 'Image preview not avaliable.',
+        'image.not.found': 'Image not found'
     },
     // Spanish
     {
@@ -93,8 +97,12 @@ export default [
         // Errores
         'user.id.not.provided': 'Falta el ID de Usuario. Por favor, recarga el módulo y vuelve a intentarlo.',
         'timeout.error': 'Exceso de tiempo durante la carga. Comprueba tu conexión a la red. Si el problema persiste puede ser un fallo del servidor :-/',
+        'failed.save': 'Oh oh... Algo no ha funcionado. Mantén la calma, aquí tienes el número de la esperanza: ' + Math.floor(Math.random() * 1000) + '',
         'no.user.exists': 'El usuario informado no existe.',
+        'wrong.pass': 'Contraseña no valida. Prueba otra vez Hackerman.',
         'no.token.provided': 'La sesión parece haber expirado. Por favor, refresca la pagina y vuelve a entrar para continuar.',
-        'no.pass.coincidence': 'La contraseña antigüa no coencide con la contraseña ahora en uso.'
+        'no.pass.coincidence': 'La contraseña antigüa no coencide con la contraseña ahora en uso.',
+        'no.image.preview': 'Previsualización de imagen no disponible.',
+        'image.not.found': 'Imagen no disponible'
     }
 ]

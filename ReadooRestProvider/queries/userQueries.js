@@ -13,6 +13,6 @@ module.exports = {
 */
     insertUser: "INSERT INTO appUser (userName, userSurname, userNick, userPass, userEmail, userAboutMe, userKarma, userAvatarUrl, userVisible)" + 
         "VALUES (?, ?, ?, ?, ?, ?, 0, ?, 1) ; ",
-    dissableUser: "UPDATE appUser SET userVisible = 0 WHERE userId = ? ;",
+    dissableUser: "UPDATE appUser SET userVisible = FALSE WHERE userId = ? ;",
     deleteUser: "DELETE FROM appUser WHERE userId = ? ;"
 }

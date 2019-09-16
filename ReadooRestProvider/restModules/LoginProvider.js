@@ -48,7 +48,7 @@ class LoginProvider {
                                             userData: result
                                         });
                             } else {
-                                return res.status(401).send({ auth: false });
+                                return res.status(401).send({ auth: false, info: 'wrong.pass'});
                             }
                         } else {
                             return res.status(401).send({ auth: false, info: 'no.user.exists'});

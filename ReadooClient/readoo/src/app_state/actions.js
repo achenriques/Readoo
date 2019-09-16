@@ -26,6 +26,7 @@ const actionTypes = {
     FETCH_MORE_BOOKS: 'FETCH_MORE_BOOKS',
     FETCH_COMMENTARIES: 'FETCH_COMMENTARIES',
     FETCH_USER_DATA: 'FETCH_USER_DATA',
+    FETCH_USER_AVATAR: 'FETCH_USER_AVATAR',
     SAVE_USER_DATA: 'SAVE_USER_DATA',
     DELETE_USER: 'DELETE_USER',
     SEND_COMMENTARY: 'SEND_COMMENTARY',
@@ -190,14 +191,20 @@ const fetchUserData = (userId) => ({
     promise: userApi.fetchUserData(userId)
 })
 
+const fetchUserAvatar = (avatarUrl) => ({
+    type: actionTypes.FETCH_USER_AVATAR,
+    promise: userApi.fetchUserAvatar(avatarUrl)
+})
+
+
 const saveUserData = (userData) => ({
     type: actionTypes.SAVE_USER_DATA,
     promise: userApi.saveUserData(userData)
 })
 
-const deleteUser = (userId) => ({
+const dissableUser = (userId) => ({
     type: actionTypes.DELETE_USER,
-    promise: userApi.deleteUser(userId)
+    promise: userApi.dissableUser(userId)
 })
 
 const sendComment = (commentId, bookId, userId, comentText, commentFatherId) => ({
@@ -237,8 +244,9 @@ export {
     fetchCommentaries,
     fetchMoreBooks,
     fetchUserData,
+    fetchUserAvatar,
     sendComment,
     saveUserData,
-    deleteUser,
+    dissableUser,
     reportErrorMessage
 }
