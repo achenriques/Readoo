@@ -26,7 +26,7 @@ class UserDao extends DaoManager {
         let statement = "UPDATE appUser SET ";
         let params = [];
         // It needs a compound query to update only the props that at this step are not null
-        if(userName !== null) {
+        if (userName !== null) {
             statement = statement + "userName = ?, "
             params.push(userName);
         }

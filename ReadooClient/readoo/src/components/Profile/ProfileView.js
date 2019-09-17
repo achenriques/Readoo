@@ -76,7 +76,7 @@ class ProfileView extends Component {
                     ...this.state,
                     loadingProfile: RUNNING_PROFILE,
                     userData: this.props.userData,
-                    avatarImage: (this.props.userData.userAvatarUrl != null) ?  ('http://localhost:3030/user/avatar/?avatarUrl=' + this.props.userData.userAvatarUrl.trim()) : avatarDefault,
+                    avatarImage: (this.props.userData.userAvatarUrl != null) ?  this.props.userData.userAvatarUrl.trim() : avatarDefault,
                     userNick: this.props.userData.userNick,
                     userPass: "******",
                     userEmail: this.props.userData.userEmail,
@@ -328,26 +328,26 @@ class ProfileView extends Component {
                     <div>
                         <Grid container className="profileGrid">
                             <Grid item sm={4} className="profileAvatarColumn">
-                                    <div style={{ position: "relative"}}>
-                                        <Paper elevation={4} className="divProfileAvatar">
-                                            <img src={this.state.avatarImage} crossOrigin='http://localhost:3030' alt={(this.state.avatarImage === null && this.state.avatarImageFile !==null) ? ( <LS msgId='no.image.preview' defaultMsg='Preview not avaliable.'/> ) : "" } className="profileAvatarImage"/>
-                                        </Paper>
-                                    </div>
-                                    <div className="divUploadAvatarButton">
-                                        <input
-                                            accept="image/*"
-                                            style={DISPLAY_NONE}
-                                            id="uploadAvatarButton"
-                                            multiple
-                                            type="file"
-                                            onChange={this.loadAvatarImage.bind(this)} 
-                                        />
-                                        <label htmlFor="uploadAvatarButton">
-                                            <Button variant="outlined" component="span" className="uploadProfileAvatar" fullWidth>
-                                                <LS msgId='add.portrait.image' defaultMsg='Add image'/>
-                                            </Button>
-                                        </label>
-                                    </div>
+                                <div style={{ position: "relative"}}>
+                                    <Paper elevation={4} className="divProfileAvatar">
+                                        <img src={this.state.avatarImage} crossOrigin='http://localhost:3030' alt={(this.state.avatarImage === null && this.state.avatarImageFile !==null) ? ( <LS msgId='no.image.preview' defaultMsg='Preview not avaliable.'/> ) : "" } className="profileAvatarImage"/>
+                                    </Paper>
+                                </div>
+                                <div className="divUploadAvatarButton">
+                                    <input
+                                        accept="image/*"
+                                        style={DISPLAY_NONE}
+                                        id="uploadAvatarButton"
+                                        multiple
+                                        type="file"
+                                        onChange={this.loadAvatarImage.bind(this)} 
+                                    />
+                                    <label htmlFor="uploadAvatarButton">
+                                        <Button variant="outlined" component="span" className="uploadProfileAvatar" fullWidth>
+                                            <LS msgId='add.portrait.image' defaultMsg='Add image'/>
+                                        </Button>
+                                    </label>
+                                </div>
                             </Grid>
                             <Grid item sm={8} className="perfilDataColumn">
                                 <Paper elevation={16}

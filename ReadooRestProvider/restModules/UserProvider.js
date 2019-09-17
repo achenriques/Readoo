@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const middleware = require('./middlewares');
 const multer = require('multer');
 const path = require('path');
-const encoder64 = require('../Util/functions');
+const encoder64 = require('../util/functions').base64_encode;
 const UserDao = require('../daos/UserDao');
 
 const userStorage = multer.diskStorage({
@@ -11,9 +11,9 @@ const userStorage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         let fileType = file.mimetype.split('/');
-        if (fileType && fileType[0] === 'image'
-            (fileType[1] === 'jpg' || fileType[1] === 'jpeg' || fileType[1] === 'png' 
-                    || fileType[1] === 'svg' || fileType[1] === 'gif')) {
+        if (fileType && fileType[0] === 'image' &&
+                (fileType[1] === 'jpg' || fileType[1] === 'jpeg' || fileType[1] === 'png' 
+                || fileType[1] === 'svg' || fileType[1] === 'gif')) {
             let fileName = req.body.userId + '-' + Date.now() + '.' + fileType[1];
             req.body.userAvatarUrl = fileName;
             return cb(null, fileName);
@@ -93,6 +93,15 @@ class UserProvider {
             if (userId) {
                 that.userDao.getOneUser(+userId).then(
                     function (result) {
+                        if (result.userAvatarUrl) {
+                            let avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + result.userAvatarUrl.trim());
+                            let base64String = encoder64(avatarFile);
+                            if (base64String) {
+                                result.userAvatarUrl = 'data:image/png;base64,' + base64String;
+                            } else {
+                                result.userAvatarUrl = null;
+                            }
+                        }
                         res.setHeader('Content-Type', 'application/json');
                         return res.send(JSON.stringify(result));
                     }
