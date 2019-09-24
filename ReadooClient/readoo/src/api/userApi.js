@@ -13,6 +13,11 @@ const fetchUserData = (userId) => axios.get(
     }
 )
 
+const fetchUserGenres = (userId) => axios.get(
+    `${baseURL}/userGenre?id=${userId}`, {
+    }
+)
+
 const saveUserData = (userData) => axios.put(
     `${baseURL}/user`,
     userData.form,
@@ -51,6 +56,7 @@ const doDislikeBook = (bookId, userId) => axios.delete(
 
 export default {
     fetchUserData,
+    fetchUserGenres,
     saveUserData,
     dissableUser,
     doLikeBook,

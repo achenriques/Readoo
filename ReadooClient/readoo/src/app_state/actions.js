@@ -19,6 +19,7 @@ const actionTypes = {
     CHECKED_NICK: 'CHECKED_NICK',
     CHECKED_EMAIL: 'CHECKED_EMAIL',
     FETCH_GENRES: 'FETCH_GENRES',
+    FETCH_USER_GENRES: 'FETCH_USER_GENRES',
     NEXT_BOOK: 'NEXT_BOOK',
     BEFORE_BOOK: 'BEFORE_BOOK',
     I_LIKE_BOOK: 'I_LIKE_BOOK',
@@ -106,7 +107,12 @@ const uploadBook = (bookData) => ({
 
 const fetchGenres = () => ({
     type: actionTypes.FETCH_GENRES,
-    promise: bookApi.fetchGenres
+    promise: bookApi.fetchGenres()
+})
+
+const fetchUserGenres = () => ({
+    type: actionTypes.FETCH_USER_GENRES,
+    promise: userApi.fetchUserGenres()
 })
 
 const nextBook = () => ({
@@ -244,6 +250,7 @@ export {
     fetchCommentaries,
     fetchMoreBooks,
     fetchUserData,
+    fetchUserGenres,
     fetchUserAvatar,
     sendComment,
     saveUserData,

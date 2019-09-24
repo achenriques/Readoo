@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import RootRef from '@material-ui/core/RootRef';
-import { actionTypes, fetchUserAvatar, fetchUserData, checkEmailIsUnique, setEmailIsUniqueFalse, saveUserData, dissableUser, resetProccess, doLogOut } from '../../app_state/actions';
+import { actionTypes, fetchUserData, fetchUserGenres, checkEmailIsUnique, setEmailIsUniqueFalse, saveUserData, dissableUser, resetProccess, doLogOut } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
+import RootRef from '@material-ui/core/RootRef';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
@@ -11,6 +11,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Popper from '@material-ui/core/Popper';
 import Help from 'material-ui/svg-icons/action/help';
 import LS from '../LanguageSelector';
+import GenreSelector from '../common/GenreSelector';
 import ContinueModal from '../common/ContinueModal';
 import avatarDefault from '../../resources/avatarDefault.svg';
 import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
@@ -54,7 +55,10 @@ class ProfileView extends Component {
         noChanges: false,
         helpKarmaOpen: false,
         alreadyLoadedTab: false,
-        openContinueDeleteProfile: false
+        openContinueDeleteProfile: false,
+        userGenresSelected: [],
+        genresSelected: [],
+        genresColected: false
     };
 
     constructor(props) {
@@ -64,9 +68,12 @@ class ProfileView extends Component {
         this.profileDataGridHeight = 0;
         this.profileDataGridWidth = 0;
         this.state = { ...this.initialState };
-        // TODO 
-        this.props.fetchUserData(this.props.userId);
     };
+
+    componentDidMount = () => {
+        this.props.fetchUserData(this.props.userId);
+        this.props.fetchUserGenres(this.props.userId);
+    }
 
     componentDidUpdate = (prevProps, prevState, snapshot) => {
         if(this.state.loadingProfile !== RUNNING_PROFILE && !this.state.alreadyLoadedTab 
@@ -158,6 +165,17 @@ class ProfileView extends Component {
                     break;
             }
         }
+        if (!this.state.genresColected && this.props.userGenres && this.props.failedProcesses && this.props.succeedProcesses && this.props.loadingProcesses) {
+            let statusOfuserGenres = getProccessStatus(actionTypes.FETCH_USER_GENRES, this.props.loadingProcesses, this.props.failedProcesses, this.props.succeedProcesses, () => { this.props.resetProccessStatus(actionTypes.FETCH_USER_GENRES)});
+            if (statusOfuserGenres === REST_SUCCESS) {
+                this.setState({
+                    ...this.state,
+                    genresColected: true,
+                    userGenresSelected: this.props.userGenres
+                });
+            }
+            
+        }
         return;
     }
 
@@ -222,6 +240,16 @@ class ProfileView extends Component {
     }
 
     acceptSaveProfile = (evt) => {
+        // Functions that returns if the genres has changed...
+        const checkGenresDiff = () => {
+            if (this.state.userGenresSelected.length === this.state.genresSelected.length
+                    && this.state.userGenresSelected.filter(x => this.state.genresSelected.includes(x)).length === 0) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
         let newUserData = {
             userAvatarUrl: (this.state.avatarImageFile !== null) ? this.state.avatarImageFile : null,
             userNick: (this.state.userNick !== this.state.userData.userNick) ? this.state.userNick : null,
@@ -236,7 +264,7 @@ class ProfileView extends Component {
         newUserData.userId = this.props.userId;
 
         if (newUserData.userAvatarUrl || newUserData.userNick || newUserData.userPass || newUserData.userEmail || newUserData.userName ||
-                newUserData.userSurname || newUserData.userAboutMe) {
+                newUserData.userSurname || newUserData.userAboutMe || checkGenresDiff()) {
             if (newUserData.userPass !== null && newUserData.userPass.length) {
                 newUserData.oldUserPass = this.state.oldUserPass;
             } else {
@@ -259,7 +287,7 @@ class ProfileView extends Component {
             (newUserData.userSurname !== null) && dataToSend.set('userSurname', newUserData.userSurname);
             (newUserData.userAboutMe !== null) && dataToSend.set('userAboutMe', newUserData.userAboutMe);
             (newUserData.oldUserPass !== null) && dataToSend.set('oldUserPass', newUserData.oldUserPass);
-
+            (checkGenresDiff()) && dataToSend.set('userGenres', JSON.stringify(this.state.genresSelected));
             this.setState({
                 ...this.state,
                 acceptDisabled: true
@@ -303,6 +331,15 @@ class ProfileView extends Component {
             ...this.state,
             helpKarmaOpen: !this.state.helpKarmaOpen
         });
+    }
+
+    onChangeGenre = (selected) => {
+        if (selected) {
+            this.setState({
+                ...this.state,
+                genresSelected: selected
+            })
+        }
     }
 
     render = () => {
@@ -495,6 +532,7 @@ class ProfileView extends Component {
                                             className="inputProfileData"
                                         />
                                         <br/>
+                                        {(this.state.genresColected) ? (<GenreSelector generSelected={this.state.userGenresSelected} onChange={this.onChangeGenre.bind(this)} />) : (<div style={DISPLAY_NONE} />)} 
                                     </Paper>
                                 </RootRef>
                             </Grid>
@@ -529,6 +567,7 @@ export default connect(
     (state) => ({
         userId: appState.getUserId(state),
         userData: appState.getUser(state),
+        userGenres: appState.getUserGenres(state),
         avaliableEmail: appState.getAvaliableEmail(state),
         loadingProcesses: appState.getLoadingProcesses(state),
         succeedProcesses: appState.getSucceedProcesses(state),
@@ -536,7 +575,7 @@ export default connect(
     }),
     (dispatch) => ({
         fetchUserData: (userId) => dispatch(fetchUserData(userId)),
-        fetchUserAvatar: (avatarUrl) => dispatch(fetchUserAvatar(avatarUrl)),
+        fetchUserGenres: (userId) => dispatch(fetchUserGenres(userId)),
         setEmailIsUniqueFalse: () => dispatch(setEmailIsUniqueFalse()),
         checkEmailIsUnique: (email) => dispatch(checkEmailIsUnique(email)),
         saveUserData: (userData) => dispatch(saveUserData(userData)),

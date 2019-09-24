@@ -273,27 +273,31 @@ class UploadBookModal extends Component {
                                     onChange={this.oChangeInput.bind(this)}
                                     className="paddingTextFields"
                                 /><br />
-                                <FormControl /*className={classes.formControl}*/>
-                                    <InputLabel htmlFor="uploadBookGenreSelect">Selecciona una categoria</InputLabel>
-                                    <Select
-                                        multiple
-                                        value={this.state.addBookGenre}
-                                        onChange={this.handleCategoria}
-                                        input={<Input id="uploadBookGenreSelect" />}
-                                        renderValue={selected => selected.join(', ')}
-                                        style={{ width: '100%' }}
-                                    >
-                                        {this.state.genreItems.map((name, index, list) => (
-                                        <MenuItem key={name} value={name}>
-                                            <Checkbox checked={this.state.name.indexOf(name) > -1} />
-                                            <ListItemText primary={name} />
-                                        </MenuItem>
-                                        ))}
-                                    </Select>
-                                    <p id="error_add_category" className="errorInput" hidden={!this.state.error.addBookGenre}>
-                                        Debes eligir al menos una categoría
-                                    </p>
-                                </FormControl>
+                                {
+                                    /*
+                                    <FormControl className={classes.formControl}>
+                                        <InputLabel htmlFor="uploadBookGenreSelect">Selecciona una categoria</InputLabel>
+                                        <Select
+                                            multiple
+                                            value={this.state.addBookGenre}
+                                            onChange={this.handleCategoria}
+                                            input={<Input id="uploadBookGenreSelect" />}
+                                            renderValue={selected => selected.join(', ')}
+                                            style={{ width: '100%' }}
+                                        >
+                                            {this.state.genreItems.map((name, index, list) => (
+                                            <MenuItem key={name} value={name}>
+                                                <Checkbox checked={this.state.name.indexOf(name) > -1} />
+                                                <ListItemText primary={name} />
+                                            </MenuItem>
+                                            ))}
+                                        </Select>
+                                        <p id="error_add_category" className="errorInput" hidden={!this.state.error.addBookGenre}>
+                                            Debes eligir al menos una categoría
+                                        </p>
+                                     </FormControl>
+                                    */
+                                }
                             </Grid>
                             <Grid item sm={6} className="uploadBookLeftGrid">
                                 <Paper zDepth={4} rounded={false} style={coverPreview}>

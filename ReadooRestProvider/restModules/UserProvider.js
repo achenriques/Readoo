@@ -128,7 +128,8 @@ class UserProvider {
             console.log("Estoy modificando " + userToUpdate.userId);     
             if (userToUpdate && userToUpdate.userId != null && (userToUpdate.userName !== undefined || userToUpdate.userSurname !== undefined 
                     || userToUpdate.userNick !== undefined || userToUpdate.userPass !== undefined || userToUpdate.userEmail !== undefined 
-                    || userToUpdate.userAboutMe  !== undefined || userToUpdate.userAvatarUrl !== undefined)) {
+                    || userToUpdate.userAboutMe  !== undefined || userToUpdate.userAvatarUrl !== undefined
+                    || userToUpdate.userGenres)) {
                 let hashedPassword = (userToUpdate.userPass !== undefined) ? bcrypt.hashSync(userToUpdate.userPass, 8) : null;
                 that.userDao.getOneUserPass(+userToUpdate.userId).then(
                     function (result) {
@@ -170,6 +171,9 @@ class UserProvider {
                             .send(reqError.text);
                     }
                 );
+                if (userToUpdate.userGenres !== undefined) {
+                    // TODO: aqui me quedo. Actualizo generos y acabo perfil
+                }
             } else {
                 return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Data');

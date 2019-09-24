@@ -42,6 +42,11 @@ export default [
         'save': 'Save',
         'no.changes': '* No changes detected. No it is necessary save anything!',
         'saved.successfully': 'Saved successfully',
+        'my.genres': 'My preferred genres',
+        'items.selected': '{0} items selected',
+        // Genres
+        'theater': 'Theater',
+        'drama': 'Drama',
         // Errors
         'user.id.not.provided': 'User Id not provided, please reload and try again',
         'timeout.error': 'Timeout while loading the page. Check your net connection. If the problem still existing could be a problem with the application server :-/',
@@ -94,6 +99,11 @@ export default [
         'save': 'Guardar',
         'no.changes': '* No se han detectado cambios. No es necesario guardar.',
         'saved.successfully': 'Se han guardado los datos correctamente',
+        'my.genres': 'Mis generos preferidos',
+        'items.selected': '{0} elementos seleccionados',
+        // Genres
+        'theater': 'Teatro',
+        'drama': 'Drama',
         // Errores
         'user.id.not.provided': 'Falta el ID de Usuario. Por favor, recarga el módulo y vuelve a intentarlo.',
         'timeout.error': 'Exceso de tiempo durante la carga. Comprueba tu conexión a la red. Si el problema persiste puede ser un fallo del servidor :-/',

@@ -342,7 +342,7 @@ const comentaries = (state = initialState.comentaries, { type, payload, data }) 
 /**
  * Reducer para las genres a mostrar y operaciones de las mismas
  */
-const genres = (state = initialState.books, { type, payload, data }) => {
+const genres = (state = initialState.genres, { type, payload, data }) => {
     switch (type) {
         case successType(actionTypes.FETCH_GENRES):
             console.log(successType(actionTypes.FETCH_GENRES));
@@ -351,15 +351,15 @@ const genres = (state = initialState.books, { type, payload, data }) => {
                 all: data.data,
             }
 
-        case failureType(actionTypes.FETCH_GENRES):
-            console.log(failureType(actionTypes.FETCH_GENRES));
+        case successType(actionTypes.FETCH_USER_GENRES):
+            console.log(successType(actionTypes.FETCH_USER_GENRES));
             return {
                 ...state,
-                all: null,
+                userGenres: data.data,
             }
 
         default:
-        return state;
+            return state;
     }
 }
 
