@@ -1,6 +1,8 @@
 module.exports = {
     allUsers: "SELECT * FROM appUser ;",
-    oneUser: "SELECT *, '' as userPass FROM appUser WHERE userId = ? ; ",
+    oneUser: "SELECT u.userId, u.userName, u.userSurname, u.userNick, '' AS userPass, u.userEmail, u.userAboutMe, " +
+        "u.userKarma, u.userAvatarUrl, u.userVisible, GROUP_CONCAT(g.genreId ORDER BY g.genreId ASC) AS userGenres " +
+        "FROM appUser u LEFT JOIN usergenre g ON u.userId = g.userId WHERE u.userId = ? ",
     oneUserPass: "SELECT userPass FROM appUser WHERE userId = ? ; ",
 /*    
     updateUser: "UPDATE appUser SET userName = (case when ? IS NULL then userName else ? end), userSurname = (case when ? IS NULL then userSurname else ? end), " + 

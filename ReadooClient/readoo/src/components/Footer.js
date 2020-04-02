@@ -7,33 +7,12 @@ import '../styles/Footer.css';
 
 class Footer extends Component {
 
-    initialState = {
-        openSnackBar: false,
-        snackBarMsg: ''
-    };
+    initialState = {};
 
     constructor(props) {
         super(props);
         this.state = { ...this.initialState };
     };
-
-    static getDerivedStateFromProps = (nextProps, prevState) => {
-        if(nextProps.errorListener != null && nextProps.errorListener.length) {
-            let errorMsg = "";
-            nextProps.errorListener.forEach((err, index, array) => {
-                if (index > 0) {
-                    errorMsg += errorMsg + ' / ';
-                }
-                return errorMsg = errorMsg += err;
-            }, this);
-            return({
-                ...prevState,
-                snackBarMsg: errorMsg,
-                openSnackBar: true,
-            });
-        }        
-        return null;
-    }
 
     getCurrentStatus(status) {
         switch (status) {
@@ -88,7 +67,6 @@ class Footer extends Component {
 export default connect(
     (state) => ({
         selectedIndex: appState.getCurrentTabID(state),
-        errorListener: appState.getFailingStatus(state),
         appLanguage: appState.getAppLanguage(state)
     }),
     (dispatch) => ({})

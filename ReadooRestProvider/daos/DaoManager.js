@@ -15,9 +15,9 @@ class DaoManager {
     executeStatment(stringQuery, params, resultHandler) {
         let that = this;
         return new Promise(function(resolve, reject) {
-            that.db.getConn(that.db.connect).then(function(response) {
-                response.query(stringQuery, params, function (err, result, fields) {
-                    response.release();
+            that.db.getConn(that.db.connect).then(function(connection) {
+                connection.query(stringQuery, params, function (err, result, fields) {
+                    connection.release();
                     if (err) {
                         if (err.code == 'ER_DUP_ENTRY') {
                             console.log('Duplicated Entry!'); 
@@ -39,7 +39,9 @@ class DaoManager {
             }, function (error) {
                 console.log(error);
                 reject(constants.dbConnectionFail);
-            });
+            }).catch (
+                
+            );
         });
     }
 
@@ -50,26 +52,46 @@ class DaoManager {
         var toRet = [];
         let that = this;
         return new Promise(function(resolve, reject) {
-            that.db.getConn(that.db.connect).beginTransaction(function(err) {
-                if (err) {
-                    console.log('Create Transaction Error!');
-                    console.log(err);
-                    return constants.queryError;
-                } else {
-                    for (let f of  executeStatmentFunctionsParametersLists) {
-                        let result = that.executeStatment.apply(that, executeStatmentFunctionsParametersLists).then(
-                            function (res) {
-                                toRet.push(res);
+            that.db.getConn(that.db.connect).then(
+                function(connection) {
+                    connection.beginTransaction(function(err) {
+                        if (err) {
+                            connection.rollback(function() {
+                                connection.release();
+                                //Failure
+                            });
+                            console.log('Create Transaction Error!');
+                            console.log(err);
+                            reject(constants.queryError);
+                        } else {
+                            for (let f of  executeStatmentFunctionsParametersLists) {
+                                let result = that.executeStatment.apply(that, executeStatmentFunctionsParametersLists).then(
+                                    function (res) {
+                                        toRet.push(res);
+                                    }
+                                ).catch(
+                                    function (err) {
+                                        connection.rollback(function() {
+                                            connection.release();
+                                            //Failure
+                                        });
+                                        reject(err);
+                                    }
+                                );
                             }
-                        ).catch(
-                            function (err) {
-                                return err;
-                            }
-                        );
-                    }
-                    return toRet;
+                            resolve(toRet);
+                        }
+                    });
+                }, function (error) {
+                    console.log(error);
+                    reject(constants.dbConnectionFail);
                 }
-            });
+            ).catch (
+                function (err) {
+                    console.log(err);
+                    reject(constants.dbConnectionFail);
+                }
+            );
         });
     }
 }

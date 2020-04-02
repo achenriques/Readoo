@@ -36,6 +36,7 @@ const initialState = {
         userAboutMe: '',
         userPass: '',
         userKarma: null,
+        userGenres: [],
         userVisible: true,
         preferedLanguage: null
     },
@@ -236,6 +237,7 @@ const user = (state = initialState.user, { type, payload, data }) => {
                     userPass: '',
                     userKarma: 0,
                     userLanguage: userData.userLanguage,
+                    userGenres: [],
                     userVisible: true
                 };
 

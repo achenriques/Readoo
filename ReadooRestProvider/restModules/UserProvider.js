@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const encoder64 = require('../util/functions').base64_encode;
 const UserDao = require('../daos/UserDao');
+const UserGenreDao = require('../daos/UserGenreDao');
 
 const userStorage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -36,6 +37,7 @@ class UserProvider {
     constructor(app, db)
     {
         this.userDao = new UserDao(db);
+        this.userGenreDao = new UserGenreDao(db);
         this.getUserAvatar(app);    //Get
         this.getAll(app);           //Get
         this.getOne(app);           //Get
@@ -102,6 +104,10 @@ class UserProvider {
                                 result.userAvatarUrl = null;
                             }
                         }
+                        if (result.userGenres) {
+                            // The genres of the user are cast to an array of numbers with the genre ids
+                            result.userGenres = result.userGenres.split(",").map(function (x) {return +x});
+                        }
                         res.setHeader('Content-Type', 'application/json');
                         return res.send(JSON.stringify(result));
                     }
@@ -143,12 +149,25 @@ class UserProvider {
                                         userToUpdate.userAvatarUrl, +userToUpdate.userId).then(
                                     function (result) {
                                         res.setHeader('Content-Type', 'application/json');
-                                        if (result.changedRows > 0) {
-                                            return res.status(200).json(result);
-                                        } else {
+                                        let returnStatus = 200;
+                                        if (result.changedRows === 0) {
                                             // Acepted but no changes commited
-                                            return res.status(202).json(result);
+                                            returnStatus = 202;
                                         }
+                                        if (userToUpdate.userGenres !== undefined) {
+                                            that.userGenreDao.updateGenres(+userToUpdate.userId, JSON.parse(userToUpdate.userGenres)).then(
+                                                function (result2) {
+                                                    return res.status(returnStatus).json(result);
+                                                }
+                                            ).catch(
+                                                function (err) {
+                                                    let reqError = functions.getRequestError(err);
+                                                    return res.status(reqError.code)        
+                                                        .send(reqError.text);
+                                                }
+                                            )
+                                        }
+                                        return res.status(returnStatus).json(result);
                                     }
                                 ).catch(
                                     function (err) {
@@ -171,9 +190,6 @@ class UserProvider {
                             .send(reqError.text);
                     }
                 );
-                if (userToUpdate.userGenres !== undefined) {
-                    // TODO: aqui me quedo. Actualizo generos y acabo perfil
-                }
             } else {
                 return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Data');

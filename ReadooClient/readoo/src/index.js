@@ -19,9 +19,6 @@ const generateClassName = createGenerateClassName();
 const jss = create(jssPreset());
 jss.options.insertionPoint = document.getElementById('jss-insertion-point');
 
-// Pluggins para el material desing
-injectTapEventPlugin();
-
 ReactDOM.render(
     <MuiThemeProvider>
         <JssProvider jss={jss} generateClassName={generateClassName}>

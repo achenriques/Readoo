@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { actionTypes, fetchUserData, fetchUserGenres, checkEmailIsUnique, setEmailIsUniqueFalse, saveUserData, dissableUser, resetProccess, doLogOut } from '../../app_state/actions';
+import { actionTypes, fetchUserData, checkEmailIsUnique, setEmailIsUniqueFalse, saveUserData, dissableUser, resetProccess, doLogOut } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import RootRef from '@material-ui/core/RootRef';
 import Grid from '@material-ui/core/Grid';
@@ -35,7 +35,7 @@ class ProfileView extends Component {
             userSurname: "",
             userAboutMe: "",
             userKarma: 0,
-            myGenres: []
+            userGenres: []
         },
         userNick: "",
         oldUserPass: "",
@@ -45,6 +45,7 @@ class ProfileView extends Component {
         userSurname: "",
         userAboutMe: "",
         userKarma: 0,
+        userGenres: [],
         avatarImage: avatarDefault,
         avatarImageFile: null,
         loadingProfile: LOADING_PROFILE,
@@ -72,7 +73,6 @@ class ProfileView extends Component {
 
     componentDidMount = () => {
         this.props.fetchUserData(this.props.userId);
-        this.props.fetchUserGenres(this.props.userId);
     }
 
     componentDidUpdate = (prevProps, prevState, snapshot) => {
@@ -91,6 +91,7 @@ class ProfileView extends Component {
                     userSurname: (this.props.userData.userSurname != null) ? this.props.userData.userSurname : "",
                     userAboutMe: (this.props.userData.userAboutMe != null) ? this.props.userData.userAboutMe : "",
                     userKarma: +this.props.userData.userKarma,
+                    userGenres: (this.props.userData.userGenres != null) ? this.props.userData.userGenres : [],
                     alreadyLoadedTab: true,
                     helpKarmaOpen: false
                 });
@@ -262,9 +263,9 @@ class ProfileView extends Component {
 
         // Sets the user Id in the object sent to back
         newUserData.userId = this.props.userId;
-
+        let genresHasChange = checkGenresDiff();
         if (newUserData.userAvatarUrl || newUserData.userNick || newUserData.userPass || newUserData.userEmail || newUserData.userName ||
-                newUserData.userSurname || newUserData.userAboutMe || checkGenresDiff()) {
+                newUserData.userSurname || newUserData.userAboutMe || genresHasChange) {
             if (newUserData.userPass !== null && newUserData.userPass.length) {
                 newUserData.oldUserPass = this.state.oldUserPass;
             } else {
@@ -287,7 +288,7 @@ class ProfileView extends Component {
             (newUserData.userSurname !== null) && dataToSend.set('userSurname', newUserData.userSurname);
             (newUserData.userAboutMe !== null) && dataToSend.set('userAboutMe', newUserData.userAboutMe);
             (newUserData.oldUserPass !== null) && dataToSend.set('oldUserPass', newUserData.oldUserPass);
-            (checkGenresDiff()) && dataToSend.set('userGenres', JSON.stringify(this.state.genresSelected));
+            (genresHasChange) && dataToSend.set('userGenres', JSON.stringify(this.state.genresSelected));
             this.setState({
                 ...this.state,
                 acceptDisabled: true
@@ -337,7 +338,7 @@ class ProfileView extends Component {
         if (selected) {
             this.setState({
                 ...this.state,
-                genresSelected: selected
+                genresSelected: selected.map((genre) => genre.genreId)
             })
         }
     }
@@ -367,7 +368,13 @@ class ProfileView extends Component {
                             <Grid item sm={4} className="profileAvatarColumn">
                                 <div style={{ position: "relative"}}>
                                     <Paper elevation={4} className="divProfileAvatar">
-                                        <img src={this.state.avatarImage} crossOrigin='http://localhost:3030' alt={(this.state.avatarImage === null && this.state.avatarImageFile !==null) ? ( <LS msgId='no.image.preview' defaultMsg='Preview not avaliable.'/> ) : "" } className="profileAvatarImage"/>
+                                        <img 
+                                            src={this.state.avatarImage} 
+                                            crossOrigin='http://localhost:3030' 
+                                            alt={(this.state.avatarImage === null && this.state.avatarImageFile !== null) 
+                                                    ? ( <LS msgId='no.image.preview' defaultMsg='Preview not avaliable.'/> ) 
+                                                    : "" } className="profileAvatarImage"
+                                        />
                                     </Paper>
                                 </div>
                                 <div className="divUploadAvatarButton">
@@ -532,7 +539,10 @@ class ProfileView extends Component {
                                             className="inputProfileData"
                                         />
                                         <br/>
-                                        {(this.state.genresColected) ? (<GenreSelector generSelected={this.state.userGenresSelected} onChange={this.onChangeGenre.bind(this)} />) : (<div style={DISPLAY_NONE} />)} 
+                                        <GenreSelector 
+                                            genresSelected={this.state.userGenres} 
+                                            onChange={this.onChangeGenre.bind(this)} 
+                                        />
                                     </Paper>
                                 </RootRef>
                             </Grid>
@@ -575,7 +585,6 @@ export default connect(
     }),
     (dispatch) => ({
         fetchUserData: (userId) => dispatch(fetchUserData(userId)),
-        fetchUserGenres: (userId) => dispatch(fetchUserGenres(userId)),
         setEmailIsUniqueFalse: () => dispatch(setEmailIsUniqueFalse()),
         checkEmailIsUnique: (email) => dispatch(checkEmailIsUnique(email)),
         saveUserData: (userData) => dispatch(saveUserData(userData)),

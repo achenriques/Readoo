@@ -31,7 +31,11 @@ class App extends Component {
                 if (index > 0) {
                     errorMsg += errorMsg + ' / ';
                 }
-                return errorMsg = errorMsg += err;
+                if (err.response && err.response.data && err.response.data.message) {
+                    return errorMsg = errorMsg += "" + err.response.data.message.trim();
+                } else {
+                    return errorMsg = errorMsg += err;
+                }
             }, this);
             return({
                 ...prevState,
@@ -40,7 +44,7 @@ class App extends Component {
             });
         }        
         return null;
-    };
+    }
 
     handleSnakRequestClose = () => {
         this.props.resetErrLog();

@@ -44,47 +44,40 @@ class GenreSelector extends Component {
         this.props.fetchGenres();
     } 
 
+    parseComponentText = (selectedGenres) => {
+        let selectedText = [];
+        let iterator = 0;
+        while (iterator <2 && iterator < selectedGenres.length) {
+            selectedText.push(LS.getStringMsg(selectedGenres[iterator].genre, selectedGenres[iterator].genre));
+            iterator += 1;
+        }
+        if (selectedGenres.length > 2) {
+            selectedText.push("...");
+            selectedText.push(LS.getStringMsg('items.selected', "Selected", [selectedGenres.length]));
+        }
+        return selectedText.join(", ");
+    }
+
     componentDidUpdate = (prevProps, prevState, snapshot) => {
         if (this.state.genresToShow.length === 0 && this.props.genres.length > 0) {
-            let selectedGenres = this.props.genres.filter(genre => this.state.genresSelected.includes(genre.genreId));
-            let selectedText = [];
-            for (let i = 0; i < selectedGenres.length; i += 1) {
-                if (i < 2) {
-                    selectedText.push(<LS msgId={selectedGenres[i].genre} defaultMsg={selectedGenres[i].genre} />);
-                } else {
-                    break;
-                }
-            }
-            if (selectedGenres.length > 2) {
-                selectedText.push("...");
-                selectedText.push(<LS msgId='items.selected' defaultMsg="Selected" params={[selectedGenres.length]} />);
-            }
+            let genresSelected = this.props.genres.filter(genre => this.state.genresSelected.includes(genre.genreId));
             // Set state
             this.setState({
                 ...this.state,
                 genresToShow: this.props.genres,
-                selectText: selectedText.join(', ')
+                selectText: this.parseComponentText(genresSelected)
             });
         }
     }
 
     handleGenreChange = (evt) => {
-        let value = evt.target.value;   // list of genres
-        let genresSelected = [];
-        let nextText = [];
-        for (let i = 0, l = value.length; i < l; i += 1) {
-            genresSelected.push(value[i].genreId);
-            (i < 2) && nextText.push(LS.getStringMsg(value[i].genre, value[i].genre));
-        }
-        if (value.length > 2) {
-            nextText.push("...");
-            nextText.push(LS.getStringMsg('items.selected', '', [value.length]));
-        }
-        
+        let value = evt.target.value;   // list of ids type number
+        let genresSelected = this.props.genres.filter(genre => value.includes(genre.genreId));
+        // Set state
         this.setState({
             ...this.state,
-            genresSelected: value,
-            selectText: nextText.join(", ")
+            genresSelected: value.slice(),
+            selectText: this.parseComponentText(genresSelected)
         });
 
         this.props.onChange(genresSelected);
@@ -107,8 +100,8 @@ class GenreSelector extends Component {
                                 MenuProps={genreMenuProps}
                             >
                                 {this.state.genresToShow.map(genre => (
-                                    <MenuItem key={genre.genreId} value={genre}>
-                                        <Checkbox checked={this.state.genresSelected.find((e) => e.genreId === genre.genreId) !== undefined} />
+                                    <MenuItem key={genre.genreId} value={genre.genreId}>
+                                        <Checkbox checked={this.state.genresSelected.find((id) => +id === +genre.genreId) !== undefined} />
                                         <ListItemText primary={<LS msgId={genre.genre} defaultMsg={genre.genre}/>} />
                                     </MenuItem>
                                 ))}
