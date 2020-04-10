@@ -60,3 +60,6 @@ typings/
 # mySQL Workbench config
 .mwb
 
+# image folder
+ReadooRestProvider/uploads/*
+
