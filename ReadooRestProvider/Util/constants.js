@@ -1,8 +1,9 @@
 module.exports = {
-    queryError: -1,
-    dbConnectionFail: -2,
-    queryErrorDuplicateEntry: -3,
-    maxComentarios: 25,
+    QUERY_ERROR: -1,
+    DB_CONNECTION_FAIL: -2,
+    QUERY_ERROR_DUPLICATE_ENTRY: -3,
+    MAX_COMMENTARIES: 25,
+    TOKEN_TIME: '12h',
     LANGUAGE_ENGLISH: 1,
-    LANGUAGE_SPANISH: 2
+    LANGUAGE_SPANISH: 2,
 }

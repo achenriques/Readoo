@@ -51,11 +51,19 @@ const checkToken = () => axios.get(
     `${baseURL}/login/isme`, { withCredentials: true }
 )
 
+const setTabSelector = (tabSelector) => axios.post(
+    `${baseURL}/login/tabSelector`,
+    {
+        tabSelector: tabSelector
+    }
+)
+
 export default {
     doLogin,
     doRegister,
     checkNickIsUnique,
     checkEmailIsUnique,
     doLogOut,
-    checkToken
+    checkToken,
+    setTabSelector
 }

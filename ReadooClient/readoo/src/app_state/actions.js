@@ -49,12 +49,19 @@ fetchTabsInicial = (userId) => ({
 }) */
 
 // Change TAB in web
-const changeTab = (newTabID) => ({
-    type: actionTypes.TAB_CHANGE,
-    payload: {
-        newTabID: newTabID
-    }
-})
+const changeTab = (newTabID) => 
+{
+    // we do not need to wait a respose
+    loginApi.setTabSelector(newTabID);
+
+    return ({
+        type: actionTypes.TAB_CHANGE,
+        payload: {
+            newTabID: newTabID
+        }
+    });
+}
+
 
 const resetErrLog = () => ({
     type: actionTypes.RESET_ERRORS,

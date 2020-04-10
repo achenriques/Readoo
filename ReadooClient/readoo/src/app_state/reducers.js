@@ -110,8 +110,18 @@ const tabs = (state = initialState.tabs, { type, payload, data }) => {
                 currentTabID: constants.pages.PROFILE
             }
 
+        case successType(actionTypes.CHECK_TOKEN):
+            if (data.data && data.data.tabSelector != null) {
+                return {
+                    ...state,
+                    currentTabID: +data.data.tabSelector
+                }
+            } else {
+                return state;
+            }
+
         default:
-        return state;
+            return state;
     }
 }
 
@@ -227,7 +237,7 @@ const user = (state = initialState.user, { type, payload, data }) => {
             case successType(actionTypes.DO_REGISTER):
                 console.log(actionTypes.DO_REGISTER);
                 return {
-                    userId: userData.id,
+                    userId: userData.userId,
                     userNick: payload.nickEmail,
                     userEmail: payload.email,
                     userName: '',

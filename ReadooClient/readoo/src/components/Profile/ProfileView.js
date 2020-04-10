@@ -57,8 +57,6 @@ class ProfileView extends Component {
         helpKarmaOpen: false,
         alreadyLoadedTab: false,
         openContinueDeleteProfile: false,
-        userGenresSelected: [],
-        genresSelected: [],
         genresColected: false
     };
 
@@ -166,17 +164,6 @@ class ProfileView extends Component {
                     break;
             }
         }
-        if (!this.state.genresColected && this.props.userGenres && this.props.failedProcesses && this.props.succeedProcesses && this.props.loadingProcesses) {
-            let statusOfuserGenres = getProccessStatus(actionTypes.FETCH_USER_GENRES, this.props.loadingProcesses, this.props.failedProcesses, this.props.succeedProcesses, () => { this.props.resetProccessStatus(actionTypes.FETCH_USER_GENRES)});
-            if (statusOfuserGenres === REST_SUCCESS) {
-                this.setState({
-                    ...this.state,
-                    genresColected: true,
-                    userGenresSelected: this.props.userGenres
-                });
-            }
-            
-        }
         return;
     }
 
@@ -243,8 +230,8 @@ class ProfileView extends Component {
     acceptSaveProfile = (evt) => {
         // Functions that returns if the genres has changed...
         const checkGenresDiff = () => {
-            if (this.state.userGenresSelected.length === this.state.genresSelected.length
-                    && this.state.userGenresSelected.filter(x => this.state.genresSelected.includes(x)).length === 0) {
+            if (this.state.userGenres.length === this.state.userData.userGenres.length
+                    && this.state.userGenres.filter(x => !this.state.userData.userGenres.includes(x)).length === 0) {
                 return false;
             } else {
                 return true;
@@ -288,7 +275,7 @@ class ProfileView extends Component {
             (newUserData.userSurname !== null) && dataToSend.set('userSurname', newUserData.userSurname);
             (newUserData.userAboutMe !== null) && dataToSend.set('userAboutMe', newUserData.userAboutMe);
             (newUserData.oldUserPass !== null) && dataToSend.set('oldUserPass', newUserData.oldUserPass);
-            (genresHasChange) && dataToSend.set('userGenres', JSON.stringify(this.state.genresSelected));
+            (genresHasChange) && dataToSend.set('userGenres', JSON.stringify(this.state.userGenres));
             this.setState({
                 ...this.state,
                 acceptDisabled: true
@@ -338,7 +325,7 @@ class ProfileView extends Component {
         if (selected) {
             this.setState({
                 ...this.state,
-                genresSelected: selected.map((genre) => genre.genreId)
+                userGenres: selected.map((genre) => genre.genreId)
             })
         }
     }

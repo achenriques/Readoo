@@ -22,11 +22,11 @@ class DaoManager {
                         if (err.code == 'ER_DUP_ENTRY') {
                             console.log('Duplicated Entry!'); 
                             console.log(err);
-                            reject(constants.queryErrorDuplicateEntry);
+                            reject(constants.QUERY_ERROR_DUPLICATE_ENTRY);
                         } else {
                             console.log('Query Error!');
                             console.log(err);
-                            reject(constants.queryError);
+                            reject(constants.QUERY_ERROR);
                         }
                     } else {
                         if (resultHandler && typeof resultHandler === 'function') {
@@ -38,9 +38,12 @@ class DaoManager {
                 });
             }, function (error) {
                 console.log(error);
-                reject(constants.dbConnectionFail);
+                reject(constants.DB_CONNECTION_FAIL);
             }).catch (
-                
+                function (que) {
+                    console.log(error);
+                    reject(constants.DB_CONNECTION_FAIL);
+                }
             );
         });
     }
@@ -62,10 +65,10 @@ class DaoManager {
                             });
                             console.log('Create Transaction Error!');
                             console.log(err);
-                            reject(constants.queryError);
+                            reject(constants.QUERY_ERROR);
                         } else {
                             for (let f of  executeStatmentFunctionsParametersLists) {
-                                let result = that.executeStatment.apply(that, executeStatmentFunctionsParametersLists).then(
+                                let result = that.executeStatment.apply(that, f).then(
                                     function (res) {
                                         toRet.push(res);
                                     }
@@ -84,12 +87,12 @@ class DaoManager {
                     });
                 }, function (error) {
                     console.log(error);
-                    reject(constants.dbConnectionFail);
+                    reject(constants.DB_CONNECTION_FAIL);
                 }
             ).catch (
                 function (err) {
                     console.log(err);
-                    reject(constants.dbConnectionFail);
+                    reject(constants.DB_CONNECTION_FAIL);
                 }
             );
         });

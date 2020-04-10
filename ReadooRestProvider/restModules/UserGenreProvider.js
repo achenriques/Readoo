@@ -1,3 +1,4 @@
+const functions = require('../util/functions');
 const middleware = require('./middlewares');
 const UserGenreDao = require('../daos/UserGenreDao');
 

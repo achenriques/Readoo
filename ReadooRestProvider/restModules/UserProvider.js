@@ -3,6 +3,7 @@ const middleware = require('./middlewares');
 const multer = require('multer');
 const path = require('path');
 const encoder64 = require('../util/functions').base64_encode;
+const functions = require('../util/functions');
 const UserDao = require('../daos/UserDao');
 const UserGenreDao = require('../daos/UserGenreDao');
 
@@ -64,7 +65,7 @@ class UserProvider {
             } else {
                 return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Id!');
-                }
+            }
         });
     }
 
@@ -135,7 +136,7 @@ class UserProvider {
             if (userToUpdate && userToUpdate.userId != null && (userToUpdate.userName !== undefined || userToUpdate.userSurname !== undefined 
                     || userToUpdate.userNick !== undefined || userToUpdate.userPass !== undefined || userToUpdate.userEmail !== undefined 
                     || userToUpdate.userAboutMe  !== undefined || userToUpdate.userAvatarUrl !== undefined
-                    || userToUpdate.userGenres)) {
+                    || userToUpdate.userGenres !== undefined)) {
                 let hashedPassword = (userToUpdate.userPass !== undefined) ? bcrypt.hashSync(userToUpdate.userPass, 8) : null;
                 that.userDao.getOneUserPass(+userToUpdate.userId).then(
                     function (result) {
@@ -145,10 +146,10 @@ class UserProvider {
                                         (userToUpdate.userSurname !== undefined) ? userToUpdate.userSurname.trim() : null, 
                                         (userToUpdate.userNick !== undefined) ? userToUpdate.userNick.trim() : null, hashedPassword, 
                                         (userToUpdate.userEmail !== undefined) ? userToUpdate.userEmail.trim() : null, 
-                                        (userToUpdate.userAboutMe !== undefined) ? userToUpdate.userAboutMe.trim() : null, 
-                                        userToUpdate.userAvatarUrl, +userToUpdate.userId).then(
+                                        (userToUpdate.userAboutMe !== undefined) ? userToUpdate.userAboutMe.trim() : null,
+                                        (userToUpdate.userAvatarUrl !== undefined) ? userToUpdate.userAvatarUrl.trim() : null, 
+                                        +userToUpdate.userId).then(
                                     function (result) {
-                                        res.setHeader('Content-Type', 'application/json');
                                         let returnStatus = 200;
                                         if (result.changedRows === 0) {
                                             // Acepted but no changes commited
@@ -157,7 +158,7 @@ class UserProvider {
                                         if (userToUpdate.userGenres !== undefined) {
                                             that.userGenreDao.updateGenres(+userToUpdate.userId, JSON.parse(userToUpdate.userGenres)).then(
                                                 function (result2) {
-                                                    return res.status(returnStatus).json(result);
+                                                    return res.header('Content-Type', 'application/json').status(returnStatus).json(result);
                                                 }
                                             ).catch(
                                                 function (err) {
@@ -166,8 +167,9 @@ class UserProvider {
                                                         .send(reqError.text);
                                                 }
                                             )
+                                        } else {
+                                            return res.header('Content-Type', 'application/json').status(returnStatus).json(result);
                                         }
-                                        return res.status(returnStatus).json(result);
                                     }
                                 ).catch(
                                     function (err) {

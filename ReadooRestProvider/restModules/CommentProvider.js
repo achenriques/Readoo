@@ -1,4 +1,5 @@
 const constants = require('../util/constants');
+const functions = require('../util/functions');
 const CommentDao = require('../daos/CommentDao');
 const middleware = require('./middlewares');
 
@@ -78,7 +79,7 @@ class CommentProvider {
             let lastDate = req.body.lastDate;
             console.log("Estoy cogiendo comentario " + bookId);     
             if (bookId) {
-                let commentaries = this.commentDao.bunchOfCommentaries(+bookId, lastDate, constants.maxComentarios)     
+                let commentaries = this.commentDao.bunchOfCommentaries(+bookId, lastDate, constants.MAX_COMMENTARIES)     
                 if (Number.isNaN(commentaries)) {
                     
                     res.setHeader('Content-Type', 'application/json');

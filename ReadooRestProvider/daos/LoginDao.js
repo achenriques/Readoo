@@ -33,7 +33,7 @@ class LoginDao extends DaoManager{
     }
 
     registerLog(userId) {
-        let statement = queries.registerLog;
+        let statement = queries.informLog;
         return this.executeStatment(statement, [userId]);
     }
             
