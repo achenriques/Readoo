@@ -13,7 +13,7 @@ body {
 }
 
 .styleButton {
-    position: 'fixed';
+    position: fixed;
     bottom: 50px;
     right: 50px;
 }
@@ -41,7 +41,7 @@ body {
     opacity: 0;
 }
 
-.imagenPortadaPreview {
+.coverImagePreview {
     text-align: center;
     max-width: 99%;
     max-height: 99%;

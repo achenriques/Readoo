@@ -260,8 +260,6 @@ class ProfileView extends Component {
             }
             // Size of PAPER DomElement from user data settings.
             // This info is used to overload a new paper over the old one with the same dimensions.
-            this.profileDataGridTop = this.profileDataGridRef.current.getBoundingClientRect().top;
-            this.profileDataGridLeft = this.profileDataGridRef.current.getBoundingClientRect().left;
             this.profileDataGridHeight = this.profileDataGridRef.current.getBoundingClientRect().height;
             this.profileDataGridWidth = this.profileDataGridRef.current.getBoundingClientRect().width;
 
@@ -564,7 +562,6 @@ export default connect(
     (state) => ({
         userId: appState.getUserId(state),
         userData: appState.getUser(state),
-        userGenres: appState.getUserGenres(state),
         avaliableEmail: appState.getAvaliableEmail(state),
         loadingProcesses: appState.getLoadingProcesses(state),
         succeedProcesses: appState.getSucceedProcesses(state),

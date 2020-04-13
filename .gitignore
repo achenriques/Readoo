@@ -63,3 +63,6 @@ typings/
 # image folder
 ReadooRestProvider/uploads/*
 
+# others
+to_continue.txt
+

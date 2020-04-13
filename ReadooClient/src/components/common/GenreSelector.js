@@ -11,7 +11,6 @@ import Checkbox from '@material-ui/core/Checkbox';
 import LS from '../LanguageSelector';
 import { fetchGenres } from '../../app_state/actions';
 import { DISPLAY_NONE } from '../../constants/appConstants';
-import { generateKeyPair } from 'crypto';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -71,7 +70,10 @@ class GenreSelector extends Component {
     }
 
     handleGenreChange = (evt) => {
-        let value = evt.target.value;   // list of ids type number
+        let value = (evt.target.value === null) ? [] : evt.target.value;   // list of ids type number
+        if (!Array.isArray(value)) {
+            value = [value]
+        }
         let genresSelected = this.props.genres.filter(genre => value.includes(genre.genreId));
         // Set state
         this.setState({
@@ -88,11 +90,14 @@ class GenreSelector extends Component {
             (this.state.genresToShow.length) 
                     ? (
                         <FormControl className="userGenreSelect">
-                            <InputLabel htmlFor="userGenreSelect">
+                            <InputLabel htmlFor="userGenreSelect" 
+                                required
+                                error={this.props.error}
+                            >
                                 <LS msgId='my.genres' defaultMsg='My favourite genres'/>
                             </InputLabel>
                             <Select
-                                multiple
+                                multiple={this.props.multiple !== undefined}
                                 value={this.state.genresSelected}
                                 onChange={this.handleGenreChange.bind(this)}
                                 input={<Input id="userGenreSelect" />}

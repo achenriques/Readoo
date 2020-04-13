@@ -105,9 +105,11 @@ class UserProvider {
                                 result.userAvatarUrl = null;
                             }
                         }
-                        if (result.userGenres) {
+                        if (result.userGenres != null) {
                             // The genres of the user are cast to an array of numbers with the genre ids
                             result.userGenres = result.userGenres.split(",").map(function (x) {return +x});
+                        } else {
+                            result.userGenres = [];
                         }
                         res.setHeader('Content-Type', 'application/json');
                         return res.send(JSON.stringify(result));

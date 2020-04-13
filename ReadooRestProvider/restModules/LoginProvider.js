@@ -6,6 +6,8 @@ const LoginDao = require('../daos/LoginDao');
 const LANGUAGE_ENGLISH = require('../util/constants').LANGUAGE_ENGLISH;
 const TOKEN_TIME = require('../util/constants').TOKEN_TIME;
 
+const USER_CREDENTIAL = process.env.READOO_USER_CREDENTIAL;
+
 class LoginProvider {
 
     constructor(app, db) {
@@ -31,7 +33,7 @@ class LoginProvider {
                             if (bcrypt.compareSync(pass, result.userPass)) {
                                 let token = jwt.sign(
                                     { userId: result.userId },
-                                    userConfig.serverCredentials.users.readooUser, // TODO: server credencials
+                                    USER_CREDENTIAL,
                                     { expiresIn: TOKEN_TIME } // expires in 24 hours 
                                 );
                                 result.userPass = '';
@@ -93,15 +95,15 @@ class LoginProvider {
                 }
             }
             
-            jwt.verify(token, userConfig.serverCredentials.users.readooUser, function(err, decoded) {
+            jwt.verify(token, USER_CREDENTIAL, function(err, decoded) {
                 if (err) {
                     return res.status(500).send({ auth: false, message: 'Failed to authenticate token!' });
                 }
                 that.loginDao.isMeLogged(decoded.userId).then(
                     function (result) {
                         res.setHeader('Content-Type', 'application/json');
-                        if (decoded.tabSelector) {
-                            result.tabSelector = decoded.tabSelector;
+                        if (decoded.tabSelector != null) {
+                            result.tabSelector = +decoded.tabSelector;
                         }
                         return res.status(200).json(result);
                     }
@@ -132,14 +134,14 @@ class LoginProvider {
                 return res.status(401).send({ auth: false, message: 'No token provided!' });
             }
             
-            jwt.verify(token, userConfig.serverCredentials.users.readooUser, function(err, decoded) {
+            jwt.verify(token, USER_CREDENTIAL, function(err, decoded) {
                 if (err) {
                     return res.status(500).send({ auth: false, message: 'Failed to authenticate token!' });
                 }
                 let token = jwt.sign(
                     { userId: decoded.userId },
-                    userConfig.serverCredentials.users.readooUser, // TODO: server credencials
-                    { expiresIn: '0s' } // We set the cookie not valid
+                    USER_CREDENTIAL,
+                    { expiresIn: '0s' }     // We set the cookie not valid
                 );
                 // We send an expired token...
                 return res.cookie('token', token, { httpOnly: true }).status(200).json({
@@ -214,9 +216,9 @@ class LoginProvider {
                             // create a token
                             let token = jwt.sign(
                                 { userId: result.insertId }, 
-                                userConfig.serverCredentials.users.readooUser, {    // TODO: server credencials
-                                expiresIn: TOKEN_TIME // expires in 24 hours
-                            });
+                                USER_CREDENTIAL, 
+                                { expiresIn: TOKEN_TIME } // expires in 24 hours}
+                            );
                             return res.cookie('token', token, { httpOnly: true }).status(200).json({
                                 success: true,
                                 message: 'Authentication successful!',
@@ -253,7 +255,7 @@ class LoginProvider {
         app.post('/login/tabSelector', function (req, res) {
             console.log("Estoy con tabSelector " + req.body.tabSelector);  
             let tabSelector = req.body.tabSelector;   
-            if (req.body.tabSelector) {
+            if (tabSelector != null) {
                 // Save on the token the current tab ID
                 let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
                 if (token === undefined && req.headers.cookie !== undefined) {
@@ -273,26 +275,24 @@ class LoginProvider {
                     token = token.slice(7, token.length);
                 }
               
-                jwt.verify(token, userConfig.serverCredentials.users.readooUser, function(err, decoded) {
+                jwt.verify(token, USER_CREDENTIAL, function(err, decoded) {
                     if (err) {
                         // We send 403 to identify when the session has expired
                         return res.status(403).send({ auth: false, message: 'Failed to authenticate token.' });
                     } else {
                         // If tab selector is not null or undefined this selector will be saved on the cookie 
-                        if (tabSelector != null) {
-                            if (decoded.tabSelector != tabSelector) {
-                                let tokenWithSelector = jwt.sign(
-                                    { userId: decoded.userId, tabSelector: +tabSelector },
-                                    userConfig.serverCredentials.users.readooUser,
-                                    { expiresIn: TOKEN_TIME } // expires in 24 hours 
-                                );
-                                return res.cookie('token', tokenWithSelector, { httpOnly: true }).status(200).json('success');
-                            }
-                        } else {
-                            return res.status(200).send("");
+                        if (decoded.tabSelector != tabSelector) {
+                            let tokenWithSelector = jwt.sign(
+                                { userId: decoded.userId, tabSelector: +tabSelector },
+                                USER_CREDENTIAL,
+                                { expiresIn: TOKEN_TIME } // expires in 24 hours 
+                            );
+                            return res.cookie('token', tokenWithSelector, { httpOnly: true }).status(200).json('success');
                         }
                     }
                 });
+            } else {
+                return res.status(200).send("");
             }
         });   
     }

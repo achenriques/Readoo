@@ -44,6 +44,17 @@ export default [
         'saved.successfully': 'Saved successfully',
         'my.genres': 'My preferred genres',
         'items.selected': '{0} items selected',
+        'upload.my.book': 'Upload my book',
+        'book.title': 'Book title',
+        'book.author': 'Book author',
+        'book.description': 'Brief description of the book, do not tell spoilers please! (MAX: {0})',
+        'book.personal': 'Your personal opinion (MAX: {0})',
+        'book.need.image' : 'You have to post an image for a better chance of being shared',
+        'book.add.cover.image': 'Add a cover',
+        'book.must.add.cover.image': 'You must add a cover before upload the book',
+        'upload': 'Upload',
+        'cancel': 'Cancel',
+        'complete.field': 'Complete this field',
         // Genres
         'theater': 'Theater',
         'drama': 'Drama',
@@ -56,7 +67,8 @@ export default [
         'no.token.provided': 'It seems the sesson has been expired. Please, refresh the application and log in to continue.',
         'no.pass.coincidence': 'The old password doesn´t coencide with the password in use.',
         'no.image.preview': 'Image preview not avaliable.',
-        'image.not.found': 'Image not found'
+        'image.not.found': 'Image not found',
+        'data.not.found': 'Some required data has not been provided'
     },
     // Spanish
     {
@@ -101,6 +113,17 @@ export default [
         'saved.successfully': 'Se han guardado los datos correctamente',
         'my.genres': 'Mis generos preferidos',
         'items.selected': '{0} elementos seleccionados',
+        'upload.my.book': 'Subir mi libro',
+        'book.title': 'Título del libro',
+        'book.author': 'Autor del libro',
+        'book.description': 'Descripcion breve del libro, ¡no lo digas TODO! (MAX: {0})',
+        'book.personal': 'Escribe tu opinión personal (MAX: {0})',
+        'book.need.image' : 'Necesitas subir una imagen para tener más posibilidades de que te encuentren',
+        'book.add.cover.image': 'Añade una portada',
+        'book.must.add.cover.image': 'Debes añadir una portada para subirlo',
+        'upload': 'Súbelo',
+        'cancel': 'Cancelar',
+        'complete.field': 'Completa este campo',
         // Genres
         'theater': 'Teatro',
         'drama': 'Drama',
@@ -113,6 +136,7 @@ export default [
         'no.token.provided': 'La sesión parece haber expirado. Por favor, refresca la pagina y vuelve a entrar para continuar.',
         'no.pass.coincidence': 'La contraseña antigüa no coencide con la contraseña ahora en uso.',
         'no.image.preview': 'Previsualización de imagen no disponible.',
-        'image.not.found': 'Imagen no disponible'
+        'image.not.found': 'Imagen no disponible',
+        'data.not.found': 'Falta algún dato requerido'
     }
 ]

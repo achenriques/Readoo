@@ -7,23 +7,28 @@ const BookDao = require('../daos/BookDao');
 
 const bookStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './ReadooRestProvider/Uploads/Portadas')
+        cb(null, './ReadooRestProvider/uploads/coverPages')
     },
     filename: function (req, file, cb) {
         let fileType = file.mimetype.split('/');
         if (fileType && fileType[0] === 'image' &&
             (fileType[1] === 'jpg' || fileType[1] === 'jpeg' || fileType[1] === 'png' || fileType[1] === 'svg')) {
-            let fileName = 'User' + '-' + Date.now() + '.' + fileType[1];
-            cb(null, fileName) //TODO: cambiar por usuario actual
-            req.body.coverUrl = fileName;
+            let fileName = req.body.userId + '-' + Date.now() + '.' + fileType[1];
+            cb(null, fileName)
+            req.body.bookCoverUrl = fileName;
         } else {
-            req.body.coverUrl = '';
-            cb(null, 'cover' + '-' + 'any')
+            req.body.bookCoverUrl = '';
+            cb('Image format error. Images only!');
         }
     }
 })
 
-const bookCoverUpload = multer({ storage: bookStorage });
+const bookCoverUpload = multer(
+    { 
+        storage: bookStorage, 
+        limits: {fileSize: 10000000} // in bytes == 10MB
+    }
+);
 
 class BookProvider {
 
@@ -122,11 +127,11 @@ class BookProvider {
 
     insertOne(app) {
         const that = this;
-        app.post('/book/new', [middleware.verifyToken, bookCoverUpload.single('bookCover')], function (req, res) { // TODO: have a look to multiple middleware
+        app.post('/book/new', [middleware.verifyToken, bookCoverUpload.single('bookCoverUrl')], function (req, res) { // TODO: have a look to multiple middleware
             console.log("Estoy insertando libro");
             let bookInfo = req.body;
-            if (bookInfo && bookInfo.bookTitle && bookInfo.bookAuthor && bookInfo.bookDescription && bookInfo.bookReview
-                    && bookInfo.bookCoverUrl && bookInfo.userId && bookInfo.genreId) {
+            if (bookInfo && bookInfo.bookTitle != null && bookInfo.bookAuthor != null && bookInfo.bookDescription && bookInfo.bookReview != null
+                    && bookInfo.bookCoverUrl != null && bookInfo.userId != null && bookInfo.genreId != null ) {
                 that.bookDao.addBook(bookInfo.bookTitle.trim(), bookInfo.bookAuthor.trim(), bookInfo.bookDescription.trim(), bookInfo.bookReview.trim(),
                         bookInfo.bookCoverUrl.trim(), +bookInfo.userId, +bookInfo.genreId).then(
                     function (result) {
@@ -142,7 +147,7 @@ class BookProvider {
                 );
             } else {
                 res.status(400)        // HTTP status 400: BadRequest
-                    .send('Missed Id');
+                    .send('Missed Id or Data');
             }
         });
     }

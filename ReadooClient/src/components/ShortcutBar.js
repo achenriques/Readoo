@@ -57,7 +57,7 @@ class ShortcutBar extends Component {
                             <BottomNavigationItem
                                 label={<LS msgId='favourites' defaultMsg='Favourites'/>}
                                 icon={favoritesIcon}
-                                onClick={(tab) => this.handleActive(pages.Favorite)}
+                                onClick={(tab) => this.handleActive(pages.FAVOURITES)}
                             />
                             <BottomNavigationItem
                                 label={<LS msgId='chats' defaultMsg='Chats'/>}

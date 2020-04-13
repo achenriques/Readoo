@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken');
 const userConfig = require('../util/serverOptions');
 const constants = require('../util/constants');
 
+const USER_CREDENTIAL = process.env.READOO_USER_CREDENTIAL;
+
 module.exports = {
     verifyToken : function (req, res, next) {
         let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
@@ -22,7 +24,7 @@ module.exports = {
             token = token.slice(7, token.length);
         }
       
-        jwt.verify(token, userConfig.serverCredentials.users.readooUser, function(err, decoded) {
+        jwt.verify(token, USER_CREDENTIAL, function(err, decoded) {
             if (err) {
                 // We send 403 to identify when the session has expired
                 return res.status(403).send({ auth: false, message: 'Failed to authenticate token.' });
@@ -33,7 +35,7 @@ module.exports = {
                     if (decoded.tabSelector != tabSelector) {
                         let tokenWithSelector = jwt.sign(
                             { userId: decoded.userId, tabSelector: tabSelector },
-                            userConfig.serverCredentials.users.readooUser,
+                            USER_CREDENTIAL,
                             { expiresIn: constants.TOKEN_TIME } // expires in 24 hours 
                         );
                         res.cookie('token', tokenWithSelector, { httpOnly: true });
