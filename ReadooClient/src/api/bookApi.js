@@ -15,12 +15,13 @@ const uploadBook = (bookData) => axios.post(
     }
 )
 
-const fetchBooks = (userId, lastBookId, numberOfBooks) => axios.post(
+const fetchBooks = (userId, lastBookId, genres, numberOfBooks) => axios.post(
     `${baseURL}/book`,
     {
         last: {
             userId: userId,
             lastBookId: lastBookId,
+            genres: genres,
             numberOfBooks: numberOfBooks
         }
     }

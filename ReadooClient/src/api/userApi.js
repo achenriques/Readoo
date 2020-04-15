@@ -37,19 +37,17 @@ const dissableUser = (userId) => axios.post(
 const doLikeBook = (bookId, userId) => axios.post(
     `${baseURL}/userLikesBook`,
     {
-        like: {
-            bookId: bookId,
-            userId: userId
-        }
+        bookId,
+        userId
     }
 )
 
 const doDislikeBook = (bookId, userId) => axios.delete(
     `${baseURL}/userLikesBook`,
     {
-        like: {
-            bookId: bookId,
-            userId: userId
+        data: {
+            bookId,
+            userId
         }
     }
 )

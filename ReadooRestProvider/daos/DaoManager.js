@@ -71,6 +71,9 @@ class DaoManager {
                                 let result = that.executeStatment.apply(that, f).then(
                                     function (res) {
                                         toRet.push(res);
+                                        if (toRet.length === executeStatmentFunctionsParametersLists.length) {
+                                            resolve(toRet);
+                                        }
                                     }
                                 ).catch(
                                     function (err) {
@@ -82,7 +85,6 @@ class DaoManager {
                                     }
                                 );
                             }
-                            resolve(toRet);
                         }
                     });
                 }, function (error) {

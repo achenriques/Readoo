@@ -379,7 +379,7 @@ class FavouritesView extends Component {
                                     <Close/>
                                 </IconButton>
                                 <br/>
-                                <div className="escritoPor">de:  </div><Typography gutterBottom variant='title' style={material_styles.inlineBlock}>
+                                <div className="writtenBy">de:  </div><Typography gutterBottom variant='title' style={material_styles.inlineBlock}>
                                     {data[this.state.selectedCell * (this.state.page + 1)].bookAuthor}
                                 </Typography>
                                 <h3 style={(data[this.state.selectedCell * (this.state.page + 1)].bookDescription)? {marginBottom: '5px'}: {display: 'none'}}>De qué va la cosa...</h3>

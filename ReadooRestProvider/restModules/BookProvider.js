@@ -1,9 +1,11 @@
 const multer = require('multer');
 const path = require('path');
-const encoder64 = require('../Util/functions');
 const functions = require('../util/functions');
 const middleware = require('./middlewares');
 const BookDao = require('../daos/BookDao');
+const LastBookDao = require('../daos/LastBookDao');
+
+const MIN_DB_ID = 0;
 
 const bookStorage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -34,6 +36,7 @@ class BookProvider {
 
     constructor(app, db) {
         this.bookDao = new BookDao(db);
+        this.lastBookDao = new LastBookDao(db);
         this.getBookCover(app); //Get
         this.getAll(app); //Get
         this.deleteOne(app);  //Delete
@@ -47,14 +50,14 @@ class BookProvider {
             let coverName = req.params.cover;
             console.log("Estoy getteando Portada" + nombrePortada);
             if (!coverName) {
-            let coverFile = path.resolve('./ReadooRestProvider/Uploads/coverPages/' + coverName);
+            let coverFile = path.resolve('./ReadooRestProvider/uploads/coverPages/' + coverName);
             if (coverFile) {
                 res.sendfile(coverFile);
             }
             else {
                 console.log(error);
                 res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
-                .send('No archive found!');
+                    .send('No archive found!');
             }
             } else {
             res.status(400)        // HTTP status 400: BadRequest
@@ -85,42 +88,77 @@ class BookProvider {
         app.post('/book', middleware.verifyToken, function (req, res) {
             let lastOne = req.body.last;
             console.log("Deberia cojer n libros " + lastOne);
-            if (lastOne && lastOne.userId && lastOne.lastBookId && lastOne.genres
-                    && lastOne.lastDate && lastOne.nBooks) {
+            if (lastOne && lastOne.userId && lastOne.lastBookId && lastOne.numberOfBooks) {
                 let userId = lastOne.userId;
                 let lastBookId = lastOne.lastBookId;
                 let genres = lastOne.genres;
                 let lastDate = lastOne.lastDate;
-                let numberOfBooks = lastOne.nBooks;
+                let numberOfBooks = lastOne.numberOfBooks;
 
                 if (genres == null) {
                     genres = [];
                 }
-                
-                that.bookDao.getBunchOfBooks(userId, lastBookId, genres, lastDate, numberOfBooks).then(
-                    function (result) {
-                        result.map(function (bookOfBucnh) {
-                            if (bookOfBucnh.coverUrl.length != 0) {
-                                let file = path.resolve('./ReadooRestProvider/Uploads/coverPages/' + bookOfBucnh.coverUrl);
-                                if (file) {
-                                    bookOfBucnh.coverUrl = encoder64(file);
+
+                const getBunchOfBooks = function (userIdParam, lastBookIdParam, genresParam, lastDateParam, numberOfBooksParam) {
+                    that.bookDao.getBunchOfBooks(userIdParam, lastBookIdParam, genresParam, lastDateParam, numberOfBooksParam).then(
+                        function (result) {
+                            let toRet = result.map(function (bookFromBunch) {
+                                // Convert into bool
+                                bookFromBunch.userLikesBook = bookFromBunch.userLikesBook == true;
+                                // Get cover file into base64 
+                                if (bookFromBunch.bookCoverUrl.length !== 0) {
+                                    let file = path.resolve('./ReadooRestProvider/uploads/coverPages/' + bookFromBunch.bookCoverUrl);
+                                    if (file) {
+                                        bookFromBunch.bookCoverUrl = functions.base64_encode(file);
+                                    }
                                 }
+                                return bookFromBunch;
+                            });
+                            return res.header('Content-Type', 'application/json').status(200).json(toRet);
+                        }
+                    ).catch(
+                        function (err) {
+                            let reqError = functions.getRequestError(err);
+                            return res.status(reqError.code) 
+                                .send(reqError.text);
+                        }
+                    );
+                }
+
+                if (lastBookId < MIN_DB_ID) {
+                    that.lastBookDao.getLastBook(+userId).then(
+                        function (resultOfLastBook) {
+                            if (resultOfLastBook.length) {
+                                if (resultOfLastBook && resultOfLastBook[0].bookId != null) {
+                                    lastBookId = resultOfLastBook[0].bookId;
+                                    return getBunchOfBooks(+userId, +lastBookId, genres, lastDate, numberOfBooks)
+                                } else {
+                                    // It could not get the last book of the user so must show err
+                                    res.status(400)        // HTTP status 400: BadRequest
+                                        .send('Missed Id or Data');
+                                }
+                            } else {
+                                return getBunchOfBooks(+userId, 0, genres, lastDate, numberOfBooks)
                             }
-                            return bookOfBucnh;
-                        });
-                        res.setHeader('Content-Type', 'application/json');
-                        return res.status(200).json(toReturn);
-                    }
-                ).catch(
-                    function (err) {
-                        let reqError = functions.getRequestError(err);
-                        return res.status(reqError.code) 
-                            .send(reqError.text);
-                    }
-                );
+                        }
+                    ).catch(
+                        function (err) {
+                            let reqError = functions.getRequestError(err);
+                            return res.status(reqError.code) 
+                                .send(reqError.text);
+                        }
+                    )
+                } else {
+                    that.lastBookDao.addOrUpdateBook(+userId, +lastBookId).catch(
+                        function (err) {
+                            console.log('Error at saving last bookId ' + lastBookId + 'for the userId ' + userId);
+                        }
+                    );
+                    return getBunchOfBooks(userId, lastBookId, genres, lastDate, numberOfBooks)
+                }
             } else {
-                return res.status(400)        // HTTP status 400: BadRequest
-                    .send('Missed Id');
+                res.status(400)        // HTTP status 400: BadRequest
+                    .send('Missed Id or Data');
             }
         });
     }

@@ -23,8 +23,11 @@ class UserLikesBookDao extends DaoManager{
     }
 
     insertOrUpdateUserLike(userId, bookId) {
-        let statement = queries.insertUserLike;
-        return this.executeStatment(statement, [userId, bookId]);
+        let statementUserLikesBook = queries.insertUserLike;
+        let statementBookLikesCounter = queries.updateBookCounter;
+        let operationOfInsert = [statementUserLikesBook, [userId, bookId]];
+        let operationOfUpdate = [statementBookLikesCounter, [+1, +1, bookId]];
+        return this.executeStatmentOnSameTransaction([operationOfInsert, operationOfUpdate]);
     }
     
     updateUserBookLike(userId, bookId, likeBoolean) {
@@ -33,8 +36,11 @@ class UserLikesBookDao extends DaoManager{
     }
 
     deleteUserLikes(userId, bookId) {
-        let statement = queries.deleteUserLikes;
-        return this.executeStatment(statement, [userId, bookId]);
+        let statementDeleteUserLikesBook = queries.deleteUserLikes;
+        let statementBookLikesCounter = queries.updateBookCounter;
+        let operationOfDelete = [statementDeleteUserLikesBook, [userId, bookId]];
+        let operationOfUpdate = [statementBookLikesCounter, [-1, -1, bookId]];
+        return this.executeStatmentOnSameTransaction([operationOfDelete, operationOfUpdate]);
     }        
 }
 

@@ -13,53 +13,71 @@ import StarBorder from 'material-ui/svg-icons/toggle/star-border';
 import Avatar from '@material-ui/core/Avatar';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
+import LS from '../LanguageSelector';
 import material_styles from './material_styles';
 import { NUM_OF_COMENTARIES, REST_FAILURE, REST_SUCCESS, REST_DEFAULT } from '../../constants/appConstants';
 
 class CommentsGrid extends Component {
 
     initialState = {
-        loadedComment: null,  // 1 para loaded, -1 para error
+        loadedComment: REST_DEFAULT,
         bookCommentaries: [],
         newCommentary: '',
         currentBookId: null
     }
 
-    static getDerivedStateFromProps(nextProps, prevState) {
-        /* if(nextProps.getfetchcommentariesSuccess && REST_FAILURE === nextProps.getfetchcommentariesSuccess) {
-            nextProps.recibidoFetchcommentaries();
-            return ({
-                ...prevState,
-                loadedComment: REST_FAILURE
-            });
-        } */
+    constructor(props) {
+        super(props);
+        this.state = { ...this.initialState };
+    };
 
-        if (nextProps.bookId > 0 && nextProps.bookId != prevState.currentBookId/*&& prevState.loadedComment !== REST_DEFAULT*/) {
+    componentDidMount() {
+        if (this.props.bookId && this.props.bookId !== this.state.currentBookId) {
             let lastCommentaryDate = null;
-            if (prevState.bookCommentaries && prevState.bookCommentaries.length) {
-                lastCommentaryDate = new Date(Math.max.apply(null, prevState.bookCommentaries.map(function(e) {
+            if (this.state.bookCommentaries && this.state.bookCommentaries.length) {
+                lastCommentaryDate = new Date(Math.max.apply(null, this.state.bookCommentaries.map(function(e) {
                     return new Date(e.date);
                   })));
             }
             // todo date
-            (nextProps.fetchCommentaries) && nextProps.fetchCommentaries(nextProps.bookId, NUM_OF_COMENTARIES, lastCommentaryDate);
-            return ({ ...prevState, loadedComment: REST_DEFAULT, currentBookId: nextProps.bookId });
-        } else
-        if (nextProps.shownCommentaries == null) {
-            return ({
-                ...prevState,
+            this.props.fetchCommentaries(this.props.bookId, NUM_OF_COMENTARIES, lastCommentaryDate);
+            this.setState({
+                ...this.state,
+                loadedComment: REST_DEFAULT,
+                currentBookId: this.props.bookId
+            });
+        }
+    }
+
+    componentDidUpdate() {
+        // This props contains current props.
+        if (this.props.bookId && this.props.bookId !== this.state.currentBookId) {
+            let lastCommentaryDate = null;
+            if (this.state.bookCommentaries && this.state.bookCommentaries.length) {
+                lastCommentaryDate = new Date(Math.max.apply(null, this.state.bookCommentaries.map(function(e) {
+                    return new Date(e.date);
+                  })));
+            }
+            // todo date
+            this.props.fetchCommentaries(this.props.bookId, NUM_OF_COMENTARIES, lastCommentaryDate);
+            this.setState({
+                ...this.state,
+                loadedComment: REST_DEFAULT,
+                currentBookId: this.props.bookId
+            });
+        } else if (this.props.shownCommentaries === null && this.state.loadedComment === REST_DEFAULT) {
+            this.setState({
+                ...this.state,
                 loadedComment: REST_FAILURE,
                 bookCommentaries: null
-            })
-        } else
-        if (nextProps.shownCommentaries && prevState.loadedComment === REST_DEFAULT) {
-            return ({
-                ...prevState.state,
+            });
+        } else if (this.props.shownCommentaries !== null && this.state.loadedComment === REST_DEFAULT) {
+            this.setState({
+                ...this.state,
                 loadedComment: REST_SUCCESS,
-                comentaries: nextProps.shownCommentaries
+                comentaries: this.props.shownCommentaries
             })
-        } else
-        return null;
+        }
     }
 
     comentaries = [
@@ -113,37 +131,26 @@ class CommentsGrid extends Component {
         },
     ]
 
-    constructor(props) {
-        super(props);
-        this.state = { ...this.initilState };
-    };
-
-    colorAleatorio () {
+    radomColor () {
         let ran = Math.round(Math.random() * 5);
         
         switch (ran) {
             case 0:
-                return 'rgba(159, 159, 237, 0.8)'
-                break;
+                return 'rgba(159, 159, 237, 0.8)';
         
             case 1:
-                return 'rgba(242, 223, 215, 0.8)'
-                break;
+                return 'rgba(242, 223, 215, 0.8)';
 
             case 2:
-                return 'rgba(254, 249, 170, 0.8)'
-                break;
+                return 'rgba(254, 249, 170, 0.8)';
 
             case 3:
-                return 'rgba(72, 190, 255, 0.8)'
-                break;
+                return 'rgba(72, 190, 255, 0.8)';
 
             case 4:
-                return 'rgba(105, 234, 127, 0.8)'
-                break;
+                return 'rgba(105, 234, 127, 0.8)';
             default:
-                return 'rgba(255, 204, 102 , 0.8)'
-                break;
+                return 'rgba(255, 204, 102 , 0.8)';
         }
     }
 
@@ -203,23 +210,23 @@ class CommentsGrid extends Component {
 
     render() {
         switch (this.state.loadedComment) {
-            case -1:
+            case REST_FAILURE:
                 return (
                     <div className="loadingCommentaries">
-                        <h3>Error en la carga de comentaries puede ser un problema de red o fallo del servidor...</h3>
+                        <h3><LS msgId='commentaries.load.error' defaultMsg='Something failed while fetching commentaries'/></h3>
                     </div>
                 )
-            case 0:
+            case REST_DEFAULT:
                 return (
                     <div className="loadingCommentaries">
-                        <h3>Cargando...</h3>
+                        <h3><LS msgId='loading' defaultMsg='Loading...'/></h3>
                     </div>
                 )
 
-            case 1:
+            case REST_SUCCESS:
                 if (this.state.comentaries.length) {
                     return (
-                        <div style={material_styles.styleRoot} >
+                        <div className="styleRoot">
                             <GridList
                                 cols={2}
                                 rows={1.5}
@@ -227,7 +234,7 @@ class CommentsGrid extends Component {
                                 padding={15}
                                 style={material_styles.styleGridList}
                             >
-                            {/*this.props.comentaries*/this.props.comentaries.map((commentaries) => (
+                            {this.props.comentaries.map((commentaries) => (
                                 <Paper elevation={4} >
                                     <GridTile
                                         key={commentaries.commentId}
@@ -249,7 +256,7 @@ class CommentsGrid extends Component {
                                                 <Grid container spacing={24}>
                                                     <Grid item sm={10}>
                                                         <TextField
-                                                            label="Escribe tu respuesta"
+                                                            label={ <LS msgId='write.commentary.answer' defaultMsg='Write an answer...' params={ [140 - this.state.newCommentary.length] } />}
                                                             maxLength="140"
                                                             multiline
                                                             rowsMax="2"
@@ -282,7 +289,7 @@ class CommentsGrid extends Component {
                                 <Grid container spacing={24}>
                                     <Grid item sm={10}>
                                         <TextField
-                                            label="Escribe un commentaries digno de un gran lector"
+                                            label={ <LS msgId='write.commentary' defaultMsg='Write a great commentary, its your time!' params={ [140 - this.state.newCommentary.length] } /> }
                                             maxLength="140"
                                             multiline
                                             rowsMax="2"
@@ -301,10 +308,9 @@ class CommentsGrid extends Component {
                     );  
                 } else {
                     return (
-                        <h3 className="marginNoCommentaries" >No contrates Jastel!</h3>
+                        <h3 className="marginNoCommentaries" ><LS msgId='not.hire.jastel' defaultMsg='Do not hire Jastel!' /></h3>
                     )
                 }
-                break;
         }
     }
 }

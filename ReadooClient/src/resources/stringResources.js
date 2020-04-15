@@ -55,6 +55,12 @@ export default [
         'upload': 'Upload',
         'cancel': 'Cancel',
         'complete.field': 'Complete this field',
+        'couldnt.get.image': 'Oh damn! It wasn´t possible show the cover',
+        'what.book.about': 'What is the book about:',
+        'what.book.opinion': 'What is the owner opinion:',
+        'what.book.likes': '{0} people think the book is cool.',
+        'what.book.by': 'By:',
+        'write.commentary': 'Write here a great commentary about the book (MAX: {0})',
         // Genres
         'theater': 'Theater',
         'drama': 'Drama',
@@ -68,7 +74,10 @@ export default [
         'no.pass.coincidence': 'The old password doesn´t coencide with the password in use.',
         'no.image.preview': 'Image preview not avaliable.',
         'image.not.found': 'Image not found',
-        'data.not.found': 'Some required data has not been provided'
+        'data.not.found': 'Some required data has not been provided',
+        'please.reload': 'Some error has occurred, please try to reload the page. Sorry for the inconveniences!',
+        'commentaries.load.error': 'An error ocurred while fetching commentaries, it might be a fail with the NET or the server...',
+        'not.hire.jastel': 'Bad connection again. Do not play Fornite!',
     },
     // Spanish
     {
@@ -124,19 +133,28 @@ export default [
         'upload': 'Súbelo',
         'cancel': 'Cancelar',
         'complete.field': 'Completa este campo',
+        'couldnt.get.image': 'Oh oh! No se ha cargado la imagen. Que mal!',
+        'what.book.about': 'De qué va el libro:',
+        'what.book.opinion': 'Cuál es la opinión de su dueño:',
+        'what.book.likes': 'A {0} personas les mola el libro.',
+        'what.book.by': 'De:',
+        'write.commentary': 'Escribe aquí un buen comentario (MAX: {0})',
         // Genres
         'theater': 'Teatro',
         'drama': 'Drama',
         // Errores
         'user.id.not.provided': 'Falta el ID de Usuario. Por favor, recarga el módulo y vuelve a intentarlo.',
         'timeout.error': 'Exceso de tiempo durante la carga. Comprueba tu conexión a la red. Si el problema persiste puede ser un fallo del servidor :-/',
-        'failed.save': 'Oh oh... Algo no ha funcionado. Mantén la calma, aquí tienes el número de la esperanza: ' + Math.floor(Math.random() * 1000) + '',
+        'failed.save': 'Oh oh... Algo no ha funcionado. Mantén la calma, aquí tienes el número de la esperanza: {0}',
         'no.user.exists': 'El usuario informado no existe.',
         'wrong.pass': 'Contraseña no valida. Prueba otra vez Hackerman.',
         'no.token.provided': 'La sesión parece haber expirado. Por favor, refresca la pagina y vuelve a entrar para continuar.',
         'no.pass.coincidence': 'La contraseña antigüa no coencide con la contraseña ahora en uso.',
         'no.image.preview': 'Previsualización de imagen no disponible.',
         'image.not.found': 'Imagen no disponible',
-        'data.not.found': 'Falta algún dato requerido'
+        'data.not.found': 'Falta algún dato requerido',
+        'please.reload': 'Ha ocurrido un error, prueba a recargar la página. ¡Disculpa las molestias!',
+        'commentaries.load.error': 'Error en la carga de comentaries puede ser un problema de red o fallo del servidor...',
+        'not.hire.jastel': 'No contrates Jastel!'
     }
 ]

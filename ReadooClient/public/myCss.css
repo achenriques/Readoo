@@ -1,3 +1,10 @@
+.styleRoot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    width: 100%;
+}
+
 .profileGrid{
     margin: 30px;
 }

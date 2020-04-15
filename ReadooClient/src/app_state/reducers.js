@@ -45,19 +45,21 @@ const initialState = {
             bookId: -1,
             bookTitle : 'Has explorados todos los books de tus deseos.',
             bookAuthor: 'Prueba a cambiar tus filtos en tu perfil de usuario.',
-            coverUrl: isEmpty,
+            bookCoverUrl: isEmpty,
             descripcion: '',
             review: '',
-            bookLikes: 0
+            bookLikes: 0,
+            userLikesBook: false
         },
         libroFailure: {
             bookId: -1,
             bookTitle : 'Jope! Se ha producido un error de red...',
             bookAuthor: 'Prueba a refrescar la aplicación o espera a que el problema se resuelva.',
-            coverUrl: noInternet,
+            bookCoverUrl: noInternet,
             descripcion: '',
             review: '',
-            bookLikes: 0
+            bookLikes: 0,
+            userLikesBook: false
         },
         currentBook: 0,
         shownBooks: [],
@@ -299,17 +301,11 @@ const books = (state = initialState.books, { type, payload, data }) => {
                 currentBook: 0,
             }
         }
-        return toRet;
-
-    case successType(actionTypes.I_LIKE_BOOK):
-        console.log(actionTypes.I_LIKE_BOOK);
-        // In this case it isnt necessary do an action
-        break;
-      
+        return toRet;      
 
     case successType(actionTypes.FETCH_LIBROS):
       console.log(successType(actionTypes.FETCH_LIBROS));
-        if (payload.primeraVez) {
+        if (payload.firstTime) {
             return {
                 ...state,
                 shownBooks: data.data,
@@ -344,6 +340,13 @@ const comentaries = (state = initialState.comentaries, { type, payload, data }) 
         return {
             ...state,
             bookCommentaries: data.data,
+        }
+
+        case failureType(actionTypes.FETCH_COMMENTARIES):
+        console.log(successType(actionTypes.FETCH_COMMENTARIES));
+        return {
+            ...state,
+            bookCommentaries: null,
         }
 
         default:

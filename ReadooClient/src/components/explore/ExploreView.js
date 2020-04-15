@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchBooks, nextBook, doLikeBook, doDislikeBook } from '../../app_state/actions';
+import { fetchBooks, nextBook, doLikeBook, doDislikeBook, reportErrorMessage, actionTypes } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -18,9 +18,14 @@ import ExpandMoreIcon from 'material-ui/svg-icons/navigation/expand-more';
 import ExpandLessIcon from 'material-ui/svg-icons/navigation/expand-less';
 import Divider from '@material-ui/core/Divider';
 import CommentsGrid from '../common/CommentsGrid';
-import { NUM_OF_BOOKS, DISPLAY_NONE } from '../../constants/appConstants';
+import LS from '../LanguageSelector';
+import { NUM_OF_BOOKS, DISPLAY_NONE, LANGUAGE_SPANISH } from '../../constants/appConstants';
+import noBookDefaultEs from '../../resources/loadingBookEs.svg';
+import noBookDefaultEn from '../../resources/loadingBookEn.svg';
 import bookDefault from '../../resources/bookDefault.gif';
 import material_styles from './material_styles';
+
+const FIRST_TIME_BOOK_ID = -1;
 
 class ExploreView extends Component {
 
@@ -35,6 +40,7 @@ class ExploreView extends Component {
             bookDescription: '',
             bookReview: '',
             bookLikes: 0,
+            userLikesBook: false
         },
         likeBook: false,
         bookCoverErr: false,
@@ -42,16 +48,22 @@ class ExploreView extends Component {
         expanded: false,
     };
 
+    constructor(props) {
+        super(props);
+        this.state = { ...this.initilState };
+    };
+
     loadCurrentBookFromProps (props) {
         console.log(props.shownBooks[props.bookIndex]);
         if (props.shownBooks.length > 0 || props.bookIndex > -1) {
-            let bookCover;
-            if (props.shownBooks.length === 1)
-                bookCover = props.shownBooks[props.bookIndex].coverUrl;
-            else if (props.shownBooks[props.bookIndex].coverUrl)
-                bookCover = 'data:image/png;base64, ' + props.shownBooks[props.bookIndex].coverUrl;
-            else
-                bookCover =  bookDefault;
+            let bookCoverUrl;
+            if (props.shownBooks.length === 1) {
+                bookCoverUrl = props.shownBooks[props.bookIndex].bookCoverUrl;
+            } else if (props.shownBooks[props.bookIndex].bookCoverUrl) {
+                bookCoverUrl = 'data:image/png;base64, ' + props.shownBooks[props.bookIndex].bookCoverUrl;
+            } else {
+                bookCoverUrl =  bookDefault;
+            }
             
             this.setState({
                 ...this.state,
@@ -59,35 +71,50 @@ class ExploreView extends Component {
                     bookId: props.shownBooks[props.bookIndex].bookId,
                     bookTitle: props.shownBooks[props.bookIndex].bookTitle,
                     bookAuthor: props.shownBooks[props.bookIndex].bookAuthor,
-                    bookCover: bookCover,
-                    bookDescription: props.shownBooks[props.bookIndex].descripcion,
-                    bookReview: props.shownBooks[props.bookIndex].review,
+                    bookCoverUrl: bookCoverUrl,
+                    bookDescription: props.shownBooks[props.bookIndex].bookDescription,
+                    bookReview: props.shownBooks[props.bookIndex].bookReview,
                     bookLikes: +props.shownBooks[props.bookIndex].bookLikes,
+                    userLikesBook: +props.shownBooks[props.bookIndex].userLikesBook
                 },
-                bookCoverErr: (!props.shownBooks[props.bookIndex].coverUrl)? "Oh oh! No se ha cargado la imagen. Que mal!": '',
+                bookCoverErr: (!props.shownBooks[props.bookIndex].bookCoverUrl) 
+                        ? LS.getStringMsg('couldnt.get.image', 'Image didn´t load properly') : '',
+                likeBook: props.shownBooks[props.bookIndex].userLikesBook == true
             });
-        } else {
-
         }
     }
 
-    constructor(props) {
-        super(props);
-        this.state = { ...this.initilState };
-    };
-
     componentDidMount() {
-        this.props.fetchBooks(0, [], true);
+        if (this.props.currentUserId && this.props.currentUserGenres) {
+            this.props.fetchBooks(this.props.currentUserId, FIRST_TIME_BOOK_ID, this.props.currentUserGenres, true);
+        } else {
+            // throw err
+            this.props.reportErrorMessage(LS.getStringMsg('please.reload', 'An error has occurred!'));
+        }
+        let currentLanguage = this.props.appLanguage;
+        if (currentLanguage !== null) {
+            this.setState({
+                ...this.state,
+                currentBook: {
+                    ...this.state.currentBook,
+                    bookCoverUrl: LANGUAGE_SPANISH === currentLanguage ? noBookDefaultEs : noBookDefaultEn
+                }
+            })
+        }
     }
 
-    componentWillReceiveProps(newProps) {
-        this.loadCurrentBookFromProps (newProps);
+    componentDidUpdate = () => {
+        // This props contains current props.
+        if (this.props.shownBooks.length && this.state.currentBook.bookId === null) {
+            this.loadCurrentBookFromProps (this.props);
+        }
     }
 
     handleBack(evt) {
         this.setState({
             ...this.state,
-            bookCoverErr: (!this.state.previousBook.bookCover)? "Oh oh! No se ha cargado la imagen. Que mal!": '',
+            bookCoverErr: (!this.state.previousBook.bookCoverUrl) 
+                    ? LS.getStringMsg('couldnt.get.image', 'Image didn´t load properly') : '',
             currentBook: { ...this.state.previousBook },
             previousBook: null,
             isPreviousBook: true,
@@ -122,14 +149,17 @@ class ExploreView extends Component {
         }
     }
 
+    getIsPossibleToHandleLike() {
+        return !this.props.loadingProcesses.includes(actionTypes.I_LIKE_BOOK);
+    }
     handleLike(evt) {
-        if (!this.state.likeBook) {
+        if (this.getIsPossibleToHandleLike() && !this.state.likeBook) {
             const closeHeart = () => {
                 setTimeout(()=>{
                     this.setState(
                         {
                             ...this.state,
-                            currentBook: { ...this.state.currentBook, bookLikes: this.state.currentBook.bookLikes +1},
+                            currentBook: { ...this.state.currentBook, bookLikes: this.state.currentBook.bookLikes + 1 },
                             showHeart: 0,
                             likeBook: true,
                         }
@@ -137,7 +167,6 @@ class ExploreView extends Component {
                 }, 1000);
             }
 
-            // (this.props.enviandoMegusta === false) && 
             this.props.doLikeBook(this.state.currentBook.bookId, this.props.currentUserId);
             this.setState(
                 {
@@ -149,13 +178,14 @@ class ExploreView extends Component {
     }
 
     handleUnlike(evt) {
-        if (this.state.likeBook) {
+        if (this.getIsPossibleToHandleLike() && this.state.likeBook) {
             const closeHeart = () => {
+                let newBookLikes = this.state.currentBook.bookLikes > 0 ? this.state.currentBook.bookLikes - 1 : 0
                 setTimeout(()=>{
                     this.setState(
                         {
                             ...this.state,
-                            currentBook: { ...this.state.currentBook, bookLikes: this.state.currentBook.bookLikes -1},
+                            currentBook: { ...this.state.currentBook, bookLikes: newBookLikes },
                             showHeart: 0,
                             likeBook: false
                         }
@@ -163,7 +193,6 @@ class ExploreView extends Component {
                 }, 1000);
             }
             
-            // (this.props.enviandoMegusta === false) && 
             this.props.doDislikeBook(this.state.currentBook.bookId, this.props.currentUserId);
             this.setState(
                 {
@@ -183,7 +212,7 @@ class ExploreView extends Component {
         })
     }
 
-    // Devuelve el estilo de doble click sobre la imagen
+    // Returns the style when a double click is done
     heartType = (typeId) => {
         switch (typeId) {
             case 0:
@@ -211,15 +240,15 @@ class ExploreView extends Component {
                     >
                     <div className='imageExplore'>
                         <IconButton onClick={this.handleBack.bind(this)} style={material_styles.styleLeftArrow} disabled={(this.state.previousBook)? false: true}>
-                            <ArrowLeft style={(this.state.previousBook)? material_styles.styleArrows: DISPLAY_NONE} />
+                            <ArrowLeft style={(this.state.previousBook)? material_styles.styleArrows : DISPLAY_NONE} />
                         </IconButton>
                         <IconButton onClick={this.handleForward.bind(this)} style={material_styles.styleRightArrow} disabled={this.props.shownBooks.length === 1}>
-                            <ArrowRight style={(this.props.shownBooks.length > 1)? material_styles.styleArrows: DISPLAY_NONE} />
+                            <ArrowRight style={(this.props.shownBooks.length > 1)? material_styles.styleArrows : DISPLAY_NONE} />
                         </IconButton >
-                        <div style= {(this.state.bookCoverErr.length)? { color: 'red', paddingTop: '1em' }: DISPLAY_NONE}>
+                        <div style= {(this.state.bookCoverErr.length)? { color: 'red', paddingTop: '1em' } : DISPLAY_NONE}>
                             { this.state.bookCoverErr }
                         </div>
-                        <img src={this.state.currentBook.bookCover} alt="" className="imageExplore" onDoubleClick={this.handleDbClickImage.bind(this)}/>
+                        <img src={this.state.currentBook.bookCoverUrl} alt="" className="imageExplore" onDoubleClick={this.handleDbClickImage.bind(this)}/>
                         <Favorite style={ this.heartType(this.state.showHeart) } />
                     </div>
                     </CardMedia>
@@ -228,18 +257,18 @@ class ExploreView extends Component {
                         <Typography gutterBottom variant='headline'>
                             {this.state.currentBook.bookTitle}
                         </Typography>
-                        <div className="escritoPor">de:  </div><Typography gutterBottom variant='title' style={material_styles.inlineBlock}>
+                        <div className="writtenBy"><LS msgId='what.book.by' defaultMsg='By:'/></div><Typography gutterBottom variant='title' style={material_styles.inlineBlock}>
                             {this.state.currentBook.bookAuthor}
                         </Typography>
-                        <h3 style={(this.state.currentBook.bookDescription)? {marginBottom: '5px'}: {display: 'none'}}>De qué va la cosa... TODO</h3>
+                        <h3 style={(this.state.currentBook.bookDescription) ? { paddingLeft: '15px', marginBottom: '5px' }: { display: 'none' }}><LS msgId='what.book.about' defaultMsg='Explanation about the book'/></h3>
                         {this.state.currentBook.bookDescription}
                         <br/>
-                        <h4 style={(this.state.currentBook.bookReview)? {marginBottom: '5px'}: {display: 'none'}}>Qué opina... TODO</h4>
+                        <h4 style={(this.state.currentBook.bookReview) ? { paddingLeft: '15px', marginBottom: '5px' }: { display: 'none' }}><LS msgId='what.book.opinion' defaultMsg='Opinion by the book owner'/></h4>
                         {this.state.currentBook.bookReview}
                     </CardContent>
                     <CardActions>
                         {(this.state.currentBook.bookId)
-                            ? (<div>Son {this.state.currentBook.bookLikes} los que piensan que este libro mola
+                            ? (<div><LS msgId='what.book.likes' defaultMsg='Likes' params={ [this.state.currentBook.bookLikes] } />
                                 <Button size='small' disableRipple disableFocusRipple variant='flat' onClick={this.handleDbClickImage.bind(this)} style={material_styles.backgroundTransparent}>
                                     <Favorite style={{...material_styles.styleFavorite, fill: (this.state.likeBook)? 'red': ''}} />
                                 </Button>
@@ -252,7 +281,6 @@ class ExploreView extends Component {
                     </CardActions>
                     <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
                         <CardContent>
-                            { /* Grid of comentaries */ }
                             <CommentsGrid bookId={this.state.currentBook.bookId} />
                         </CardContent>
                     </Collapse>
@@ -266,14 +294,16 @@ export default connect(
     (state) => ({
         bookIndex: appState.getBookIndex(state),
         shownBooks: appState.getBooks(state),
-        currentUserId: appState.getUserId(state)
-        // TODO
-        // enviandoMegusta: appState.getEnviandoMeGusta(state) */
+        currentUserId: appState.getUserId(state),
+        currentUserGenres: appState.getUserGenres(state),
+        appLanguage: appState.getAppLanguage(state),
+        loadingProcesses: appState.getLoadingProcesses(state)
     }),
     (dispatch) => ({
-        fetchBooks: (lastBookId, genres, primeraVez) => dispatch(fetchBooks(lastBookId, genres, primeraVez)),
+        fetchBooks: (userId, lastBookId, genres, primeraVez) => dispatch(fetchBooks(userId, lastBookId, genres, primeraVez)),
         nextBook: () => dispatch(nextBook()),
         doLikeBook: (bookId, userId) => dispatch(doLikeBook(bookId, userId)),
         doDislikeBook: (bookId, userId) => dispatch(doDislikeBook(bookId, userId)),
+        reportErrorMessage: (errorMsg) => dispatch(reportErrorMessage(errorMsg))
     })
 )(ExploreView);

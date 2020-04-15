@@ -13,7 +13,7 @@ class LastBookDao extends DaoManager {
     }
 
     getLastBook(userId) {
-        let statement = queries.allLastBooks;
+        let statement = queries.lastUsersBook;
         return this.executeStatment(statement, [userId]);
     }
 

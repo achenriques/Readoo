@@ -142,10 +142,10 @@ const doDislikeBook = (bookId, userId) => ({
     promise: userApi.doDislikeBook(bookId, userId)
 })
 
-const fetchBooks = (lastBookId, genres, firstTime) => ({
+const fetchBooks = (userId, lastBookId, genres, firstTime) => ({
     type: actionTypes.FETCH_LIBROS,
     payload: { firstTime: firstTime },
-    promise: bookApi.fetchBooks(lastBookId, genres, NUM_OF_BOOKS)
+    promise: bookApi.fetchBooks(+userId, +lastBookId, genres, NUM_OF_BOOKS)
 })
 
 const fetchMoreBooks = (lastBookId, genres) => ({
