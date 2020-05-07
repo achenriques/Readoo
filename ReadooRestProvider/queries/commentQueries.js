@@ -2,22 +2,20 @@ module.exports = {
     allCommentary: "SELECT * FROM userCommentsBook ;",
     oneBookCommentaries: "SELECT * FROM userCommentsBook WHERE bookId = ? ;",
     subcommentaries: "SELECT * FROM userCommentsBook WHERE libro_bookId = ? AND commentFatherId = ? ;",
-    buchOfCommentaries: "SELECT c.commentId, c.userId, c.bookId, c.commentDate, c.commentText, " +
-        " c.commentFatherId, c2.commentId AS commentId2, c2.userId AS userId2, c2.commentDate AS commentDate2, " + 
-        " c2.commentText AS commentText2, u.userAvatarUrl, u2.userAvatarUrl AS userAvatarUrl2" + 
+    bunchOfCommentaries: "SELECT c.commentId, c.userId, u.userNick, u.userAvatarUrl, c.bookId, c.commentDate, " +
+        " c.commentText, c.commentFatherId " +
         " FROM userCommentsBook c INNER JOIN appUser u ON c.userId = u.userId " +
-        " LEFT JOIN userCommentsBook c2 ON c.commentFatherId IS NOT NULL AND c.commentFatherId = c2.commentId " +
-        " LEFT JOIN appUser u2 ON c2.userId = u2.userId " +
-        " WHERE c.bookId = ? AND c.commentDate < ? " + 
+        " WHERE c.bookId = ? AND c.commentFatherId IS NULL AND c.commentDate < ? AND c.commentVisible = TRUE " + 
         " ORDER BY c.commentDate DESC LIMIT ? ;",
-    buchOfCommentariesWithoutDate: "SELECT c.commentId, c.userId, c.bookId, c.commentDate, c.commentText, " +
-        " c.commentFatherId, c2.commentId AS commentId2, c2.userId AS userId2, c2.commentDate AS commentDate2, " + 
-        " c2.commentText AS commentText2, u.userAvatarUrl, u2.userAvatarUrl AS userAvatarUrl2" + 
+    bunchOfCommentariesWithoutDate: "SELECT c.commentId, c.userId, u.userNick, u.userAvatarUrl, c.bookId, c.commentDate, " +
+        " c.commentText, c.commentFatherId " +
         " FROM userCommentsBook c INNER JOIN appUser u ON c.userId = u.userId " +
-        " LEFT JOIN userCommentsBook c2 ON c.commentFatherId IS NOT NULL AND c.commentFatherId = c2.commentId " +
-        " LEFT JOIN appUser u2 ON c2.userId = u2.userId " +
-        " WHERE c.bookId = ? " + 
-        " GROUP BY c.commentId, c.userId, c.bookId, c.commentDate, c.commentText, u.userAvatarUrl, c.commentFatherId, u.userAvatarUrl " +
+        " WHERE c.bookId = ? AND c.commentFatherId IS NULL AND c.commentVisible = TRUE " + 
+        " ORDER BY c.commentDate DESC LIMIT ? ;",
+    bunchOfSubCommentaries: "SELECT c.commentId, c.userId, u.userNick, u.userAvatarUrl, c.bookId, c.commentDate, " +
+        " c.commentText, c.commentFatherId " +
+        " FROM userCommentsBook c INNER JOIN appUser u ON c.userId = u.userId " +
+        " WHERE c.bookId = ? AND c.commentFatherId IN (?) AND c.commentVisible = TRUE " + 
         " ORDER BY c.commentDate DESC LIMIT ? ;",
     insertOne: "INSERT INTO userCommentsBook (commentId, userId, bookId, commentDate, commentText, commentFatherId, commentVisible) " + 
         "VALUES ( 0, ?, ?, CURRENT_TIMESTAMP(), ?, ?, 1) ; ",

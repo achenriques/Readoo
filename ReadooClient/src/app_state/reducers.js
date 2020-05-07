@@ -394,7 +394,7 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
             return {
                 ...state,
                 failed_processes: failed_processes1,
-                loading_process: loading_processes1,
+                loading_processes: loading_processes1,
                 succeed_processes: succeed_processes1
             }
 
@@ -472,6 +472,8 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
                     }
                     return {
                         ...state,
+                        loading_processes: loading_processes2,
+                        succeed_processes: succeed_processes2,
                         failed_processes: failed_processes2,
                         failure: nextFailure,
                         loading: (state.loading < 0) ? 0 : state.loading - 1
@@ -481,7 +483,9 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
                     loading_processes2.push(nameOfProcess);
                     return {
                         ...state,
-                        loading_process: loading_processes2,
+                        loading_processes: loading_processes2,
+                        succeed_processes: succeed_processes2,
+                        failed_processes: failed_processes2,
                         loading: state.loading + 1
                     };
 
@@ -489,6 +493,8 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
                     succeed_processes2.push(nameOfProcess);
                     return {
                         ...state,
+                        loading_processes: loading_processes2,
+                        failed_processes: failed_processes2,
                         succeed_processes: succeed_processes2,
                         loading: (state.loading < 0) ? 0 : state.loading - 1
                     };

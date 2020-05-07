@@ -3,6 +3,56 @@
     flex-wrap: wrap;
     justify-content: space-around;
     width: 100%;
+    margin: 15px;
+    padding: 15px;
+}
+
+.styleChildren {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    width: 85%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    text-align: left;
+    float: right;
+    /*
+    max-height: 10;
+    overflowY: 'auto';
+    */
+}
+
+.styleGridList {
+    width: 100%;
+    height: auto;
+    overflow-y: auto;
+    margin-bottom: 30px;
+}
+
+.styleChildrenList {
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.styleSendButton {
+    bottom: 2px;
+    position: absolute;
+}
+
+.styleCommentSeparator {
+    width: 95%;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 5px;
+}
+
+.commentMargin {
+    margin-bottom: 15px;
+}
+
+.commentBackground {
+    background-color: #eeeeee;
 }
 
 .profileGrid{
@@ -11,6 +61,13 @@
 
 .primaryButton {
     margin: 5px;
+}
+
+.verticalDivider {
+    width: 1px;
+    height: 100%;
+    margin: auto;
+    border-right: 1px solid black;
 }
 
 .profileAvatarColumn {
@@ -108,3 +165,30 @@
     text-align: right;
     margin-right: 30px;
 }
+
+.divCommentaryAnswer {
+    width: 100%;
+}
+
+.commentListTileBar {
+    position: relative;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.7) 0%, rgba(0, 0, 0 , 0.3) 50%,rgba(0,0,0,0) 100%);
+    margin-bottom: 5px;
+}
+
+.commentListTileBar2 {
+    position: relative;
+    background: linear-gradient(to bottom right, rgba(255,255,255,0.7) 0%, rgba(0, 0, 0 , 0.2) 50%,rgba(0,0,0,0) 100%);
+    margin-bottom: 5px;
+}
+
+.commentaryNickName {
+    color: black;
+    padding-left: 10px;
+}
+
+/*
+.divCommentaryAnswerSubCommentary {
+
+}
+*/

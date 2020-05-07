@@ -152,6 +152,7 @@ class ExploreView extends Component {
     getIsPossibleToHandleLike() {
         return !this.props.loadingProcesses.includes(actionTypes.I_LIKE_BOOK);
     }
+    
     handleLike(evt) {
         if (this.getIsPossibleToHandleLike() && !this.state.likeBook) {
             const closeHeart = () => {
@@ -272,17 +273,24 @@ class ExploreView extends Component {
                                 <Button size='small' disableRipple disableFocusRipple variant='flat' onClick={this.handleDbClickImage.bind(this)} style={material_styles.backgroundTransparent}>
                                     <Favorite style={{...material_styles.styleFavorite, fill: (this.state.likeBook)? 'red': ''}} />
                                 </Button>
-                                <Button disableRipple size="small" variant='flat' onClick={this.handleCollapse.bind(this)} style={material_styles.styleExpandComentaries}>{(this.state.expanded)? "Ocultar comentaries": "Ver Comentarios"}
+                                <Button 
+                                    disableRipple 
+                                    size="small" 
+                                    variant='flat' 
+                                    onClick={this.handleCollapse.bind(this)} 
+                                    style={material_styles.styleExpandComentaries}
+                                >
+                                    {(this.state.expanded)? <LS msgId='hide.commentaries' defaultMsg='Hide comments'/> : <LS msgId='show.commentaries' defaultMsg='Show comments'/>}
                                     {(this.state.expanded)? (<ExpandLessIcon />): (<ExpandMoreIcon />)}
                                 </Button >
                             </div>)
                             : (<div></div>)
                         }
                     </CardActions>
-                    <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
-                        <CardContent>
+                    <Collapse in={this.state.expanded} timeout="auto" direction="right" mountOnEnter unmountOnExit>
+                        <div className="commentBackground">
                             <CommentsGrid bookId={this.state.currentBook.bookId} />
-                        </CardContent>
+                        </div>                        
                     </Collapse>
                 </Card>
             </div>

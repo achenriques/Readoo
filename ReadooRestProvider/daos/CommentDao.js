@@ -19,14 +19,18 @@ class BookDao extends DaoManager{
 
     getBunchOfCommentaries(bookId, commentDate, comentLimit) {
         let statement = "";
-        let resultSet = null;
         if (commentDate) {
-            statement = queries.buchOfCommentaries;
+            statement = queries.bunchOfCommentaries;
             return this.executeStatment(statement, [bookId, commentDate, comentLimit]);
         } else {
-            statement = queries.buchOfCommentariesWithoutDate;
+            statement = queries.bunchOfCommentariesWithoutDate;
             return this.executeStatment(statement, [bookId, comentLimit]);
         }
+    }
+
+    getBunchOfSubCommentaries(bookId, commentaryIds, comentLimit) {
+        let statement = queries.bunchOfSubCommentaries;;
+        return this.executeStatment(statement, [bookId, commentaryIds, comentLimit]);        
     }
 
     addCommentary(userId, bookId, commentary, commentFatherId) {

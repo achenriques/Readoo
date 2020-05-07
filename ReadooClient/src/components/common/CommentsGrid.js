@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchCommentaries, sendComment } from '../../app_state/actions';
+import { fetchCommentaries, sendComment, actionTypes } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Grid from '@material-ui/core/Grid';
 // TODO change GridList
-import { GridList, GridTile } from 'material-ui/GridList';
+import { GridList, GridListTile, GridListTileBar } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import Send from 'material-ui/svg-icons/content/send';
@@ -14,7 +14,7 @@ import Avatar from '@material-ui/core/Avatar';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import LS from '../LanguageSelector';
-import material_styles from './material_styles';
+import avatarDefault from '../../resources/avatarDefault.svg';
 import { NUM_OF_COMENTARIES, REST_FAILURE, REST_SUCCESS, REST_DEFAULT } from '../../constants/appConstants';
 
 class CommentsGrid extends Component {
@@ -22,8 +22,7 @@ class CommentsGrid extends Component {
     initialState = {
         loadedComment: REST_DEFAULT,
         bookCommentaries: [],
-        newCommentary: '',
-        currentBookId: null
+        currentBookId: null,
     }
 
     constructor(props) {
@@ -65,17 +64,17 @@ class CommentsGrid extends Component {
                 loadedComment: REST_DEFAULT,
                 currentBookId: this.props.bookId
             });
-        } else if (this.props.shownCommentaries === null && this.state.loadedComment === REST_DEFAULT) {
+        } else if (this.state.loadedComment === REST_DEFAULT && !this.isLoading() && this.props.shownCommentaries === null) {
             this.setState({
                 ...this.state,
                 loadedComment: REST_FAILURE,
                 bookCommentaries: null
             });
-        } else if (this.props.shownCommentaries !== null && this.state.loadedComment === REST_DEFAULT) {
+        } else if (this.state.loadedComment === REST_DEFAULT && !this.isLoading() && this.props.shownCommentaries !== null) {
             this.setState({
                 ...this.state,
                 loadedComment: REST_SUCCESS,
-                comentaries: this.props.shownCommentaries
+                bookCommentaries: this.props.shownCommentaries
             })
         }
     }
@@ -85,29 +84,29 @@ class CommentsGrid extends Component {
             commentId: 1,
             userName: "Minervo",
             commentaries: "Ou la la!",
-            subcommentaries: []
+            subCommentaries: []
         },
         {   
             commentId: 2,
             userName: "Minervo",
             commentaries: "Ou la la!",
-            subcommentaries: []
+            subCommentaries: []
         },
         {   
             commentId: 3,
             userName: "Minervo",
             commentaries: "Ou la lelo!",
-            subcommentaries: [ 
+            subCommentaries: [ 
                 {
                     commentId: 13,
                     userName: "Minervo",
                     commentaries: "Me gusta lo que has dicho",
-                    subcommentaries: []
+                    subCommentaries: []
                 },  {
                     commentId: 14,
                     userName: "Minerv1",
                     commentaries: "Adios vella",
-                    subcommentaries: []
+                    subCommentaries: []
                 } 
             ]
         },
@@ -115,19 +114,19 @@ class CommentsGrid extends Component {
             commentId: 4,
             userName: "Minervo",
             commentaries: "Ou la la!",
-            subcommentaries: []
+            subCommentaries: []
         },
         {   
             commentId: 5,
             userName: "Minervo",
             commentaries: "Ou la la!",
-            subcommentaries: []
+            subCommentaries: []
         },
         {   
             commentId: 6,
             userName: "Minervo",
             commentaries: "Ou la la!",
-            subcommentaries: []
+            subCommentaries: []
         },
     ]
 
@@ -154,57 +153,90 @@ class CommentsGrid extends Component {
         }
     }
 
-    changeNewCommentaries (evt) {
-        (evt) && this.setState({
-            ...this.state,
-            newCommentary: evt.currentTarget.value
-        })
+    isLoading() {
+        return this.props.loadingProcesses.includes(actionTypes.FETCH_COMMENTARIES);
     }
 
-    sendCommentary (evt, commentId, bookId) {
-        if (this.state.newCommentary) {
-            let commentText = this.state.newCommentary.trim();
+    changeNewCommentaries (textFieldId, evt) {
+        if (textFieldId && evt) {
+            let nameOfErrorParam = "commentError_" + textFieldId;
+            let nameOfNewParam = "newCommentary_" + textFieldId;
+            this.setState({
+                ...this.state,
+                [nameOfNewParam]: evt.currentTarget.value,
+                [nameOfErrorParam]: undefined
+            });
+        }
+    }
 
-            this.props.sendCommentary(commentId, bookId, this.props.currentUserId, 
-                this.props.currentUser.userNick, commentText);
+    sendCommentary (evt, commentFatherId, bookId, textFieldId) {
+        let nameOfParam = "newCommentary_" + textFieldId;
+        if (this.state[nameOfParam]) {
+            let commentText = this.state[nameOfParam].trim();
+            if (commentText.length) {
+                // Send commentary to the server
+                this.props.sendCommentary(commentFatherId, bookId, this.props.currentUserId, commentText);
+            } else {
+                let nameOfErrorParam = "commentError_" + textFieldId;
+                let statusText = LS.getStringMsg('error.empty.commentary', 'Text can not be empty!');
+                this.setState({
+                    ...this.state,
+                    [nameOfErrorParam]: statusText
+                });
+            }
         }
     }
 
     showSubcommentaries (commentaries) {
-        if (commentaries.subcommentaries.length) {
+        if (commentaries && commentaries.subCommentaries && commentaries.subCommentaries.length) {
             return (
                 <div>
                     <div className="commentariesAnswer">
-                        {(commentaries.subcommentaries.length > 1)? 'Respuestas': 'Respuesta'}
+                        <LS msgId='answer' defaultMsg='Answers' params={[(commentaries.subCommentaries.length > 1)? 's': '']}/>
                     </div>
-                    <div style={material_styles.styleChildren} >
+                    <div className="styleChildren">
                         <GridList
-                            cols={1}
+                            cols={2}
+                            rows={1.5}
                             cellHeight='auto'
-                            padding={10}
-                            style={material_styles.styleChildrenList}
+                            padding={15}
+                            className="styleChildrenList"
                         >
-                        {commentaries.subcommentaries.map((subComment) => (
-                            <Paper elevation={1} >
-                                <GridTile
-                                    key={subComment.commentId}
-                                    title={subComment.userName}
-                                    actionIcon={<IconButton><StarBorder color="white" style={{width: '30px', heigth: '30px' }}><Avatar src="" /></StarBorder></IconButton>}
-                                    actionPosition="left"
-                                    titlePosition="top"
-                                    titleBackground={"linear-gradient(to bottom, rgba(255,255,255,0.7) 0%, rgba(0, 0, 0 , 0.3) 50%,rgba(0,0,0,0) 100%)"}
-                                    titleStyle={{color: 'black', heigth: '30px'}}
+                        {commentaries.subCommentaries.map((subCommentary) => (
+                            <Paper key={subCommentary.commentId} elevation={4} variant="outlined" className="commentMargin">
+                                <GridListTile
+                                    key={subCommentary.commentId}
+                                    style={{heigth: '30px'}}
                                     cols={1}
                                     rows={1}
                                 >
-                                    <div className='divCommentaries'> {subComment.commentaries} </div>
-                                </GridTile>
+                                    <GridListTileBar
+                                        title={<h4><span className="commentaryNickName">{subCommentary.userNick}</span></h4>}
+                                        titlePosition="top"
+                                        actionPosition="left"
+                                        actionIcon={<IconButton><Avatar src={(subCommentary.userAvatarUrl !== null) ? subCommentary.userAvatarUrl : avatarDefault} /></IconButton>}
+                                        className="commentListTileBar2"
+                                    />
+                                    <Grid container spacing={24}>
+                                        <Grid item sm={1}>
+                                            <div className="verticalDivider"/>
+                                        </Grid>
+                                        <Grid item sm={11}>
+                                            <div>
+                                                <div className='divCommentaries'> {subCommentary.commentText} </div>
+                                                <Divider className="styleCommentSeparator"/>
+                                            </div>
+                                        </Grid>
+                                    </Grid>
+                                </GridListTile>
                             </Paper>
                         ))}
                         </GridList>
                     </div>
                 </div>
             )
+        } else {
+            return (<div/>)
         }
     }
 
@@ -213,7 +245,7 @@ class CommentsGrid extends Component {
             case REST_FAILURE:
                 return (
                     <div className="loadingCommentaries">
-                        <h3><LS msgId='commentaries.load.error' defaultMsg='Something failed while fetching commentaries'/></h3>
+                        <h3><LS msgId='commentaries.load.error' defaultMsg='Something failed while fetching commentaries. Sorry!'/></h3>
                     </div>
                 )
             case REST_DEFAULT:
@@ -224,7 +256,7 @@ class CommentsGrid extends Component {
                 )
 
             case REST_SUCCESS:
-                if (this.state.comentaries.length) {
+                if (this.state.bookCommentaries.length) {
                     return (
                         <div className="styleRoot">
                             <GridList
@@ -232,50 +264,90 @@ class CommentsGrid extends Component {
                                 rows={1.5}
                                 cellHeight='auto'
                                 padding={15}
-                                style={material_styles.styleGridList}
+                                className="styleGridList"
                             >
-                            {this.props.comentaries.map((commentaries) => (
-                                <Paper elevation={4} >
-                                    <GridTile
-                                        key={commentaries.commentId}
-                                        title={commentaries.userName}
-                                        actionIcon={<IconButton><StarBorder color="white" ><Avatar src="" /></StarBorder></IconButton>}
-                                        actionPosition="left"
-                                        titlePosition="top"
-                                        titleBackground={"linear-gradient(to bottom right, rgba(255,255,255,0.7) 0%, rgba(0, 0, 0 , 0.2) 50%,rgba(0,0,0,0) 100%)"}
-                                        titleStyle={{color: 'black' }}
+                            {this.state.bookCommentaries.map((commentary) => (
+                                <Paper key={commentary.commentId} elevation={4} variant="outlined" className="commentMargin">
+                                    <GridListTile
+                                        key={commentary.commentId}
                                         style={{heigth: '30px'}}
                                         cols={1}
                                         rows={1}
                                     >
-                                        <div>
-                                            <div className='divCommentaries'> {commentaries.commentaries} </div>
-                                            <Divider style={material_styles.styleCommentSeparator}/>
-                                            {this.showSubcommentaries(commentaries)}
-                                            <div className="divCommentaryAnswer">
-                                                <Grid container spacing={24}>
-                                                    <Grid item sm={10}>
-                                                        <TextField
-                                                            label={ <LS msgId='write.commentary.answer' defaultMsg='Write an answer...' params={ [140 - this.state.newCommentary.length] } />}
-                                                            maxLength="140"
-                                                            multiline
-                                                            rowsMax="2"
-                                                            fullWidth={true}
-                                                            onChange={this.changeNewCommentaries.bind(this)}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item sm={1}>
-                                                        <IconButton color="primary" onClick={() => {this.sendCommentary(this, null, this.props.bookId)}} style={material_styles.styleSendButton}>
-                                                            <Send/>
-                                                        </IconButton>
-                                                    </Grid>
-                                                </Grid>
-                                            </div>
-                                        </div>
-                                    </GridTile>
+                                        <GridListTileBar
+                                            title={<h4><span className="commentaryNickName">{commentary.userNick}</span></h4>}
+                                            titlePosition="top"
+                                            actionPosition="left"
+                                            actionIcon={<IconButton><Avatar src={(commentary.userAvatarUrl !== null) ? commentary.userAvatarUrl : avatarDefault} /></IconButton>}
+                                            className="commentListTileBar"
+                                        />
+                                        <Grid container spacing={24}>
+                                            <Grid item sm={1}>
+                                                <div className="verticalDivider"/>
+                                            </Grid>
+                                            <Grid item sm={11}>
+                                                <div>
+                                                    <div className='divCommentaries'> {commentary.commentText} </div>
+                                                    {this.showSubcommentaries(commentary)}
+                                                    <div className="divCommentaryAnswerSubCommentary">
+                                                        <Grid container spacing={24}>
+                                                            <Grid item sm={10}>
+                                                                <TextField
+                                                                    error={this.state["commentError_" + commentary.commentId]  !== undefined}
+                                                                    helperText={(this.state["commentError_" + commentary.commentId]  !== undefined) ? this.state["commentError_" + commentary.commentId]: ""}
+                                                                    label={ <LS msgId='write.commentary.answer' defaultMsg='Write an answer...' params={ [(this.state["newCommentary_" + commentary.commentId] !== undefined) ? 140 - this.state["newCommentary_" + commentary.commentId].length : 140] } /> } 
+                                                                    maxLength="140"
+                                                                    multiline
+                                                                    rowsMax="2"
+                                                                    fullWidth={true}
+                                                                    onChange={this.changeNewCommentaries.bind(this, "" + commentary.commentId)}
+                                                                />
+                                                            </Grid>
+                                                            <Grid item sm={1}>
+                                                                <IconButton 
+                                                                    color="primary" 
+                                                                    disabled={this.isLoading()}
+                                                                    onClick={() => {this.sendCommentary(this, commentary.commentId, this.props.bookId, "" + commentary.commentId)}} 
+                                                                    className="styleSendButton"
+                                                                >
+                                                                    <Send/>
+                                                                </IconButton>
+                                                            </Grid>
+                                                        </Grid>
+                                                    </div>
+                                                </div>
+                                            </Grid>
+                                        </Grid>
+                                    </GridListTile>
                                 </Paper>
                             ))}
                             </GridList>
+                            <div className="divCommentaryAnswer">
+                                <Grid container spacing={24}>
+                                    <Grid item sm={10}>
+                                        <TextField
+                                            error={this.state["commentError_new"] !== undefined}
+                                            helperText={(this.state["commentError_new"]  !== undefined) ? this.state["commentError_new"]: ""}
+                                            label={ <LS msgId='write.commentary' defaultMsg='Write a great commentary, its your time!' params={ [(this.state["newCommentary_new"] !== undefined) ? 140 - this.state["newCommentary_new"].length : 140] } /> } 
+                                            maxLength="140"
+                                            multiline
+                                            rowsMax="2"
+                                            fullWidth={true}
+                                            onChange={this.changeNewCommentaries.bind(this, "new")}
+                                        />
+                                    </Grid>
+                                    <Grid item sm={1} style={{position: 'relative'}}>
+                                        <IconButton 
+                                            color="primary"
+                                            disabled={this.isLoading()}
+                                            onClick={() => {this.sendCommentary(this, null, this.props.bookId, "new")}} 
+                                            className="styleSendButton"
+                                        >
+                                            <Send/>
+                                        </IconButton>
+                                    </Grid>
+                                </Grid>
+                            </div>
                         </div>
                     );
                 }
@@ -284,21 +356,28 @@ class CommentsGrid extends Component {
                 if (this.props.bookId > 0) {
                     return (
                         <div>
-                            <h3 className="marginNoCommentaries" >No hay ningún commentaries. Sé tu el primero en romper el hielo...</h3>
+                            <h3 className="marginNoCommentaries" ><LS msgId='no.commentaries.yet' defaultMsg='No commentaries yet. Write a commentary, its your time!' /></h3>
                             <div className="divCommentaryAnswer">
                                 <Grid container spacing={24}>
                                     <Grid item sm={10}>
                                         <TextField
-                                            label={ <LS msgId='write.commentary' defaultMsg='Write a great commentary, its your time!' params={ [140 - this.state.newCommentary.length] } /> }
+                                            error={this.state["commentError_new"] !== undefined}
+                                            helperText={(this.state["commentError_new"]  !== undefined) ? this.state["commentError_new"]: ""}
+                                            label={ <LS msgId='write.commentary' defaultMsg='Write a great commentary, its your time!' params={ [(this.state["newCommentary_new"] !== undefined) ? 140 - this.state["newCommentary_new"].length : 140] } /> } 
                                             maxLength="140"
                                             multiline
                                             rowsMax="2"
                                             fullWidth={true}
-                                            onChange={this.changeNewCommentaries.bind(this)}
+                                            onChange={this.changeNewCommentaries.bind(this, "new")}
                                         />
                                     </Grid>
                                     <Grid item sm={1} style={{position: 'relative'}}>
-                                        <IconButton color="primary" onClick={() => {this.sendCommentary(this, null, this.props.bookId)}} style={material_styles.styleSendButton}>
+                                        <IconButton 
+                                            color="primary"
+                                            disabled={this.isLoading()}
+                                            onClick={() => {this.sendCommentary(this, null, this.props.bookId, "new")}} 
+                                            className="styleSendButton"
+                                        >
                                             <Send/>
                                         </IconButton>
                                     </Grid>
@@ -317,11 +396,12 @@ class CommentsGrid extends Component {
 
 export default connect(
     (state) => ({
+        currentUserId: appState.getUserId(state),
         shownCommentaries: appState.getCommentaries(state),
-        // TODO getfetchcommentariesSuccess: appState.getfetchcommentariesSuccess(state)
+        loadingProcesses: appState.getLoadingProcesses(state)
     }),
     (dispatch) => ({
         fetchCommentaries: (bookId, nCommentaries, lastDate) => dispatch(fetchCommentaries(bookId, nCommentaries, lastDate)),
-        sendCommentary: (commentId, bookId, userId, commentaries) => dispatch(sendComment(commentId, bookId, userId, commentaries)),
+        sendCommentary: (commentFatherId, bookId, userId, commentaries) => dispatch(sendComment(commentFatherId, bookId, userId, commentaries)),
     })
 )(CommentsGrid);

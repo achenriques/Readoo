@@ -1,7 +1,8 @@
+const path = require('path');
 const constants = require('../util/constants');
 const functions = require('../util/functions');
-const CommentDao = require('../daos/CommentDao');
 const middleware = require('./middlewares');
+const CommentDao = require('../daos/CommentDao');
 
 class CommentProvider {
     
@@ -97,43 +98,74 @@ class CommentProvider {
                     function (resultSet) {
                         // Commentaries are prcessed to group their children
                         let toRet = [];
+                        let principalIds = [];
                         resultSet.forEach(function(c, index, rSet) {
-                            let commentaryToRet = toRet.find(function(comment) {
-                                return comment.commentId === c.commentId;
-                            });
-                            if (commentaryToRet !== undefined) {
-                                // If the commentary exits in toRet array thats means the
-                                //  id is unique so we only have to add the new subComments...
-                                commentaryToRet.subcommentaries.push({
-                                    commentId: c.commentId2, 
-                                    userId: c.userId2, 
-                                    bookId: c.bookId, 
-                                    date: c.commentDate2,
-                                    userAvatarUrl: c.userAvatarUrl2, 
-                                    commentFatherId: null,
-                                    subcommentaries: []
-                                });
-                            } else {
-                                toRet.push({
-                                    commentId: c.commentId, 
-                                    userId: c.userId, 
-                                    bookId: c.bookId, 
-                                    date: c.commentDate,
-                                    userAvatarUrl: c.userAvatarUrl, 
-                                    commentFatherId: c.commentFatherId,
-                                    subcommentaries: (c.commentId2 != null) ? [{
-                                        commentId: c.commentId2, 
-                                        userId: c.userId2, 
-                                        bookId: c.bookId, 
-                                        date: c.commentDate2,
-                                        userAvatarUrl: c.userAvatarUrl2, 
-                                        commentFatherId: null,
-                                        subcommentaries: null
-                                    }] : []
-                                });
+                            // Parse the image
+                            if (c.userAvatarUrl != null && c.userAvatarUrl.length !== 0) {
+                                let file = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + c.userAvatarUrl);
+                                if (file) {
+                                    c.userAvatarUrl = 'data:image/png;base64, ' + functions.base64_encode(file);
+                                }
                             }
+
+                            principalIds.push(c.commentId);
+
+                            toRet.push({
+                                commentId: c.commentId, 
+                                commentText: c.commentText, 
+                                userId: c.userId,
+                                userNick: c.userNick,
+                                userAvatarUrl: c.userAvatarUrl, 
+                                bookId: c.bookId, 
+                                date: c.commentDate,
+                                commentFatherId: null,
+                                subCommentaries: []
+                            });
                         });
-                        return res.header('Content-Type', 'application/json').send(JSON.stringify(toRet));
+
+                        if (principalIds.length) {
+                            that.commentDao.getBunchOfSubCommentaries(+bookId, principalIds, constants.MAX_COMMENTARIES).then(
+                                function (resultSet2) {
+                                    resultSet2.forEach(function(c, index, rSet) {
+                                        // Parse the image
+                                        if (c.userAvatarUrl != null && c.userAvatarUrl.length !== 0) {
+                                            let file2 = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + c.userAvatarUrl);
+                                            if (file2) {
+                                                c.userAvatarUrl = 'data:image/png;base64, ' + functions.base64_encode(file2);
+                                            }
+                                        }
+            
+                                        let principalCommentary = toRet.find(function(principalCommentary) {
+                                            return principalCommentary.commentId == c.commentFatherId;
+                                        });
+    
+                                        if (principalCommentary != null) {
+                                            principalCommentary.subCommentaries.push({
+                                                commentId: c.commentId, 
+                                                commentText: c.commentText, 
+                                                userId: c.userId,
+                                                userNick: c.userNick,
+                                                userAvatarUrl: c.userAvatarUrl, 
+                                                bookId: c.bookId, 
+                                                date: c.commentDate,
+                                                commentFatherId: c.commentFatherId,
+                                                subCommentaries: []
+                                            })
+                                        }
+                                    });
+                                    return res.header('Content-Type', 'application/json').status(200).json(toRet);
+                                }
+                            ).catch(
+                                function (err) {
+                                    // Sql Err
+                                    let reqError = functions.getRequestError(err);
+                                    return res.status(reqError.code)
+                                        .send(reqError.text);
+                                }
+                            );
+                        } else {
+                            return res.header('Content-Type', 'application/json').status(200).json(toRet);
+                        }
                     }
                 ).catch(
                     function (err) {
@@ -153,11 +185,11 @@ class CommentProvider {
     insertOne(app, db) {
         const that = this;
         app.post('/commentary/new', middleware.verifyToken, function (req, res) {
-            let commentary = req.body.comentario;
-            console.log("Estoy insertando comentario " + commentary);     
-            if (commentary && commentary.userId && commentary.bookId && commentary.commentary) {
-                that.commentDao.addCommentary(+commentary.userId, +commentary.bookId, 
-                        commentary.commentary, +commentary.commentFatherId).then(
+            let commentInfo = req.body;
+            console.log("Estoy insertando comentario " + commentInfo);     
+            if (commentInfo && commentInfo.userId && commentInfo.bookId && commentInfo.commentText) {
+                that.commentDao.addCommentary(+commentInfo.userId, +commentInfo.bookId, 
+                    commentInfo.commentText, (commentInfo.commentFatherId != null) ? +commentInfo.commentFatherId : null).then(
                     function (result) {
                         return res.header('Content-Type', 'application/json').send(JSON.stringify(result));
                     }

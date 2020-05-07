@@ -61,6 +61,10 @@ export default [
         'what.book.likes': '{0} people think the book is cool.',
         'what.book.by': 'By:',
         'write.commentary': 'Write here a great commentary about the book (MAX: {0})',
+        'no.commentaries.yet': 'No commentaries yet. Yours will be the first, just do it!',
+        'hide.commentaries': 'Hide commentaries',
+        'show.commentaries': 'Show commentaries',
+        'answer': 'Answer{0}',
         // Genres
         'theater': 'Theater',
         'drama': 'Drama',
@@ -139,6 +143,10 @@ export default [
         'what.book.likes': 'A {0} personas les mola el libro.',
         'what.book.by': 'De:',
         'write.commentary': 'Escribe aquí un buen comentario (MAX: {0})',
+        'no.commentaries.yet': 'No hay comentarios todavía. ¡Sé el primero en escribir!',
+        'hide.commentaries': 'Ocultar comentarios',
+        'show.commentaries': 'Mostrar comentarios',
+        'answer': 'Respuesta{0}',
         // Genres
         'theater': 'Teatro',
         'drama': 'Drama',

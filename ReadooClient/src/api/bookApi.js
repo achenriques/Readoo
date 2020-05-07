@@ -53,13 +53,13 @@ const fetchCommentaries = (bookId, nCommentaries, lastDate) => axios.post(
     }
 )
 
-const sendComment = (commentId, bookId, userId, comentText, commentFatherId) => axios.post(
+const sendComment = (commentFatherId, bookId, userId, commentText) => axios.post(
     `${baseURL}/commentary/new`,
     {
-        commentId,
+        commentFatherId,
         bookId,
         userId,
-        comentText
+        commentText
     }
 )
 
