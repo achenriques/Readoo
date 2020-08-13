@@ -64,6 +64,7 @@ export default [
         'no.commentaries.yet': 'No commentaries yet. Yours will be the first, just do it!',
         'hide.commentaries': 'Hide commentaries',
         'show.commentaries': 'Show commentaries',
+        'number.of.answers': '{0} answers',
         'answer': 'Answer{0}',
         // Genres
         'theater': 'Theater',
@@ -146,6 +147,7 @@ export default [
         'no.commentaries.yet': 'No hay comentarios todavía. ¡Sé el primero en escribir!',
         'hide.commentaries': 'Ocultar comentarios',
         'show.commentaries': 'Mostrar comentarios',
+        'number.of.answers': '{0} respuestas',
         'answer': 'Respuesta{0}',
         // Genres
         'theater': 'Teatro',

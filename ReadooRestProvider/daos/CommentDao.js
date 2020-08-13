@@ -28,6 +28,12 @@ class BookDao extends DaoManager{
         }
     }
 
+    getNumberOfSubCommentaries(commentaryIdsList) {
+        let statement = "";
+        statement = queries.getNumberOfSubCommentaries;
+        return this.executeStatment(statement, [commentaryIdsList]);
+    }
+
     getBunchOfSubCommentaries(bookId, commentaryIds, comentLimit) {
         let statement = queries.bunchOfSubCommentaries;;
         return this.executeStatment(statement, [bookId, commentaryIds, comentLimit]);        

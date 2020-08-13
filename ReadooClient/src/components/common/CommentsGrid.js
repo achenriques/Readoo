@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchCommentaries, sendComment, actionTypes } from '../../app_state/actions';
+import { fetchCommentaries, fetchSubCommentaries, sendComment, actionTypes } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Grid from '@material-ui/core/Grid';
-// TODO change GridList
 import { GridList, GridListTile, GridListTileBar } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
+import Collapse from '@material-ui/core/Collapse';
 import Send from 'material-ui/svg-icons/content/send';
-// FIXME borrar start
-import StarBorder from 'material-ui/svg-icons/toggle/star-border';
+import ExpandMoreIcon from 'material-ui/svg-icons/navigation/expand-more';
+import ExpandLessIcon from 'material-ui/svg-icons/navigation/expand-less';
+import SubCommentsGrid from './SubCommentsGrid';
 import Avatar from '@material-ui/core/Avatar';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
@@ -22,7 +24,9 @@ class CommentsGrid extends Component {
     initialState = {
         loadedComment: REST_DEFAULT,
         bookCommentaries: [],
+        bookSubCommentaries: [],
         currentBookId: null,
+        showSubcommentariesFatherId: null
     }
 
     constructor(props) {
@@ -39,7 +43,11 @@ class CommentsGrid extends Component {
                   })));
             }
             // todo date
-            this.props.fetchCommentaries(this.props.bookId, NUM_OF_COMENTARIES, lastCommentaryDate);
+            if (this.props.commentFatherId === null) {
+                this.props.fetchCommentaries(this.props.bookId, NUM_OF_COMENTARIES, lastCommentaryDate);
+            } else {
+                this.props.fetchSubCommentaries(this.props.bookId, this.props.commentFatherId, NUM_OF_COMENTARIES, lastCommentaryDate);
+            }
             this.setState({
                 ...this.state,
                 loadedComment: REST_DEFAULT,
@@ -170,6 +178,7 @@ class CommentsGrid extends Component {
     }
 
     sendCommentary (evt, commentFatherId, bookId, textFieldId) {
+        evt.stopPropagation();
         let nameOfParam = "newCommentary_" + textFieldId;
         if (this.state[nameOfParam]) {
             let commentText = this.state[nameOfParam].trim();
@@ -185,6 +194,31 @@ class CommentsGrid extends Component {
                 });
             }
         }
+    }
+
+    handleCollapseSubs (evt, commentaryId) {
+        console.log("I made click on show subcommentaries of: " + commentaryId);
+        if (commentaryId !== null) {
+            let nameOfParam = "expandSubs_" + commentaryId;
+            if (this.state[nameOfParam] !== undefined) {
+                // Close the expand
+                this.setState({
+                    ...this.state,
+                    [nameOfParam]: undefined
+                });
+            } else {
+                this.setState({
+                    ...this.state,
+                    [nameOfParam]: true
+                });
+            }
+            
+        }
+    }
+
+    handleAvatarClick (evt, userId) {
+        evt.stopPropagation();
+        console.log("I made click on avatar: " + userId);
     }
 
     showSubcommentaries (commentaries) {
@@ -278,7 +312,7 @@ class CommentsGrid extends Component {
                                             title={<h4><span className="commentaryNickName">{commentary.userNick}</span></h4>}
                                             titlePosition="top"
                                             actionPosition="left"
-                                            actionIcon={<IconButton><Avatar src={(commentary.userAvatarUrl !== null) ? commentary.userAvatarUrl : avatarDefault} /></IconButton>}
+                                            actionIcon={<IconButton onClick={(evt) => this.handleAvatarClick(evt, commentary.userId)}><Avatar src={(commentary.userAvatarUrl !== null) ? commentary.userAvatarUrl : avatarDefault} /></IconButton>}
                                             className="commentListTileBar"
                                         />
                                         <Grid container spacing={24}>
@@ -288,7 +322,24 @@ class CommentsGrid extends Component {
                                             <Grid item sm={11}>
                                                 <div>
                                                     <div className='divCommentaries'> {commentary.commentText} </div>
-                                                    {this.showSubcommentaries(commentary)}
+                                                    {(commentary.nSubCommentaries > 0)
+                                                        ? ( <div>
+                                                                <Button 
+                                                                    disableRipple 
+                                                                    size="small" 
+                                                                    variant='flat' 
+                                                                    onClick={(evt) => this.handleCollapseSubs(evt, commentary.commentId)}
+                                                                >
+                                                                    {(this.state.expanded)? <LS msgId='hide.commentaries' defaultMsg='Hide comments'/> : <LS msgId='show.commentaries' defaultMsg='Show subcomments'/>}
+                                                                    {(this.state.expanded)? (<ExpandLessIcon />): (<ExpandMoreIcon />)}
+                                                                </Button >
+                                                                <Collapse in={this.state["expandSubs_" + commentary.commentId]} timeout="auto" direction="right" mountOnEnter unmountOnExit>
+                                                                    <div className="commentBackground">
+                                                                        <SubCommentsGrid bookId={this.state.currentBookId} commentFatherId={commentary.commentId}/>
+                                                                    </div>                        
+                                                                </Collapse>
+                                                            </div>) : (<div/>)
+                                                    }
                                                     <div className="divCommentaryAnswerSubCommentary">
                                                         <Grid container spacing={24}>
                                                             <Grid item sm={10}>
@@ -398,10 +449,12 @@ export default connect(
     (state) => ({
         currentUserId: appState.getUserId(state),
         shownCommentaries: appState.getCommentaries(state),
+        shownSubCommentaries: appState.getSubCommentaries(state),
         loadingProcesses: appState.getLoadingProcesses(state)
     }),
     (dispatch) => ({
         fetchCommentaries: (bookId, nCommentaries, lastDate) => dispatch(fetchCommentaries(bookId, nCommentaries, lastDate)),
+        fetchSubCommentaries: (bookId, fatherCommentaryId, nCommentaries, lastDate) => dispatch(fetchSubCommentaries(bookId, fatherCommentaryId, nCommentaries, lastDate)),
         sendCommentary: (commentFatherId, bookId, userId, commentaries) => dispatch(sendComment(commentFatherId, bookId, userId, commentaries)),
     })
 )(CommentsGrid);

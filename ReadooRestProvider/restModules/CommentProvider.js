@@ -11,8 +11,8 @@ class CommentProvider {
         this.commentDao = new CommentDao(db);
         this.getAll(app);       //Get
         this.getOne(app);       //Get
-        this.getSubs(app);      //Get
         this.getBunch(app);     //Post
+        this.getSubs(app);      //Post
         this.deleteOne(app);    //Delete
         this.dissableOne(app);  //Post
         this.insertOne(app);    //Post
@@ -43,32 +43,6 @@ class CommentProvider {
             console.log("Estoy getteando " + bookId);     
             if (bookId) {
                 that.commentDao.getCommentaryById(+bookId).then(
-                    function (result) {
-                        return res.header('Content-Type', 'application/json').send(JSON.stringify(result));
-                    }
-                ).catch(
-                    function (err) {
-                        // Sql Err
-                        let reqError = functions.getRequestError(err);
-                        return res.status(reqError.code)
-                            .send(reqError.text);
-                    }
-                );
-            } else {
-                res.status(400)        // HTTP status 400: BadRequest
-                .send('Missed Id');
-            }            
-        });
-    }
-
-    getSubs(app) {
-        const that = this;
-        app.get('/commentary/:id/:commentId', middleware.verifyToken, function (req, res) {
-            let bookId = req.params.id;
-            let fatherCommentId = req.params.commentId;
-            console.log("Estoy getteando " + bookId);     
-            if (bookId && fatherCommentId) {
-                that.commentDao.getSubCommentaries(+bookId, +fatherCommentId).then(
                     function (result) {
                         return res.header('Content-Type', 'application/json').send(JSON.stringify(result));
                     }
@@ -119,38 +93,22 @@ class CommentProvider {
                                 bookId: c.bookId, 
                                 date: c.commentDate,
                                 commentFatherId: null,
+                                nSubCommentaries: 0,
                                 subCommentaries: []
                             });
                         });
 
                         if (principalIds.length) {
-                            that.commentDao.getBunchOfSubCommentaries(+bookId, principalIds, constants.MAX_COMMENTARIES).then(
+                            that.commentDao.getNumberOfSubCommentaries(principalIds).then(
                                 function (resultSet2) {
-                                    resultSet2.forEach(function(c, index, rSet) {
+                                    resultSet2.forEach(function(nC, index, rSet) {
                                         // Parse the image
-                                        if (c.userAvatarUrl != null && c.userAvatarUrl.length !== 0) {
-                                            let file2 = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + c.userAvatarUrl);
-                                            if (file2) {
-                                                c.userAvatarUrl = 'data:image/png;base64, ' + functions.base64_encode(file2);
-                                            }
-                                        }
-            
                                         let principalCommentary = toRet.find(function(principalCommentary) {
-                                            return principalCommentary.commentId == c.commentFatherId;
+                                            return principalCommentary.commentId == nC.commentFatherId;
                                         });
     
                                         if (principalCommentary != null) {
-                                            principalCommentary.subCommentaries.push({
-                                                commentId: c.commentId, 
-                                                commentText: c.commentText, 
-                                                userId: c.userId,
-                                                userNick: c.userNick,
-                                                userAvatarUrl: c.userAvatarUrl, 
-                                                bookId: c.bookId, 
-                                                date: c.commentDate,
-                                                commentFatherId: c.commentFatherId,
-                                                subCommentaries: []
-                                            })
+                                            principalCommentary.nSubCommentaries = nC.nAnswers;
                                         }
                                     });
                                     return res.header('Content-Type', 'application/json').status(200).json(toRet);
@@ -166,6 +124,56 @@ class CommentProvider {
                         } else {
                             return res.header('Content-Type', 'application/json').status(200).json(toRet);
                         }
+                    }
+                ).catch(
+                    function (err) {
+                        // Sql Err
+                        let reqError = functions.getRequestError(err);
+                        return res.status(reqError.code)
+                            .send(reqError.text);
+                    }
+                );
+            } else {
+                res.status(400)        // HTTP status 400: BadRequest
+                .send('Missed Id');
+            }            
+        });
+    }
+
+    getSubs(app) {
+        const that = this;
+        app.post('/commentary/fetchSubs', middleware.verifyToken, function (req, res) {
+            let bookId = req.body.bookId;
+            let fatherId = req.body.fatherCommentaryId;
+            let lastDate = req.body.lastDate;
+            console.log("Estoy cogiendo comentario " + bookId);     
+            if (bookId, fatherCommentaryId) {
+                that.commentDao.getBunchOfSubCommentaries(+bookId, [+fatherId], lastDate, constants.MAX_COMMENTARIES).then(
+                    function (resultSet) {
+                        // Commentaries are prcessed to group their children
+                        let toRet = [];
+                        resultSet.forEach(function(c, index, rSet) {
+                            // Parse the image
+                            if (c.userAvatarUrl != null && c.userAvatarUrl.length !== 0) {
+                                let file = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + c.userAvatarUrl);
+                                if (file) {
+                                    c.userAvatarUrl = 'data:image/png;base64, ' + functions.base64_encode(file);
+                                }
+                            }
+
+                            toRet.push({
+                                commentId: c.commentId, 
+                                commentText: c.commentText, 
+                                userId: c.userId,
+                                userNick: c.userNick,
+                                userAvatarUrl: c.userAvatarUrl, 
+                                bookId: c.bookId, 
+                                date: c.commentDate,
+                                commentFatherId: c.commentFatherId,
+                                subCommentaries: []
+                            });
+                        });
+                        return res.header('Content-Type', 'application/json').status(200).json(toRet);
                     }
                 ).catch(
                     function (err) {

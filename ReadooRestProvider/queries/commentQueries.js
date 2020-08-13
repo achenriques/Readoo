@@ -17,6 +17,7 @@ module.exports = {
         " FROM userCommentsBook c INNER JOIN appUser u ON c.userId = u.userId " +
         " WHERE c.bookId = ? AND c.commentFatherId IN (?) AND c.commentVisible = TRUE " + 
         " ORDER BY c.commentDate DESC LIMIT ? ;",
+    getNumberOfSubCommentaries: 'SELECT commentFatherId, count(commentFatherId) AS nAnswers FROM usercommentsbook WHERE commentFatherId IN (?) GROUP BY commentFatherId ; ',
     insertOne: "INSERT INTO userCommentsBook (commentId, userId, bookId, commentDate, commentText, commentFatherId, commentVisible) " + 
         "VALUES ( 0, ?, ?, CURRENT_TIMESTAMP(), ?, ?, 1) ; ",
     dissableCommentary: "UPDATE userCommentsBook SET commentVissible = 0 WHERE bookId = ? ; ",

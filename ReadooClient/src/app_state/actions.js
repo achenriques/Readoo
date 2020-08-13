@@ -26,6 +26,7 @@ const actionTypes = {
     FETCH_LIBROS: 'FETCH_LIBROS',
     FETCH_MORE_BOOKS: 'FETCH_MORE_BOOKS',
     FETCH_COMMENTARIES: 'FETCH_COMMENTARIES',
+    FETCH_SUB_COMMENTARIES: 'FETCH_SUB_COMMENTARIES',
     FETCH_USER_DATA: 'FETCH_USER_DATA',
     FETCH_USER_AVATAR: 'FETCH_USER_AVATAR',
     SAVE_USER_DATA: 'SAVE_USER_DATA',
@@ -199,6 +200,11 @@ const fetchCommentaries = (bookId, nCommentaries, lastDate) => ({
     promise: bookApi.fetchCommentaries(bookId, nCommentaries, lastDate)
 })
 
+const fetchSubCommentaries = (bookId, fatherCommentaryId, nCommentaries, lastDate) => ({
+    type: actionTypes.FETCH_SUB_COMMENTARIES,
+    promise: bookApi.fetchSubCommentaries(bookId, fatherCommentaryId, nCommentaries, lastDate)
+})
+
 const fetchUserData = (userId) => ({
     type: actionTypes.FETCH_USER_DATA,
     promise: userApi.fetchUserData(userId)
@@ -255,6 +261,7 @@ export {
     doDislikeBook,
     fetchBooks,
     fetchCommentaries,
+    fetchSubCommentaries,
     fetchMoreBooks,
     fetchUserData,
     fetchUserGenres,

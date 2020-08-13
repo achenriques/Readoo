@@ -53,6 +53,16 @@ const fetchCommentaries = (bookId, nCommentaries, lastDate) => axios.post(
     }
 )
 
+const fetchSubCommentaries = (bookId, fatherCommentaryId, nCommentaries, lastDate) => axios.post(
+    `${baseURL}/commentary/fetchSubs`,
+    {
+        bookId,
+        fatherCommentaryId,
+        nCommentaries,
+        lastDate
+    }
+)
+
 const sendComment = (commentFatherId, bookId, userId, commentText) => axios.post(
     `${baseURL}/commentary/new`,
     {
@@ -69,5 +79,6 @@ export default {
     fetchMoreBooks,
     fetchGenres,
     fetchCommentaries,
+    fetchSubCommentaries,
     sendComment
 }

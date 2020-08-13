@@ -68,6 +68,7 @@ const initialState = {
     },
     comentaries: {
         bookCommentaries: [],
+        bookSubCommentaries: [],
     },
     genres: {
         all: [],
@@ -342,11 +343,25 @@ const comentaries = (state = initialState.comentaries, { type, payload, data }) 
             bookCommentaries: data.data,
         }
 
+        case successType(actionTypes.FETCH_SUB_COMMENTARIES):
+        console.log(successType(actionTypes.FETCH_SUB_COMMENTARIES));
+        return {
+            ...state,
+            bookSubCommentaries: data.data,
+        }
+
         case failureType(actionTypes.FETCH_COMMENTARIES):
         console.log(successType(actionTypes.FETCH_COMMENTARIES));
         return {
             ...state,
             bookCommentaries: null,
+        }
+
+        case failureType(actionTypes.FETCH_SUB_COMMENTARIES):
+        console.log(successType(actionTypes.FETCH_SUB_COMMENTARIES));
+        return {
+            ...state,
+            bookSubCommentaries: null,
         }
 
         default:
@@ -540,6 +555,7 @@ export const getUserGenres = (state) => state.genres.userGenres;
 export const getBookIndex = (state) => state.books.currentBook;
 export const getBooks = (state) => state.books.shownBooks;
 export const getCommentaries = (state) => state.comentaries.bookCommentaries;
+export const getSubCommentaries = (state) => state.comentaries.bookSubCommentaries;
 export const getLoadingStatus = (state) => state.controllerStatus.loading;
 export const getFailingStatus = (state) => state.controllerStatus.failure;
 export const getFailedProcesses = (state) => state.controllerStatus.failed_processes;

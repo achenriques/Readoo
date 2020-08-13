@@ -236,7 +236,7 @@ class ExploreView extends Component {
         return (
             <div>
                 <Card>
-                    <CardMedia style={material_styles.styleCard}
+                    <CardMedia style={material_styles.styleCard} src="empty"
                     //overlay={<CardTitle title="Overlay title" subtitle="Overlay subtitle" />}
                     >
                     <div className='imageExplore'>
@@ -289,7 +289,7 @@ class ExploreView extends Component {
                     </CardActions>
                     <Collapse in={this.state.expanded} timeout="auto" direction="right" mountOnEnter unmountOnExit>
                         <div className="commentBackground">
-                            <CommentsGrid bookId={this.state.currentBook.bookId} />
+                            <CommentsGrid bookId={this.state.currentBook.bookId} commentFatherId={null}/>
                         </div>                        
                     </Collapse>
                 </Card>
