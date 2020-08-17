@@ -22,6 +22,12 @@ export default {
         textAlign: 'center'
     },
 
+    styleCardRoot: {
+        position: 'absolute',
+        height: '100%',
+        width: '100%'
+    },
+
     styleLeftArrow: {
         position: 'absolute',
         height: '100%',

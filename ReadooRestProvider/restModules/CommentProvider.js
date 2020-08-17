@@ -94,7 +94,6 @@ class CommentProvider {
                                 date: c.commentDate,
                                 commentFatherId: null,
                                 nSubCommentaries: 0,
-                                subCommentaries: []
                             });
                         });
 
@@ -147,8 +146,8 @@ class CommentProvider {
             let fatherId = req.body.fatherCommentaryId;
             let lastDate = req.body.lastDate;
             console.log("Estoy cogiendo comentario " + bookId);     
-            if (bookId, fatherCommentaryId) {
-                that.commentDao.getBunchOfSubCommentaries(+bookId, [+fatherId], lastDate, constants.MAX_COMMENTARIES).then(
+            if (bookId, fatherId) {
+                that.commentDao.getBunchOfSubCommentaries(+bookId, [+fatherId], constants.MAX_COMMENTARIES).then(
                     function (resultSet) {
                         // Commentaries are prcessed to group their children
                         let toRet = [];
@@ -170,7 +169,6 @@ class CommentProvider {
                                 bookId: c.bookId, 
                                 date: c.commentDate,
                                 commentFatherId: c.commentFatherId,
-                                subCommentaries: []
                             });
                         });
                         return res.header('Content-Type', 'application/json').status(200).json(toRet);

@@ -17,14 +17,14 @@ class BookDao extends DaoManager{
         return this.executeStatment(statement, [bookId]);
     }
 
-    getBunchOfCommentaries(bookId, commentDate, comentLimit) {
+    getBunchOfCommentaries(bookId, commentDate, commentLimit) {
         let statement = "";
         if (commentDate) {
             statement = queries.bunchOfCommentaries;
-            return this.executeStatment(statement, [bookId, commentDate, comentLimit]);
+            return this.executeStatment(statement, [bookId, commentDate, commentLimit]);
         } else {
             statement = queries.bunchOfCommentariesWithoutDate;
-            return this.executeStatment(statement, [bookId, comentLimit]);
+            return this.executeStatment(statement, [bookId, commentLimit]);
         }
     }
 
@@ -34,9 +34,9 @@ class BookDao extends DaoManager{
         return this.executeStatment(statement, [commentaryIdsList]);
     }
 
-    getBunchOfSubCommentaries(bookId, commentaryIds, comentLimit) {
+    getBunchOfSubCommentaries(bookId, commentaryIds, commentLimit) {
         let statement = queries.bunchOfSubCommentaries;;
-        return this.executeStatment(statement, [bookId, commentaryIds, comentLimit]);        
+        return this.executeStatment(statement, [bookId, commentaryIds, commentLimit]);        
     }
 
     addCommentary(userId, bookId, commentary, commentFatherId) {

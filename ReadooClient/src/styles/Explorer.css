@@ -1,0 +1,72 @@
+.styleFavorite {
+    height: 1em;
+}
+
+.inlineBlock {
+    display: inline-block;
+}
+
+.width50 {
+    width: 50%;
+}
+
+.styleCard {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    position: relative;
+    width: 99%;
+    max-height: 500px;
+    min-height: 100px;
+    text-align: center;
+}
+
+.styleCardRoot {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.styleLeftArrow {
+    position: absolute;
+    height: 100%;
+    width: 77px;
+    /* top: '50%'; */
+    left: 20px
+}
+
+.styleRightArrow {
+    position: absolute;
+    height: 100%;
+    width: 77px;
+    /* top: '50%'; */
+    right: 20px
+}
+
+.styleArrows {
+    position: relative;
+    height: 75px;
+    width: 75px;
+    color: #969696
+}
+
+.heartStyle {
+    position: absolute;
+    height: 100px;
+    width: 100px;
+    top: 50%;
+    left: 45%;
+}
+
+.styleExpandComentaries {
+    margin-left: 300px;
+}
+
+.backgroundTransparent {
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.backgroundTransparent:hover {
+    background: transparent;
+}

@@ -31,6 +31,7 @@ const actionTypes = {
     FETCH_USER_AVATAR: 'FETCH_USER_AVATAR',
     SAVE_USER_DATA: 'SAVE_USER_DATA',
     DELETE_USER: 'DELETE_USER',
+    WRITE_COMMENTARY: 'WRITE_COMMENTARY',
     SEND_COMMENTARY: 'SEND_COMMENTARY',
     RESET_LOADS: 'RESET_LOADS',
     RESET_ERRORS: 'RESET_ERRORS',
@@ -226,9 +227,15 @@ const dissableUser = (userId) => ({
     promise: userApi.dissableUser(userId)
 })
 
-const sendComment = (commentId, bookId, userId, comentText, commentFatherId) => ({
+const writeComment = (newComment) => ({
+    type: actionTypes.WRITE_COMMENTARY,
+    payload: { newComment },
+})
+
+const sendComment = (newComment) => ({
     type: actionTypes.SEND_COMMENTARY,
-    promise: bookApi.sendComment(commentId, bookId, userId, comentText, commentFatherId)
+    payload: { newComment },
+    promise: bookApi.sendComment(newComment.commentFatherId, newComment.bookId, newComment.userId, newComment.comentText)
 })
 
 const reportErrorMessage = (errorMsg) => ({
@@ -266,6 +273,7 @@ export {
     fetchUserData,
     fetchUserGenres,
     fetchUserAvatar,
+    writeComment,
     sendComment,
     saveUserData,
     dissableUser,

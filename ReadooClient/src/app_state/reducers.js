@@ -364,6 +364,41 @@ const comentaries = (state = initialState.comentaries, { type, payload, data }) 
             bookSubCommentaries: null,
         }
 
+        case (actionTypes.WRITE_COMMENTARY):
+        console.log(actionTypes.WRITE_COMMENTARY);
+        if (payload.newComment.commentFatherId === null) {
+            let copyOfCommentaries = state.bookCommentaries.slice();
+            copyOfCommentaries.push(payload.newComment);
+            return {
+                ...state,
+                bookSubCommentaries: copyOfCommentaries,
+            }  
+        } else {
+            let copyOfSubCommentaries = state.bookSubCommentaries.slice();
+            copyOfSubCommentaries.push(payload.newComment);
+            return {
+                ...state,
+                bookSubCommentaries: copyOfSubCommentaries,
+            }
+        }
+        
+        case failureType(actionTypes.SEND_COMMENTARY):
+        console.log(failureType(actionTypes.FETCH_SUB_COMMENTARIES));
+        if (payload.newComment.commentFatherId === null) {
+            let copyOfCommentaries = state.bookCommentaries.filter((commentary) => commentary.commentId !== payload.newComment.commentId);
+            return {
+                ...state,
+                bookSubCommentaries: copyOfCommentaries,
+            }  
+        } else {
+            let copyOfSubCommentaries = state.bookSubCommentaries.filter((commentary) => commentary.commentId !== payload.newComment.commentId);
+            copyOfSubCommentaries.push(payload.newComment);
+            return {
+                ...state,
+                bookSubCommentaries: copyOfSubCommentaries,
+            }
+        }
+
         default:
             return state;
     }

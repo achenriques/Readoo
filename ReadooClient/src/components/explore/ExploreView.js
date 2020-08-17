@@ -24,6 +24,7 @@ import noBookDefaultEs from '../../resources/loadingBookEs.svg';
 import noBookDefaultEn from '../../resources/loadingBookEn.svg';
 import bookDefault from '../../resources/bookDefault.gif';
 import material_styles from './material_styles';
+import '../../styles/Explorer.css';
 
 const FIRST_TIME_BOOK_ID = -1;
 
@@ -235,7 +236,7 @@ class ExploreView extends Component {
     render() {  
         return (
             <div>
-                <Card>
+                <Card classes={{ root: 'styleCardRoot' }}>
                     <CardMedia style={material_styles.styleCard} src="empty"
                     //overlay={<CardTitle title="Overlay title" subtitle="Overlay subtitle" />}
                     >
