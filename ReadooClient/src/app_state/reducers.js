@@ -366,16 +366,18 @@ const comentaries = (state = initialState.comentaries, { type, payload, data }) 
 
         case (actionTypes.WRITE_COMMENTARY):
         console.log(actionTypes.WRITE_COMMENTARY);
+        let copyOfCommentaries = state.bookCommentaries.slice();
         if (payload.newComment.commentFatherId === null) {
-            let copyOfCommentaries = state.bookCommentaries.slice();
-            copyOfCommentaries.push(payload.newComment);
+            copyOfCommentaries.unshift(payload.newComment);
             return {
                 ...state,
-                bookSubCommentaries: copyOfCommentaries,
+                bookCommentaries: copyOfCommentaries,
             }  
         } else {
             let copyOfSubCommentaries = state.bookSubCommentaries.slice();
-            copyOfSubCommentaries.push(payload.newComment);
+            copyOfSubCommentaries.unshift(payload.newComment);
+            let theFather = copyOfCommentaries.find((c => c.commentId === payload.newComment.commentFatherId));
+            theFather.nSubCommentaries = theFather.nSubCommentaries + 1;
             return {
                 ...state,
                 bookSubCommentaries: copyOfSubCommentaries,

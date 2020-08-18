@@ -22,3 +22,6 @@ export const getProccessStatus = (processName, loadingProccesses, failureProcess
     (toRet !== null && actionCallback != null) && actionCallback(processName);
     return toRet;
 }
+
+// Delete unnecesary spaces
+export const parseInputText = (inputText) => inputText.trim().replace(/(\r\n|\r|\n){2,}/g, '$1\n');

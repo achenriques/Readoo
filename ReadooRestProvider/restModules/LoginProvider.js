@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const userConfig = require('../util/serverOptions');
 const functions = require('../util/functions');
 const LoginDao = require('../daos/LoginDao');
+const path = require('path');
+const encoder64 = require('../util/functions').base64_encode;
 const LANGUAGE_ENGLISH = require('../util/constants').LANGUAGE_ENGLISH;
 const TOKEN_TIME = require('../util/constants').TOKEN_TIME;
 
@@ -101,6 +103,15 @@ class LoginProvider {
                 }
                 that.loginDao.isMeLogged(decoded.userId).then(
                     function (result) {
+                        if (result.userAvatarUrl) {
+                            let avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + result.userAvatarUrl.trim());
+                            let base64String = encoder64(avatarFile);
+                            if (base64String) {
+                                result.userAvatarUrl = 'data:image/png;base64,' + base64String;
+                            } else {
+                                result.userAvatarUrl = null;
+                            }
+                        }
                         res.setHeader('Content-Type', 'application/json');
                         if (decoded.tabSelector != null) {
                             result.tabSelector = +decoded.tabSelector;

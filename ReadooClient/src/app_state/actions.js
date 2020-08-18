@@ -235,7 +235,7 @@ const writeComment = (newComment) => ({
 const sendComment = (newComment) => ({
     type: actionTypes.SEND_COMMENTARY,
     payload: { newComment },
-    promise: bookApi.sendComment(newComment.commentFatherId, newComment.bookId, newComment.userId, newComment.comentText)
+    promise: bookApi.sendComment(newComment.commentFatherId, newComment.bookId, newComment.userId, newComment.commentText)
 })
 
 const reportErrorMessage = (errorMsg) => ({
