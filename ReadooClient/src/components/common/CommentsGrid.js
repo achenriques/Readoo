@@ -8,6 +8,7 @@ import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import Collapse from '@material-ui/core/Collapse';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Send from 'material-ui/svg-icons/content/send';
 import ExpandMoreIcon from 'material-ui/svg-icons/navigation/expand-more';
 import ExpandLessIcon from 'material-ui/svg-icons/navigation/expand-less';
@@ -18,7 +19,7 @@ import Divider from '@material-ui/core/Divider';
 import LS from '../LanguageSelector';
 import avatarDefault from '../../resources/avatarDefault.svg';
 import { parseInputText } from '../../utils/AppUtils';
-import { NUM_OF_COMENTARIES, REST_FAILURE, REST_SUCCESS, REST_DEFAULT } from '../../constants/appConstants';
+import { DISPLAY_NONE, NUM_OF_COMENTARIES, REST_FAILURE, REST_SUCCESS, REST_DEFAULT } from '../../constants/appConstants';
 
 class CommentsGrid extends Component {
 
@@ -27,7 +28,8 @@ class CommentsGrid extends Component {
         bookCommentaries: [],
         currentBookId: null,
         commentFatherId: null,
-        expandComment: null
+        expandComment: null,
+        loadMoreCount: 1
     }
 
     constructor(props) {
@@ -227,21 +229,33 @@ class CommentsGrid extends Component {
     handleCollapseSubs (evt, commentaryId) {
         console.log("I made click on show subcommentaries of: " + commentaryId);
         if (commentaryId !== null) {
-            let nameOfParam = "expandSubs_" + commentaryId;
-            if (this.state[nameOfParam] !== undefined) {
+            if (this.state.expandComment === commentaryId) {
                 // Close the expand
                 this.setState({
                     ...this.state,
-                    [nameOfParam]: undefined
+                    expandComment: null
                 });
             } else {
                 this.setState({
                     ...this.state,
-                    [nameOfParam]: true
+                    expandComment: commentaryId
                 });
             }
-            
         }
+    }
+
+    handleLoadMore (evt) {
+        if (this.state.commentFatherId === null) {
+            this.props.fetchCommentaries(this.state.currentBookId, 
+                    NUM_OF_COMENTARIES, this.state.bookCommentaries[this.state.bookCommentaries.length - 1].date, true);
+        } else {
+            this.props.fetchSubCommentaries(this.state.currentBookId, this.state.commentFatherId, 
+                    NUM_OF_COMENTARIES, this.state.bookCommentaries[this.state.bookCommentaries.length - 1].date, true);
+        }
+        this.setState({
+            ...this.state,
+            loadMoreCount: this.state.loadMoreCount + 1
+        });
     }
 
     handleAvatarClick (evt, userId) {
@@ -299,17 +313,18 @@ class CommentsGrid extends Component {
                                                 <div>
                                                     <div className='divCommentaries'> {commentary.commentText} </div>
                                                     {(commentary.nSubCommentaries > 0)
-                                                        ? ( <div>
+                                                        ? ( <div className='divShowAnswers'>
                                                                 <Button 
-                                                                    disableRipple 
+                                                                    disableRipple
+                                                                    disabled={(this.isLoadingSubs())}
                                                                     size="small" 
                                                                     variant='flat' 
                                                                     onClick={(evt) => this.handleCollapseSubs(evt, commentary.commentId)}
                                                                 >
-                                                                    {(this.state.expandComment === commentary.commentId)? <LS msgId='hide.subcommentaries' defaultMsg='Hide subcommentaries'/> : <LS msgId='show.subcommentaries' defaultMsg='Show subcommentaries'/>}
-                                                                    {(this.state.expandComment === commentary.commentId)? (<ExpandLessIcon />): (<ExpandMoreIcon />)}
+                                                                    {(this.state.expandComment === commentary.commentId) ? <LS msgId='hide.subcommentaries' defaultMsg='Hide subcommentaries'/> : <LS msgId='show.subcommentaries' defaultMsg='Show subcommentaries'/>}
+                                                                    {(this.state.expandComment === commentary.commentId) ? (this.isLoadingSubs()) ? <CircularProgress className="loadingIcon" size='20' /> : <ExpandLessIcon />: <ExpandMoreIcon />}
                                                                 </Button >
-                                                                <Collapse in={this.state["expandSubs_" + commentary.commentId]} timeout="auto" direction="right" mountOnEnter unmountOnExit>
+                                                                <Collapse in={this.state.expandComment === commentary.commentId} timeout="auto" direction="right" mountOnEnter unmountOnExit>
                                                                     <div className="commentBackground">
                                                                         <SubCommentsGrid bookId={this.state.currentBookId} commentFatherId={commentary.commentId}/>
                                                                     </div>                        
@@ -321,7 +336,6 @@ class CommentsGrid extends Component {
                                                                 <Grid container spacing={24}>
                                                                     <Grid item sm={10}>
                                                                         <TextField
-                                                                            ref={"input_" + commentary.commentId}
                                                                             error={this.state["commentError_" + commentary.commentId]  !== undefined}
                                                                             helperText={(this.state["commentError_" + commentary.commentId]  !== undefined) ? this.state["commentError_" + commentary.commentId]: ""}
                                                                             label={ <LS msgId='write.commentary.answer' defaultMsg='Write an answer...' params={ [(this.state["newCommentary_" + commentary.commentId] !== undefined) ? 140 - this.state["newCommentary_" + commentary.commentId].length : 140] } /> } 
@@ -386,6 +400,19 @@ class CommentsGrid extends Component {
                                     </div>)
                                 : (<div/>)
                             }
+                            <p>
+                            <Button 
+                                disableRipple 
+                                disabled={(this.isLoading() || this.isLoadingSubs())}
+                                size="small" 
+                                variant='flat'
+                                style={(this.state.bookCommentaries.length >= NUM_OF_COMENTARIES * this.state.loadMoreCount) ? {} : (this.isLoading() || this.isLoadingSubs()) ? {} : DISPLAY_NONE}
+                                onClick={(evt) => this.handleLoadMore(evt)}
+                            >
+                                {(this.state.commentFatherId === null) ? <LS msgId='search.more.commentaries' defaultMsg='Search more'/> : <LS msgId='search.more.subcommentaries' defaultMsg='Show more'/>}
+                                {(this.isLoading() || this.isLoadingSubs()) ? <CircularProgress className="loadingIcon" size='20' /> : <ExpandMoreIcon />}
+                            </Button >
+                            </p>
                         </div>
                     );
                 }
@@ -443,8 +470,8 @@ export default connect(
         loadingProcesses: appState.getLoadingProcesses(state)
     }),
     (dispatch) => ({
-        fetchCommentaries: (bookId, nCommentaries, lastDate) => dispatch(fetchCommentaries(bookId, nCommentaries, lastDate)),
-        fetchSubCommentaries: (bookId, fatherCommentaryId, nCommentaries, lastDate) => dispatch(fetchSubCommentaries(bookId, fatherCommentaryId, nCommentaries, lastDate)),
+        fetchCommentaries: (bookId, nCommentaries, lastDate, fetchMore) => dispatch(fetchCommentaries(bookId, nCommentaries, lastDate, fetchMore)),
+        fetchSubCommentaries: (bookId, fatherCommentaryId, nCommentaries, lastDate, fetchMore) => dispatch(fetchSubCommentaries(bookId, fatherCommentaryId, nCommentaries, lastDate, fetchMore)),
         writeComment: (newComment) => dispatch(writeComment(newComment)),
         sendCommentary: (newComment) => dispatch(sendComment(newComment))
     })

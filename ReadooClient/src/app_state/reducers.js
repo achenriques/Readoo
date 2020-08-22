@@ -280,9 +280,9 @@ const books = (state = initialState.books, { type, payload, data }) => {
         let toRet = {};
         if (state.currentBook +1 < state.shownBooks.length) {
             toRet = {
-            ...state,
-            currentBook: state.currentBook + 1,
-            }
+                ...state,
+                currentBook: state.currentBook + 1,
+            };
         }
 
         if (state.currentBook + 1 === state.shownBooks.length
@@ -291,7 +291,7 @@ const books = (state = initialState.books, { type, payload, data }) => {
                 ...state,
                 shownBooks: state.loaded.slice(0),
                 currentBook: 0,
-            }
+            };
         }
 
         if (state.currentBook + 1 === state.shownBooks.length
@@ -300,7 +300,7 @@ const books = (state = initialState.books, { type, payload, data }) => {
                 ...state,
                 shownBooks: [ state.bookDefault ],
                 currentBook: 0,
-            }
+            };
         }
         return toRet;      
 
@@ -312,13 +312,13 @@ const books = (state = initialState.books, { type, payload, data }) => {
                 shownBooks: data.data,
                 loaded: data.data,
                 success_fetch: true,
-            }
+            };
         } else {
             return {
                 ...state,
                 loaded: data.data,
                 success_fetch: true,
-            }
+            };
         }
 
     case failureType(actionTypes.FETCH_LIBROS):
@@ -327,7 +327,7 @@ const books = (state = initialState.books, { type, payload, data }) => {
             ...state,
             shownBooks: [ state.libroFailure ],
             success_fetch: false,
-        }
+        };
 
     default:
         return state;
@@ -337,69 +337,82 @@ const books = (state = initialState.books, { type, payload, data }) => {
 const comentaries = (state = initialState.comentaries, { type, payload, data }) => {
     switch (type) {
         case successType(actionTypes.FETCH_COMMENTARIES):
-        console.log(successType(actionTypes.FETCH_COMMENTARIES));
-        return {
-            ...state,
-            bookCommentaries: data.data,
-        }
+            console.log(successType(actionTypes.FETCH_COMMENTARIES));
+            let bookCommentaries = state.bookCommentaries;
+            if (payload && payload.fetchMore) {
+                bookCommentaries = bookCommentaries.concat(data.data);
+            } else {
+                bookCommentaries = data.data;
+            }
+            return {
+                ...state,
+                bookCommentaries,
+            };
 
         case successType(actionTypes.FETCH_SUB_COMMENTARIES):
-        console.log(successType(actionTypes.FETCH_SUB_COMMENTARIES));
-        return {
-            ...state,
-            bookSubCommentaries: data.data,
-        }
+            console.log(successType(actionTypes.FETCH_SUB_COMMENTARIES));
+            let bookSubCommentaries = state.bookSubCommentaries;
+            if (payload && payload.fetchMore) {
+                bookSubCommentaries = bookSubCommentaries.concat(data.data);
+            } else {
+                bookSubCommentaries = data.data;
+            }
+            return {
+                ...state,
+                bookSubCommentaries,
+            };
+            
 
         case failureType(actionTypes.FETCH_COMMENTARIES):
-        console.log(successType(actionTypes.FETCH_COMMENTARIES));
-        return {
-            ...state,
-            bookCommentaries: null,
-        }
+            console.log(successType(actionTypes.FETCH_COMMENTARIES));
+            return {
+                ...state,
+                bookCommentaries: null,
+            };
 
         case failureType(actionTypes.FETCH_SUB_COMMENTARIES):
-        console.log(successType(actionTypes.FETCH_SUB_COMMENTARIES));
-        return {
-            ...state,
-            bookSubCommentaries: null,
-        }
+            console.log(successType(actionTypes.FETCH_SUB_COMMENTARIES));
+            return {
+                ...state,
+                bookSubCommentaries: null,
+            };
 
         case (actionTypes.WRITE_COMMENTARY):
-        console.log(actionTypes.WRITE_COMMENTARY);
-        let copyOfCommentaries = state.bookCommentaries.slice();
-        if (payload.newComment.commentFatherId === null) {
-            copyOfCommentaries.unshift(payload.newComment);
-            return {
-                ...state,
-                bookCommentaries: copyOfCommentaries,
-            }  
-        } else {
-            let copyOfSubCommentaries = state.bookSubCommentaries.slice();
-            copyOfSubCommentaries.unshift(payload.newComment);
-            let theFather = copyOfCommentaries.find((c => c.commentId === payload.newComment.commentFatherId));
-            theFather.nSubCommentaries = theFather.nSubCommentaries + 1;
-            return {
-                ...state,
-                bookSubCommentaries: copyOfSubCommentaries,
+            console.log(actionTypes.WRITE_COMMENTARY);
+            let copyOfCommentaries = state.bookCommentaries.slice();
+            if (payload.newComment.commentFatherId === null) {
+                copyOfCommentaries.unshift(payload.newComment);
+                return {
+                    ...state,
+                    bookCommentaries: copyOfCommentaries,
+                };
+            } else {
+                let copyOfSubCommentaries = state.bookSubCommentaries.slice();
+                copyOfSubCommentaries.unshift(payload.newComment);
+                let theFather = copyOfCommentaries.find((c => c.commentId === payload.newComment.commentFatherId));
+                theFather.nSubCommentaries = theFather.nSubCommentaries + 1;
+                return {
+                    ...state,
+                    bookSubCommentaries: copyOfSubCommentaries,
+                };
             }
-        }
         
         case failureType(actionTypes.SEND_COMMENTARY):
-        console.log(failureType(actionTypes.FETCH_SUB_COMMENTARIES));
-        if (payload.newComment.commentFatherId === null) {
-            let copyOfCommentaries = state.bookCommentaries.filter((commentary) => commentary.commentId !== payload.newComment.commentId);
-            return {
-                ...state,
-                bookSubCommentaries: copyOfCommentaries,
-            }  
-        } else {
-            let copyOfSubCommentaries = state.bookSubCommentaries.filter((commentary) => commentary.commentId !== payload.newComment.commentId);
-            copyOfSubCommentaries.push(payload.newComment);
-            return {
-                ...state,
-                bookSubCommentaries: copyOfSubCommentaries,
+            console.log(failureType(actionTypes.FETCH_SUB_COMMENTARIES));
+            if (payload.newComment.commentFatherId === null) {
+                let copyOfCommentaries = state.bookCommentaries.filter((commentary) => commentary.commentId !== payload.newComment.commentId);
+                return {
+                    ...state,
+                    bookSubCommentaries: copyOfCommentaries,
+                };
+            } else {
+                let copyOfSubCommentaries = state.bookSubCommentaries.filter((commentary) => commentary.commentId !== payload.newComment.commentId);
+                copyOfSubCommentaries.push(payload.newComment);
+                return {
+                    ...state,
+                    bookSubCommentaries: copyOfSubCommentaries,
+                };
             }
-        }
 
         default:
             return state;
@@ -416,14 +429,14 @@ const genres = (state = initialState.genres, { type, payload, data }) => {
             return {
                 ...state,
                 all: data.data,
-            }
+            };
 
         case successType(actionTypes.FETCH_USER_GENRES):
             console.log(successType(actionTypes.FETCH_USER_GENRES));
             return {
                 ...state,
                 userGenres: data.data,
-            }
+            };
 
         default:
             return state;
@@ -448,7 +461,7 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
                 failed_processes: failed_processes1,
                 loading_processes: loading_processes1,
                 succeed_processes: succeed_processes1
-            }
+            };
 
         case actionTypes.RESET_LOADS:
             return {
@@ -470,7 +483,7 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
             return {
                 ...state,
                 failure: newFailure
-            }
+            };
             
         default:
             let petitionStatus = null;

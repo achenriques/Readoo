@@ -13,11 +13,13 @@ import IconButton from '@material-ui/core/IconButton';
 import Collapse from '@material-ui/core/Collapse';
 import ArrowLeft from 'material-ui/svg-icons/navigation/chevron-left';
 import ArrowRight from 'material-ui/svg-icons/navigation/chevron-right';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import Favorite from 'material-ui/svg-icons/action/favorite';
 import ExpandMoreIcon from 'material-ui/svg-icons/navigation/expand-more';
 import ExpandLessIcon from 'material-ui/svg-icons/navigation/expand-less';
 import Divider from '@material-ui/core/Divider';
 import CommentsGrid from '../common/CommentsGrid';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import LS from '../LanguageSelector';
 import { NUM_OF_BOOKS, DISPLAY_NONE, LANGUAGE_SPANISH } from '../../constants/appConstants';
 import noBookDefaultEs from '../../resources/loadingBookEs.svg';
@@ -52,6 +54,7 @@ class ExploreView extends Component {
     constructor(props) {
         super(props);
         this.state = { ...this.initilState };
+        this.cardRootRef = React.createRef();
     };
 
     loadCurrentBookFromProps (props) {
@@ -153,6 +156,10 @@ class ExploreView extends Component {
     getIsPossibleToHandleLike() {
         return !this.props.loadingProcesses.includes(actionTypes.I_LIKE_BOOK);
     }
+
+    isLoadingCommentaries() {
+        return this.props.loadingProcesses.includes(actionTypes.FETCH_COMMENTARIES);
+    }
     
     handleLike(evt) {
         if (this.getIsPossibleToHandleLike() && !this.state.likeBook) {
@@ -214,6 +221,10 @@ class ExploreView extends Component {
         })
     }
 
+    handleScroll(evt) {
+        console.log(this);
+    }
+
     // Returns the style when a double click is done
     heartType = (typeId) => {
         switch (typeId) {
@@ -236,7 +247,7 @@ class ExploreView extends Component {
     render() {  
         return (
             <div>
-                <Card classes={{ root: 'styleCardRoot' }}>
+                <Card classes={{ root: 'styleCardRoot' }} ref={this.cardRootRef} >
                     <CardMedia style={material_styles.styleCard} src="empty"
                     //overlay={<CardTitle title="Overlay title" subtitle="Overlay subtitle" />}
                     >
@@ -276,13 +287,14 @@ class ExploreView extends Component {
                                 </Button>
                                 <Button 
                                     disableRipple 
+                                    disabled={(this.isLoadingCommentaries())}
                                     size="small" 
                                     variant='flat' 
                                     onClick={this.handleCollapse.bind(this)} 
                                     style={material_styles.styleExpandComentaries}
                                 >
                                     {(this.state.expanded)? <LS msgId='hide.commentaries' defaultMsg='Hide comments'/> : <LS msgId='show.commentaries' defaultMsg='Show comments'/>}
-                                    {(this.state.expanded)? (<ExpandLessIcon />): (<ExpandMoreIcon />)}
+                                    {(this.state.expanded)? (this.isLoadingCommentaries()) ? <CircularProgress className="loadingIconCommentaries" size='20' /> : <ExpandLessIcon /> : <ExpandMoreIcon />}
                                 </Button >
                             </div>)
                             : (<div></div>)
@@ -294,6 +306,9 @@ class ExploreView extends Component {
                         </div>                        
                     </Collapse>
                 </Card>
+                <Button variant="fab" color="action" aria-label="add" onClick={this.handleScroll.bind(this)} className='styleButtonUp'>
+                    <KeyboardArrowUpIcon/>
+                </Button>
             </div>
         );
     }

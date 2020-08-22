@@ -22,6 +22,12 @@
     */
 }
 
+.loadingIconCommentaries {
+    height: 20px;
+    width: 20px;
+    margin-left: 20px;
+}
+
 .styleGridList {
     width: 100%;
     height: auto;
@@ -166,7 +172,16 @@
     margin-right: 30px;
 }
 
+.divCommentaries {
+    padding: 10px;
+}
+
 .divCommentaryAnswer {
+    width: 100%;
+}
+
+.divShowAnswers {
+    text-align: center;
     width: 100%;
 }
 

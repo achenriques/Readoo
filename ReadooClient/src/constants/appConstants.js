@@ -14,7 +14,7 @@ export const pages = {
 export const SHORTCUT_HEIGHT_PX = 60;
 
 export const NUM_OF_BOOKS = 10;
-export const NUM_OF_COMENTARIES = 25;
+export const NUM_OF_COMENTARIES = 5; // MAX COMMENTARIES PER REQUEST. IMPORTANT TO CHANGE THIS NUMBER ALSO IN THE BACK APP (MAX_COMMENTARIES).
 export const DISPLAY_NONE = {
     display: 'none'
 }

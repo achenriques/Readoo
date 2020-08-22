@@ -5,6 +5,7 @@ const functions = require('../util/functions');
 const LoginDao = require('../daos/LoginDao');
 const path = require('path');
 const encoder64 = require('../util/functions').base64_encode;
+const resizeToIcon = require('../util/imageFormater').resizeToIcon;
 const LANGUAGE_ENGLISH = require('../util/constants').LANGUAGE_ENGLISH;
 const TOKEN_TIME = require('../util/constants').TOKEN_TIME;
 
@@ -105,18 +106,22 @@ class LoginProvider {
                     function (result) {
                         if (result.userAvatarUrl) {
                             let avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + result.userAvatarUrl.trim());
-                            let base64String = encoder64(avatarFile);
-                            if (base64String) {
-                                result.userAvatarUrl = 'data:image/png;base64,' + base64String;
-                            } else {
-                                result.userAvatarUrl = null;
-                            }
+                            resizeToIcon(avatarFile).then(function (base64String) {
+                                if (base64String) {
+                                    result.userAvatarUrl = base64String;
+                                } else {
+                                    result.userAvatarUrl = null;
+                                }
+                                res.setHeader('Content-Type', 'application/json');
+                                if (decoded.tabSelector != null) {
+                                    result.tabSelector = +decoded.tabSelector;
+                                }
+                                return res.status(200).json(result);
+                            }).catch(function (err) {
+                                console.log(err);
+                                return res.status(200).json(result);
+                            });
                         }
-                        res.setHeader('Content-Type', 'application/json');
-                        if (decoded.tabSelector != null) {
-                            result.tabSelector = +decoded.tabSelector;
-                        }
-                        return res.status(200).json(result);
                     }
                 ).catch(
                     function (err) {

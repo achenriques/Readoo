@@ -3,6 +3,7 @@ const constants = require('../util/constants');
 const functions = require('../util/functions');
 const middleware = require('./middlewares');
 const CommentDao = require('../daos/CommentDao');
+const resizeToIcon = require('../util/imageFormater').resizeToIcon;
 
 class CommentProvider {
     
@@ -61,11 +62,43 @@ class CommentProvider {
         });
     }
 
+    parseProfileImages (commentArray) {
+        if (commentArray) {
+            return Promise.all(commentArray.map(function(c, index, rSet) {
+                if (c.userAvatarUrl != null && c.userAvatarUrl.length !== 0) {
+                    let avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + c.userAvatarUrl);
+                    if (avatarFile) {
+                        return resizeToIcon(avatarFile).then(function (base64String) {
+                            if (base64String) {
+                                c.userAvatarUrl = base64String;
+                            } else {
+                                c.userAvatarUrl = null;
+                            }
+                        }).catch(function (err) {
+                            console.log(err);
+                            c.userAvatarUrl = null;
+                        });
+                    } else {
+                        console.log('Avatar image not found: ' + c.userAvatarUrl);
+                        return Promise.resolve();
+                    }
+                }
+            })).then(function (promisesResult) {
+                return commentArray;
+            }).catch(function (err) {
+                console.log(err);
+            });
+        } else {
+            return Promise.resolve(commentArray);
+        }
+    }
+
     getBunch(app) {
         const that = this;
         app.post('/commentary/fetch', middleware.verifyToken, function (req, res) {
             let bookId = req.body.bookId;
             let lastDate = req.body.lastDate;
+            let nCommentaries = req.body.nCommentaries;
             console.log("Estoy cogiendo comentario " + bookId);     
             if (bookId) {
                 that.commentDao.getBunchOfCommentaries(+bookId, lastDate, constants.MAX_COMMENTARIES).then(
@@ -74,16 +107,7 @@ class CommentProvider {
                         let toRet = [];
                         let principalIds = [];
                         resultSet.forEach(function(c, index, rSet) {
-                            // Parse the image
-                            if (c.userAvatarUrl != null && c.userAvatarUrl.length !== 0) {
-                                let file = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + c.userAvatarUrl);
-                                if (file) {
-                                    c.userAvatarUrl = 'data:image/png;base64, ' + functions.base64_encode(file);
-                                }
-                            }
-
                             principalIds.push(c.commentId);
-
                             toRet.push({
                                 commentId: c.commentId, 
                                 commentText: c.commentText, 
@@ -110,7 +134,9 @@ class CommentProvider {
                                             principalCommentary.nSubCommentaries = nC.nAnswers;
                                         }
                                     });
-                                    return res.header('Content-Type', 'application/json').status(200).json(toRet);
+                                    that.parseProfileImages(toRet).then(function (resultOfParse) {
+                                        return res.header('Content-Type', 'application/json').status(200).json(toRet);
+                                    });                                    
                                 }
                             ).catch(
                                 function (err) {
@@ -121,7 +147,9 @@ class CommentProvider {
                                 }
                             );
                         } else {
-                            return res.header('Content-Type', 'application/json').status(200).json(toRet);
+                            that.parseProfileImages(toRet).then(function (resultOfParse) {
+                                return res.header('Content-Type', 'application/json').status(200).json(toRet);
+                            }); 
                         }
                     }
                 ).catch(
@@ -152,14 +180,7 @@ class CommentProvider {
                         // Commentaries are prcessed to group their children
                         let toRet = [];
                         resultSet.forEach(function(c, index, rSet) {
-                            // Parse the image
-                            if (c.userAvatarUrl != null && c.userAvatarUrl.length !== 0) {
-                                let file = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + c.userAvatarUrl);
-                                if (file) {
-                                    c.userAvatarUrl = 'data:image/png;base64, ' + functions.base64_encode(file);
-                                }
-                            }
-
+                            
                             toRet.push({
                                 commentId: c.commentId, 
                                 commentText: c.commentText, 
@@ -171,7 +192,13 @@ class CommentProvider {
                                 commentFatherId: c.commentFatherId,
                             });
                         });
-                        return res.header('Content-Type', 'application/json').status(200).json(toRet);
+
+                        that.parseProfileImages(toRet).then(function (resultOfParse) {
+                            return res.header('Content-Type', 'application/json').status(200).json(toRet);
+                        }).catch (function (err) {
+                            res.status(400)        // HTTP status 400: BadRequest
+                            .send('Error while parsing commentaries');
+                        });
                     }
                 ).catch(
                     function (err) {

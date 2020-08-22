@@ -67,6 +67,8 @@ export default [
         'show.commentaries': 'Show commentaries',
         'hide.subcommentaries': 'Hide subcommentaries',
         'show.subcommentaries': 'Show subcommentaries',
+        'search.more.commentaries': 'Search more commentaries',
+        'search.more.subcommentaries': 'Search more answers',
         'number.of.answers': '{0} answers',
         'answer': 'Answer{0}',
         // Genres
@@ -153,6 +155,8 @@ export default [
         'show.commentaries': 'Mostrar comentarios',
         'hide.subcommentaries': 'Ocultar subcomentarios',
         'show.subcommentaries': 'Mostrar subcomentarios',
+        'search.more.commentaries': 'Buscar más comentarios',
+        'search.more.subcommentaries': 'Buscar más respuestas',
         'number.of.answers': '{0} respuestas',
         'answer': 'Respuesta{0}',
         // Genres

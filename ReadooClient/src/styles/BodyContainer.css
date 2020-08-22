@@ -18,6 +18,12 @@ body {
     right: 50px;
 }
 
+.styleButtonUp {
+    position: fixed;
+    bottom: 125px;
+    right: 50px;
+}
+
 .bodyFavoritos {
     margin-top: 70px;
     padding-bottom: 30px;

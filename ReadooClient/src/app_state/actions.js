@@ -196,13 +196,15 @@ const setEmailIsUniqueFalse = () => ({
     type: actionTypes.CHECKED_EMAIL
 })
 
-const fetchCommentaries = (bookId, nCommentaries, lastDate) => ({
+const fetchCommentaries = (bookId, nCommentaries, lastDate, fetchMore) => ({
     type: actionTypes.FETCH_COMMENTARIES,
+    payload: { fetchMore },
     promise: bookApi.fetchCommentaries(bookId, nCommentaries, lastDate)
 })
 
-const fetchSubCommentaries = (bookId, fatherCommentaryId, nCommentaries, lastDate) => ({
+const fetchSubCommentaries = (bookId, fatherCommentaryId, nCommentaries, lastDate, fetchMore) => ({
     type: actionTypes.FETCH_SUB_COMMENTARIES,
+    payload: { fetchMore },
     promise: bookApi.fetchSubCommentaries(bookId, fatherCommentaryId, nCommentaries, lastDate)
 })
 
