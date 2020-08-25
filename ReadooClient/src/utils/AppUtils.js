@@ -1,4 +1,4 @@
-import { REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../constants/appConstants';
+import { REST_FAILURE, REST_DEFAULT, REST_SUCCESS, FILE_BYTE_LIMIT } from '../constants/appConstants';
 
 /*
  *  Remove a proccess from the proccesses list and at the end returns where the proccess was if it was found in other cases returns null.
@@ -25,3 +25,8 @@ export const getProccessStatus = (processName, loadingProccesses, failureProcess
 
 // Delete unnecesary spaces
 export const parseInputText = (inputText) => inputText.trim().replace(/(\r\n|\r|\n){2,}/g, '$1\n');
+
+// LIMITS the file size
+export const excedsLimit = (file) => {
+    return file.size > FILE_BYTE_LIMIT;
+}

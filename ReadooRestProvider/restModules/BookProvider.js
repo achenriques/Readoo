@@ -1,9 +1,11 @@
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const functions = require('../util/functions');
 const middleware = require('./middlewares');
 const BookDao = require('../daos/BookDao');
 const LastBookDao = require('../daos/LastBookDao');
+const { resizeToBook } = require('../util/imageFormater');
 
 const MIN_DB_ID = 0;
 
@@ -83,6 +85,38 @@ class BookProvider {
         });
     }
 
+    parseBookCoverImages (coverArray) {
+        if (coverArray) {
+            return Promise.all(coverArray.map(function(b, index, rSet) {
+                if (b.bookCoverUrl != null && b.bookCoverUrl.length !== 0) {
+                    let coverFile = path.resolve('./ReadooRestProvider/uploads/coverPages/' + b.bookCoverUrl);
+                    if (coverFile && fs.existsSync(coverFile)) {
+                        return resizeToBook(coverFile).then(function (base64String) {
+                            if (base64String) {
+                                b.bookCoverUrl = base64String;
+                            } else {
+                                b.bookCoverUrl = null;
+                            }
+                        }).catch(function (err) {
+                            console.log(err);
+                            b.bookCoverUrl = null;
+                        });
+                    } else {
+                        console.log('Book cover image not found: ' + b.bookCoverUrl);
+                        b.bookCoverUrl = null;
+                        return Promise.resolve();
+                    }
+                }
+            })).then(function (promisesResult) {
+                return coverArray;
+            }).catch(function (err) {
+                console.log(err);
+            });
+        } else {
+            return Promise.resolve(coverArray);
+        }
+    }
+
     getBunch(app) {
         const that = this;
         app.post('/book', middleware.verifyToken, function (req, res) {
@@ -102,19 +136,9 @@ class BookProvider {
                 const getBunchOfBooks = function (userIdParam, lastBookIdParam, genresParam, lastDateParam, numberOfBooksParam) {
                     that.bookDao.getBunchOfBooks(userIdParam, lastBookIdParam, genresParam, lastDateParam, numberOfBooksParam).then(
                         function (result) {
-                            let toRet = result.map(function (bookFromBunch) {
-                                // Convert into bool
-                                bookFromBunch.userLikesBook = bookFromBunch.userLikesBook == true;
-                                // Get cover file into base64 
-                                if (bookFromBunch.bookCoverUrl.length !== 0) {
-                                    let file = path.resolve('./ReadooRestProvider/uploads/coverPages/' + bookFromBunch.bookCoverUrl);
-                                    if (file) {
-                                        bookFromBunch.bookCoverUrl = functions.base64_encode(file);
-                                    }
-                                }
-                                return bookFromBunch;
+                            that.parseBookCoverImages(result).then(function (resultOfParse) {
+                                return res.header('Content-Type', 'application/json').status(200).json(resultOfParse);
                             });
-                            return res.header('Content-Type', 'application/json').status(200).json(toRet);
                         }
                     ).catch(
                         function (err) {
@@ -174,7 +198,7 @@ class BookProvider {
                         bookInfo.bookCoverUrl.trim(), +bookInfo.userId, +bookInfo.genreId).then(
                     function (result) {
                         res.setHeader('Content-Type', 'application/json');
-                        return res.status(200).json(result.insertedId);
+                        return res.status(200).json(result.insertId);
                     }
                 ).catch(
                     function (err) {

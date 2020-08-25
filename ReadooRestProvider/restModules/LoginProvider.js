@@ -104,6 +104,14 @@ class LoginProvider {
                 }
                 that.loginDao.isMeLogged(decoded.userId).then(
                     function (result) {
+                        // Parse genres
+                        if (result.userGenres != null) {
+                            // The genres of the user are cast to an array of numbers with the genre ids
+                            result.userGenres = result.userGenres.split(",").map(function (x) {return +x});
+                        } else {
+                            result.userGenres = [];
+                        }
+                        // Parse avatar
                         if (result.userAvatarUrl) {
                             let avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + result.userAvatarUrl.trim());
                             resizeToIcon(avatarFile).then(function (base64String) {

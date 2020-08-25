@@ -15,7 +15,7 @@ import GenreSelector from '../common/GenreSelector';
 import ContinueModal from '../common/ContinueModal';
 import avatarDefault from '../../resources/avatarDefault.svg';
 import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
-import { getProccessStatus } from '../../utils/AppUtils';
+import { getProccessStatus, excedsLimit } from '../../utils/AppUtils';
 
 const iconHelp = <Help/>;
 
@@ -51,6 +51,7 @@ class ProfileView extends Component {
         loadingProfile: LOADING_PROFILE,
         showOldPass: false,
         emailError: false,
+        avatarError: '',
         acceptDisabled: false,
         acceptDisabledText: 'loading',
         noChanges: false,
@@ -214,11 +215,19 @@ class ProfileView extends Component {
 
     loadAvatarImage = (evt) => {
         if (evt.target.files && evt.target.files[0]) {
-            this.setState({
-                ...this.state,
-                avatarImageFile: evt.target.files[0],
-                avatarImage: (URL.createObjectURL(evt.target.files[0])) ? URL.createObjectURL(evt.target.files[0]) : ""
-            }, /*callState*/);
+            if (!excedsLimit(evt.target.files[0])) {
+                this.setState({
+                    ...this.state,
+                    avatarImageFile: evt.target.files[0],
+                    avatarImage: (URL.createObjectURL(evt.target.files[0])) ? URL.createObjectURL(evt.target.files[0]) : "",
+                    avatarError: false
+                });
+            } else {
+                this.setState({
+                    ...this.state,
+                    avatarError: true
+                });
+            }            
         } else {
             this.setState({
                 avatarImageFile: null,
@@ -376,6 +385,9 @@ class ProfileView extends Component {
                                             <LS msgId='add.portrait.image' defaultMsg='Add image'/>
                                         </Button>
                                     </label>
+                                    <p id="error_add_profile_img" className="errorInput" hidden={!this.state.avatarError}>
+                                        <LS msgId='image.exceds.limit' defaultMsg='The image exceds the limit of 5MB'/>
+                                    </p>
                                 </div>
                             </Grid>
                             <Grid item sm={8} className="perfilDataColumn">

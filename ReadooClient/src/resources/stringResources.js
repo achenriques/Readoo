@@ -71,6 +71,7 @@ export default [
         'search.more.subcommentaries': 'Search more answers',
         'number.of.answers': '{0} answers',
         'answer': 'Answer{0}',
+        'nothing.to.see': 'Nothing to see here! Continue your exploration in other button.',
         // Genres
         'theater': 'Theater',
         'drama': 'Drama',
@@ -84,6 +85,7 @@ export default [
         'no.pass.coincidence': 'The old password doesn´t coencide with the password in use.',
         'no.image.preview': 'Image preview not avaliable.',
         'image.not.found': 'Image not found',
+        'image.exceds.limit': 'The image file is bigger than our limit of 5MB. Cut it!',
         'data.not.found': 'Some required data has not been provided',
         'please.reload': 'Some error has occurred, please try to reload the page. Sorry for the inconveniences!',
         'commentaries.load.error': 'An error ocurred while fetching commentaries, it might be a fail with the NET or the server...',
@@ -159,6 +161,7 @@ export default [
         'search.more.subcommentaries': 'Buscar más respuestas',
         'number.of.answers': '{0} respuestas',
         'answer': 'Respuesta{0}',
+        'nothing.to.see': 'Aquí no hay nada que ver! Continua tu exploración en otra parte.',
         // Genres
         'theater': 'Teatro',
         'drama': 'Drama',
@@ -172,6 +175,7 @@ export default [
         'no.pass.coincidence': 'La contraseña antigüa no coencide con la contraseña ahora en uso.',
         'no.image.preview': 'Previsualización de imagen no disponible.',
         'image.not.found': 'Imagen no disponible',
+        'image.exceds.limit': 'La imagen supera nuestro limite de 5MB. Recortala!',
         'data.not.found': 'Falta algún dato requerido',
         'please.reload': 'Ha ocurrido un error, prueba a recargar la página. ¡Disculpa las molestias!',
         'commentaries.load.error': 'Error en la carga de comentaries puede ser un problema de red o fallo del servidor...',

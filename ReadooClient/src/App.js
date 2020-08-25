@@ -56,7 +56,7 @@ class App extends Component {
 
     render() {
         return (
-            <div>
+            <div id="appDiv">
                 <Snackbar
                     open={this.state.openSnackBar}
                     message={this.state.snackBarMsg}                            

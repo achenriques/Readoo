@@ -19,6 +19,8 @@ export const DISPLAY_NONE = {
     display: 'none'
 }
 
+export const FILE_BYTE_LIMIT = 5000000;
+
 export const ROWS_PER_PAGE = 3;
 export const BOOKS_PER_PAGE = 9;
 

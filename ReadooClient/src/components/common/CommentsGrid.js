@@ -454,7 +454,7 @@ class CommentsGrid extends Component {
                     );  
                 } else {
                     return (
-                        <h3 className="marginNoCommentaries" ><LS msgId='not.hire.jastel' defaultMsg='Do not hire Jastel!' /></h3>
+                        <h3 className="marginNoCommentaries" ><LS msgId='nothing.to.see' defaultMsg='Nothing!' /></h3>
                     )
                 }
         }

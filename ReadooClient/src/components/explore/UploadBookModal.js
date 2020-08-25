@@ -14,7 +14,7 @@ import Grid from '@material-ui/core/Grid';
 import LS from '../LanguageSelector';
 import GenreSelector from '../common/GenreSelector';
 import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
-import { getProccessStatus } from '../../utils/AppUtils';
+import { getProccessStatus, excedsLimit } from '../../utils/AppUtils';
 
 const COMPLETE_FIELD = LS.getStringMsg('complete.field', 'Complete this field');
 
@@ -45,7 +45,8 @@ class UploadBookModal extends Component {
             addBookDescription: "",
             addBookReview: "",
             addBookGenre: "",
-            addBookCover: false
+            addBookCover: false,
+            coverSize: false
         },
 
         runningStatus: RUNNING_BOOK_UPLOAD
@@ -192,23 +193,27 @@ class UploadBookModal extends Component {
     }
 
     changeCoverImage = (evt) => {
-        const callState = () => {
-            if (this.state.error.addBookCover === true) {
+        if (evt.target.files[0]) {
+            if (!excedsLimit(evt.target.files[0])) {
+                this.setState({
+                    ...this.state,
+                    addBookCover: (URL.createObjectURL(evt.target.files[0])) ? URL.createObjectURL(evt.target.files[0]) : null,
+                    addBookCoverFile: evt.target.files[0] ? evt.target.files[0] : null,
+                    error: {
+                        ...this.state.error,
+                        coverSize: false,
+                        addBookCover: false
+                    }
+                });
+            } else {
                 this.setState({
                     ...this.state,
                     error: {
                         ...this.state.error,
-                        addBookCover: false
+                        coverSize: true
                     }
                 });
             }
-        };
-
-        if (evt.target.files[0]) {
-            this.setState({
-                addBookCover: (URL.createObjectURL(evt.target.files[0])) ? URL.createObjectURL(evt.target.files[0]) : null,
-                addBookCoverFile: evt.target.files[0] ? evt.target.files[0] : null
-            }, callState);
         }
     }
 
@@ -340,6 +345,9 @@ class UploadBookModal extends Component {
                                     </div>
                                     <p id="error_add_img" className="errorInput" hidden={!this.state.error.addBookCover}>
                                         <LS msgId='book.must.add.cover.image' defaultMsg='You must add a cover'/>
+                                    </p>
+                                    <p id="error_add_img" className="errorInput" hidden={!this.state.error.coverSize}>
+                                        <LS msgId='image.exceds.limit' defaultMsg='The image exceds the limit of 5MB'/>
                                     </p>
                                 </Grid>
                         </Grid>

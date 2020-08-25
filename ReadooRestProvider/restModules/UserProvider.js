@@ -6,6 +6,7 @@ const encoder64 = require('../util/functions').base64_encode;
 const functions = require('../util/functions');
 const UserDao = require('../daos/UserDao');
 const UserGenreDao = require('../daos/UserGenreDao');
+const { resizeToProfile } = require('../util/imageFormater');
 
 const userStorage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -94,34 +95,37 @@ class UserProvider {
             let userId = req.query.id;
             console.log("Estoy getteando " + userId);
             if (userId) {
-                that.userDao.getOneUser(+userId).then(
-                    function (result) {
-                        if (result.userAvatarUrl) {
-                            let avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + result.userAvatarUrl.trim());
-                            let base64String = encoder64(avatarFile);
+                that.userDao.getOneUser(+userId).then(function (result) {
+                    // Parse genres
+                    if (result.userGenres != null) {
+                        // The genres of the user are cast to an array of numbers with the genre ids
+                        result.userGenres = result.userGenres.split(",").map(function (x) {return +x});
+                    } else {
+                        result.userGenres = [];
+                    }
+                    // Parse avatar
+                    if (result.userAvatarUrl) {
+                        let avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + result.userAvatarUrl.trim());
+                        resizeToProfile(avatarFile).then(function (base64String) {
                             if (base64String) {
-                                result.userAvatarUrl = 'data:image/png;base64,' + base64String;
+                                result.userAvatarUrl = base64String;
                             } else {
                                 result.userAvatarUrl = null;
                             }
-                        }
-                        if (result.userGenres != null) {
-                            // The genres of the user are cast to an array of numbers with the genre ids
-                            result.userGenres = result.userGenres.split(",").map(function (x) {return +x});
-                        } else {
-                            result.userGenres = [];
-                        }
-                        res.setHeader('Content-Type', 'application/json');
-                        return res.send(JSON.stringify(result));
+                            res.setHeader('Content-Type', 'application/json');
+                            return res.send(JSON.stringify(result));
+                        }).catch(function (err) {
+                            console.log(err);
+                            return res.status(200).json(result);
+                        });
                     }
-                ).catch(
+                }).catch(
                     function (err) {
                         // Sql Err
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);
-                    }
-                );
+                });
             } else {
                 res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Id');

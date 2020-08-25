@@ -41,7 +41,7 @@ class ShortcutBar extends Component {
 
     render = () => {
         return (
-            <Paper zDepth={1} style={{position: 'fixed', top: 0, left: 0, width: '100%', height: '60px', overflow: 'visible', zIndex: 1}}>
+            <Paper zDepth={1} className='bar'>
                 <Grid container spacing={8}>
                     <Grid item sm={2} xs={1} >
                         {(this.props.loading > 0) ? <CircularProgress className="loadingIcon" size='20' /> : <div/>}

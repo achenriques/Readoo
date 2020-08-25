@@ -50,7 +50,7 @@ class Footer extends Component {
     render() {
         return (
             <div>
-                <div className="Back-Color">
+                <div className="footerColor">
                     <div className="displayed-left">
                         <LS msgId="status" defaultMsg=""/> {this.getCurrentStatus(this.props.selectedIndex)}
                     </div>

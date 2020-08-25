@@ -71,8 +71,7 @@ const initialState = {
         bookSubCommentaries: [],
     },
     genres: {
-        all: [],
-        userGenres: []
+        all: []
     },
     controllerStatus: {
         loading: 0,
@@ -283,18 +282,14 @@ const books = (state = initialState.books, { type, payload, data }) => {
                 ...state,
                 currentBook: state.currentBook + 1,
             };
-        }
-
-        if (state.currentBook + 1 === state.shownBooks.length
+        } else if (state.currentBook + 1 === state.shownBooks.length
             && state.shownBooks.length === constants.NUM_OF_BOOKS) {
             toRet = {
                 ...state,
                 shownBooks: state.loaded.slice(0),
                 currentBook: 0,
             };
-        }
-
-        if (state.currentBook + 1 === state.shownBooks.length
+        } else if (state.currentBook + 1 === state.shownBooks.length
             && state.shownBooks.length < constants.NUM_OF_BOOKS) {
             toRet = {
                 ...state,
@@ -305,14 +300,25 @@ const books = (state = initialState.books, { type, payload, data }) => {
         return toRet;      
 
     case successType(actionTypes.FETCH_LIBROS):
-      console.log(successType(actionTypes.FETCH_LIBROS));
+        console.log(successType(actionTypes.FETCH_LIBROS));
         if (payload.firstTime) {
-            return {
-                ...state,
-                shownBooks: data.data,
-                loaded: data.data,
-                success_fetch: true,
-            };
+            if (data.data.length) {
+                return {
+                    ...state,
+                    shownBooks: data.data,
+                    loaded: data.data,
+                    success_fetch: true,
+                };
+            } else {
+                // If no books returned
+                return {
+                    ...state,
+                    shownBooks: [state.bookDefault],
+                    loaded: [],
+                    success_fetch: true,
+                };
+            }
+            
         } else {
             return {
                 ...state,
@@ -601,7 +607,7 @@ export const getIsOpenModal = (state) => state.dialogs;
 export const getUserId = (state) => state.user.userId;
 export const getUser = (state) => state.user;
 export const getGenres = (state) => state.genres.all;
-export const getUserGenres = (state) => state.genres.userGenres;
+export const getUserGenres = (state) => state.user.userGenres;
 export const getBookIndex = (state) => state.books.currentBook;
 export const getBooks = (state) => state.books.shownBooks;
 export const getCommentaries = (state) => state.comentaries.bookCommentaries;
