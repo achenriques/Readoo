@@ -61,7 +61,7 @@ class BodyContainer extends Component {
             case 3:
                 return (
                     <div className='bodyContainer'>
-                        <ProfileView/>
+                        <ProfileView previewUser={null}/>
                     </div>
                 );
 

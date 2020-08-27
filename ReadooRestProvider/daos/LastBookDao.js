@@ -12,14 +12,14 @@ class LastBookDao extends DaoManager {
         return this.executeStatment(statement);
     }
 
-    getLastBook(userId) {
+    getLastBook(userId, genreId) {
         let statement = queries.lastUsersBook;
-        return this.executeStatment(statement, [userId]);
+        return this.executeStatment(statement, [userId, genreId]);
     }
 
-    addOrUpdateBook(userId, bookId) {
+    addOrUpdateBook(userId, bookId, genreId) {
         let statement = queries.insertUpdateLastBook;
-        return this.executeStatment(statement, [userId, bookId, bookId])
+        return this.executeStatment(statement, [userId, bookId, genreId, bookId])
     }
 
     deleteLastBook(bookId) {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchCommentaries, fetchSubCommentaries, writeComment, sendComment, actionTypes } from '../../app_state/actions';
+import { fetchCommentaries, fetchSubCommentaries, writeComment, sendComment, setIsOpenProfilePreview, actionTypes } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Grid from '@material-ui/core/Grid';
 import { GridList, GridListTile, GridListTileBar } from '@material-ui/core';
@@ -20,6 +20,7 @@ import LS from '../LanguageSelector';
 import avatarDefault from '../../resources/avatarDefault.svg';
 import { parseInputText } from '../../utils/AppUtils';
 import { DISPLAY_NONE, NUM_OF_COMENTARIES, REST_FAILURE, REST_SUCCESS, REST_DEFAULT } from '../../constants/appConstants';
+import ProfilePreviewModal from '../profile/ProfilePreviewModal';
 
 class CommentsGrid extends Component {
 
@@ -29,7 +30,8 @@ class CommentsGrid extends Component {
         currentBookId: null,
         commentFatherId: null,
         expandComment: null,
-        loadMoreCount: 1
+        loadMoreCount: 1,
+        previewUser: null
     }
 
     constructor(props) {
@@ -260,7 +262,13 @@ class CommentsGrid extends Component {
 
     handleAvatarClick (evt, userId) {
         evt.stopPropagation();
-        console.log("I made click on avatar: " + userId);
+        if (userId) {
+            console.log("I made click on avatar: " + userId);
+            this.setState({
+                ...this.state,
+                previewUser: userId
+            }, () => this.props.openProfilePreview(true));
+        }
     }
 
 
@@ -413,6 +421,7 @@ class CommentsGrid extends Component {
                                 {(this.isLoading() || this.isLoadingSubs()) ? <CircularProgress className="loadingIcon" size='20' /> : <ExpandMoreIcon />}
                             </Button >
                             </p>
+                            <ProfilePreviewModal previewUser={this.state.previewUser}/>
                         </div>
                     );
                 }
@@ -473,6 +482,7 @@ export default connect(
         fetchCommentaries: (bookId, nCommentaries, lastDate, fetchMore) => dispatch(fetchCommentaries(bookId, nCommentaries, lastDate, fetchMore)),
         fetchSubCommentaries: (bookId, fatherCommentaryId, nCommentaries, lastDate, fetchMore) => dispatch(fetchSubCommentaries(bookId, fatherCommentaryId, nCommentaries, lastDate, fetchMore)),
         writeComment: (newComment) => dispatch(writeComment(newComment)),
-        sendCommentary: (newComment) => dispatch(sendComment(newComment))
+        sendCommentary: (newComment) => dispatch(sendComment(newComment)),
+        openProfilePreview: (isOpen) => dispatch(setIsOpenProfilePreview(isOpen))
     })
 )(CommentsGrid);

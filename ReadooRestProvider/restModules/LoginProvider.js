@@ -4,6 +4,7 @@ const userConfig = require('../util/serverOptions');
 const functions = require('../util/functions');
 const LoginDao = require('../daos/LoginDao');
 const path = require('path');
+const UserGenreDao = require('../daos/UserGenreDao');
 const encoder64 = require('../util/functions').base64_encode;
 const resizeToIcon = require('../util/imageFormater').resizeToIcon;
 const LANGUAGE_ENGLISH = require('../util/constants').LANGUAGE_ENGLISH;
@@ -15,6 +16,8 @@ class LoginProvider {
 
     constructor(app, db) {
         this.loginDao = new LoginDao(db);
+        this.userGenreDao = new UserGenreDao(db);
+        this.returnErrCode = functions.returnErrCode;
         this.login(app);                // Post
         this.isMe(app);                 // Get
         this.logOut(app);               // Get
@@ -40,20 +43,48 @@ class LoginProvider {
                                     { expiresIn: TOKEN_TIME } // expires in 24 hours 
                                 );
                                 result.userPass = '';
-                                // Save date of login of all users.
-                                that.loginDao.registerLog(+result.userId).then(
-                                    function (resultLog) {
-                                        console.log("Registered user with ID: " + result.userId + " logged at " + new Date().toString());
-                                    }
-                                ).catch(function (err) {
-                                    console.log("Error at saving log register: " + err);
-                                });
-                                return res.cookie('token', token, { httpOnly: true }).status(200).json({
-                                            success: true,
-                                            message: 'Authentication successful!',
-                                            userId: result.userId,
-                                            userData: result
+                                // Get user genres
+                                that.userGenreDao.getOneUserGenre(result.userId).then(function(genres) {
+                                    // Set user genres
+                                    result.userGenres = genres.map(function (g) { return +g.genreId });
+                                    // Save date of login of all users.
+                                    that.loginDao.registerLog(+result.userId).then(
+                                        function (resultLog) {
+                                            console.log("Registered user with ID: " + result.userId + " logged at " + new Date().toString());
+                                        }
+                                    ).catch(function (err) {
+                                        console.log("Error at saving log register: " + err);
+                                    });
+                                    // Convert image to icon
+                                    if (result.userAvatarUrl) {
+                                        let avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + result.userAvatarUrl.trim());
+                                        resizeToIcon(avatarFile).then(function (base64String) {
+                                            if (base64String) {
+                                                result.userAvatarUrl = base64String;
+                                            } else {
+                                                result.userAvatarUrl = null;
+                                            }
+                                            // return statement
+                                            return res.cookie('token', token, { httpOnly: true }).status(200).json({
+                                                success: true,
+                                                message: 'Authentication successful!',
+                                                userId: result.userId,
+                                                userData: result
+                                            });
+                                        }).catch(function (err) {
+                                            console.log(err);
+                                            // return statement
+                                            return res.cookie('token', token, { httpOnly: true }).status(200).json({
+                                                success: true,
+                                                message: 'Authentication successful!',
+                                                userId: result.userId,
+                                                userData: result
+                                            });
                                         });
+                                    }
+                                }).catch(function(err) {
+                                    return that.returnErrCode(err, res);
+                                });
                             } else {
                                 return res.status(401).send({ auth: false, info: 'wrong.pass'});
                             }
@@ -61,13 +92,9 @@ class LoginProvider {
                             return res.status(401).send({ auth: false, info: 'no.user.exists'});
                         }
                     }
-                ).catch(
-                    function (err) {
-                        let reqError = functions.getRequestError(err);
-                        return res.status(reqError.code)        // HTTP status 204: NotContent
-                            .send(reqError.text);
-                    }
-                );
+                ).catch(function(err) {
+                    return that.returnErrCode(err, res);
+                });
             } else {
                 return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Data');
@@ -131,13 +158,9 @@ class LoginProvider {
                             });
                         }
                     }
-                ).catch(
-                    function (err) {
-                        let reqError = functions.getRequestError(err);
-                        return res.status(reqError.code)        // HTTP status 204: NotContent
-                            .send(reqError.text);
-                    }
-                );
+                ).catch(function(err) {
+                    return that.returnErrCode(err, res);
+                });
             });
         });
     }
@@ -186,13 +209,9 @@ class LoginProvider {
                         res.setHeader('Content-Type', 'application/json');
                         return res.status(200).send(result.length === 0);
                     }
-                ).catch(
-                    function (err) {
-                        let reqError = functions.getRequestError(err);
-                        return res.status(reqError.code)        // HTTP status 204: NotContent
-                            .send(reqError.text);
-                    } 
-                );
+                ).catch(function(err) {
+                    return that.returnErrCode(err, res);
+                });
             } else {
                 return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Data');
@@ -209,13 +228,9 @@ class LoginProvider {
                         res.setHeader('Content-Type', 'application/json');
                         return res.status(200).send(result.length === 0);
                     }
-                ).catch(
-                    function (err) {
-                        let reqError = functions.getRequestError(err);
-                        return res.status(reqError.code)        // HTTP status 204: NotContent
-                            .send(reqError.text);
-                    } 
-                );
+                ).catch(function(err) {
+                    return that.returnErrCode(err, res);
+                });
             } else {
                 return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Data');
@@ -260,13 +275,9 @@ class LoginProvider {
                             console.log("Error at saving log register: " + err);
                         });
                     }
-                ).catch(
-                    function (err) {
-                        let reqError = functions.getRequestError(err);
-                        return res.status(reqError.code)        // HTTP status 204: NotContent
-                            .send(reqError.text);
-                    }
-                );
+                ).catch(function(err) {
+                    return that.returnErrCode(err, res);
+                });
             } else {
                 return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Data');

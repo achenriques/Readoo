@@ -1,5 +1,12 @@
 const fs = require('fs');
 
+// prepare return error for a response
+const returnErrCode = function(error, response) {
+    let reqError = functions.getRequestError(error);
+    return response.status(reqError.code)        // HTTP status 204: NotContent
+        .send(reqError.text);
+}
+
 // function to encode file data to base64 encoded string
 const base64_encode = function (file) {
     let toRet = '';
@@ -35,4 +42,4 @@ const getRequestError = function (code) {
     }
 }
 
-module.exports = {base64_encode, getRequestError};
+module.exports = {returnErrCode, base64_encode, getRequestError};

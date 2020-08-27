@@ -58,7 +58,9 @@ class ProfileView extends Component {
         helpKarmaOpen: false,
         alreadyLoadedTab: false,
         openContinueDeleteProfile: false,
-        genresColected: false
+        genresColected: false,
+        isPreview: false,
+        previewUser: null
     };
 
     constructor(props) {
@@ -67,7 +69,11 @@ class ProfileView extends Component {
         this.profileDataGridRef = React.createRef();
         this.profileDataGridHeight = 0;
         this.profileDataGridWidth = 0;
-        this.state = { ...this.initialState };
+        this.state = { 
+            ...this.initialState, 
+            isPreview: props.previewUser !== null,
+            previewUser: props.previewUser
+        };
     };
 
     componentDidMount = () => {
@@ -256,7 +262,7 @@ class ProfileView extends Component {
             userSurname: (this.state.userSurname != "" && this.state.userSurname !== this.state.userData.userSurname) ? this.state.userSurname : null,
             userAboutMe: (this.state.userAboutMe !== this.state.userData.userAboutMe) ? this.state.userAboutMe : null
         }
-
+        
         // Sets the user Id in the object sent to back
         newUserData.userId = this.props.userId;
         let genresHasChange = checkGenresDiff();
@@ -282,11 +288,14 @@ class ProfileView extends Component {
             (newUserData.userSurname !== null) && dataToSend.set('userSurname', newUserData.userSurname);
             (newUserData.userAboutMe !== null) && dataToSend.set('userAboutMe', newUserData.userAboutMe);
             (newUserData.oldUserPass !== null) && dataToSend.set('oldUserPass', newUserData.oldUserPass);
-            (genresHasChange) && dataToSend.set('userGenres', JSON.stringify(this.state.userGenres));
+            if (genresHasChange) {
+                newUserData.userGenres = this.state.userGenres;
+                dataToSend.set('userGenres', JSON.stringify(this.state.userGenres));
+            }
             this.setState({
                 ...this.state,
                 acceptDisabled: true
-            }, () => { this.props.saveUserData({form: dataToSend}); })
+            }, () => { this.props.saveUserData(newUserData, {form: dataToSend}); })
         } else {
             this.setState({
                 ...this.state,
@@ -358,7 +367,7 @@ class ProfileView extends Component {
             default:
                 return (
                     <div>
-                        <Grid container className="profileGrid">
+                        <Grid container className={(!this.state.isPreview) ? "profileGrid" : ""}>
                             <Grid item sm={4} className="profileAvatarColumn">
                                 <div style={{ position: "relative"}}>
                                     <Paper elevation={4} className="divProfileAvatar">
@@ -371,24 +380,26 @@ class ProfileView extends Component {
                                         />
                                     </Paper>
                                 </div>
-                                <div className="divUploadAvatarButton">
-                                    <input
-                                        accept="image/*"
-                                        style={DISPLAY_NONE}
-                                        id="uploadAvatarButton"
-                                        multiple
-                                        type="file"
-                                        onChange={this.loadAvatarImage.bind(this)} 
-                                    />
-                                    <label htmlFor="uploadAvatarButton">
-                                        <Button variant="outlined" component="span" className="uploadProfileAvatar" fullWidth>
-                                            <LS msgId='add.portrait.image' defaultMsg='Add image'/>
-                                        </Button>
-                                    </label>
-                                    <p id="error_add_profile_img" className="errorInput" hidden={!this.state.avatarError}>
-                                        <LS msgId='image.exceds.limit' defaultMsg='The image exceds the limit of 5MB'/>
-                                    </p>
-                                </div>
+                                {(!this.state.isPreview)
+                                    ?   <div className="divUploadAvatarButton">
+                                            <input
+                                                accept="image/*"
+                                                style={DISPLAY_NONE}
+                                                id="uploadAvatarButton"
+                                                multiple
+                                                type="file"
+                                                onChange={this.loadAvatarImage.bind(this)} 
+                                            />
+                                            <label htmlFor="uploadAvatarButton">
+                                                <Button variant="outlined" component="span" className="uploadProfileAvatar" fullWidth>
+                                                    <LS msgId='add.portrait.image' defaultMsg='Add image'/>
+                                                </Button>
+                                            </label>
+                                            <p id="error_add_profile_img" className="errorInput" hidden={!this.state.avatarError}>
+                                                <LS msgId='image.exceds.limit' defaultMsg='The image exceds the limit of 5MB'/>
+                                            </p>
+                                        </div>
+                                    :   <div/> }
                             </Grid>
                             <Grid item sm={8} className="perfilDataColumn">
                                 <Paper elevation={16}
@@ -445,48 +456,86 @@ class ProfileView extends Component {
                                                 </div>
                                             </Grid>
                                         </Grid>
-                                        <TextField
-                                            error={this.state.userName.length === 0}
-                                            label={<LS msgId='your.name' defaultMsg='Name'/>}
-                                            id="userName"
-                                            name="userName"
-                                            fullWidth
-                                            inputProps={{
-                                                maxLength: 45,
-                                            }}
-                                            value={this.state.userName}
-                                            onChange={this.oChangeInput.bind(this)}
-                                            className="inputProfileData"
-                                        />
-                                        <br/>
-                                        <TextField
-                                            error={this.state.userSurname.length === 0}
-                                            label={<LS msgId='your.surname' defaultMsg='Surname'/>}
-                                            id="userSurname"
-                                            name="userSurname"
-                                            fullWidth
-                                            inputProps={{
-                                                maxLength: 45,
-                                            }}
-                                            value={this.state.userSurname}
-                                            onChange={this.oChangeInput.bind(this)}
-                                            className="inputProfileData"
-                                        />
-                                        <br/>
-                                        <TextField
-                                            error={this.state.emailError || noAvaliableEmail}
-                                            label={(!this.state.emailError && !noAvaliableEmail) ? (<LS msgId='your.email'/>) : (!noAvaliableEmail) 
-                                                    ? (<LS msgId='isnot.email'/>) : (<LS msgId='email.user.exists'/>)}
-                                            id="userEmail"
-                                            name="userEmail"
-                                            fullWidth
-                                            inputProps={{
-                                                maxLength: 45,
-                                            }}
-                                            value={this.state.userEmail}
-                                            onChange={this.oChangeInput.bind(this)}
-                                            className="inputProfileData"
-                                        />
+                                        {(!this.state.isPreview)
+                                            ?   <div>
+                                                    <TextField
+                                                        error={this.state.userName.length === 0}
+                                                        label={<LS msgId='your.name' defaultMsg='Name'/>}
+                                                        id="userName"
+                                                        name="userName"
+                                                        fullWidth
+                                                        inputProps={{
+                                                            maxLength: 45,
+                                                        }}
+                                                        value={this.state.userName}
+                                                        onChange={this.oChangeInput.bind(this)}
+                                                        className="inputProfileData"
+                                                    />
+                                                    <br/>
+                                                    <TextField
+                                                        error={this.state.userSurname.length === 0}
+                                                        label={<LS msgId='your.surname' defaultMsg='Surname'/>}
+                                                        id="userSurname"
+                                                        name="userSurname"
+                                                        fullWidth
+                                                        inputProps={{
+                                                            maxLength: 45,
+                                                        }}
+                                                        value={this.state.userSurname}
+                                                        onChange={this.oChangeInput.bind(this)}
+                                                        className="inputProfileData"
+                                                    />
+                                                    <br/>
+                                                    <TextField
+                                                        error={this.state.emailError || noAvaliableEmail}
+                                                        label={(!this.state.emailError && !noAvaliableEmail) ? (<LS msgId='your.email'/>) : (!noAvaliableEmail) 
+                                                                ? (<LS msgId='isnot.email'/>) : (<LS msgId='email.user.exists'/>)}
+                                                        id="userEmail"
+                                                        name="userEmail"
+                                                        fullWidth
+                                                        inputProps={{
+                                                            maxLength: 45,
+                                                        }}
+                                                        value={this.state.userEmail}
+                                                        onChange={this.oChangeInput.bind(this)}
+                                                        className="inputProfileData"
+                                                    />
+                                                    <br/>
+                                                    {(this.state.showOldPass) 
+                                                        ?   <div>
+                                                                <TextField
+                                                                    error={this.state.oldUserPass.length === 0}
+                                                                    label={<LS msgId='old.pass' defaultMsg="Current pass"/>}
+                                                                    id="oldUserPass"
+                                                                    name="oldUserPass"
+                                                                    fullWidth
+                                                                    type="password"
+                                                                    inputProps={{
+                                                                        maxLength: 20,
+                                                                    }}
+                                                                    value={this.state.oldUserPass}
+                                                                    onChange={this.oChangeInput.bind(this)}
+                                                                    className="inputProfileData"
+                                                                />
+                                                                <br/>
+                                                            </div>
+                                                        : (<div/>)}
+                                                    <TextField
+                                                        error={this.state.userPass.length === 0}
+                                                        label={<LS msgId='your.pass' defaultMsg='Password'/>}
+                                                        id="userPass"
+                                                        name="userPass"
+                                                        fullWidth
+                                                        type="password"
+                                                        inputProps={{
+                                                            maxLength: 20,
+                                                        }}
+                                                        value={this.state.userPass}
+                                                        onChange={this.oChangeInput.bind(this)}
+                                                        className="inputProfileData"
+                                                    />
+                                                </div>
+                                            :   <div/>}
                                         <br/>
                                         <TextField
                                             label={<LS msgId='about.you' params={(this.state.userAboutMe != null) ? [140 - this.state.userAboutMe.length] : [140]}/>}
@@ -500,43 +549,11 @@ class ProfileView extends Component {
                                             }}
                                             value={this.state.userAboutMe}
                                             onChange={this.oChangeInput.bind(this)}
-                                            className="inputProfileData"
-                                        />
-                                        {(this.state.showOldPass)? (
-                                            <div>
-                                                <TextField
-                                                    error={this.state.oldUserPass.length === 0}
-                                                    label={<LS msgId='old.pass' defaultMsg="Current pass"/>}
-                                                    id="oldUserPass"
-                                                    name="oldUserPass"
-                                                    fullWidth
-                                                    type="password"
-                                                    inputProps={{
-                                                        maxLength: 20,
-                                                    }}
-                                                    value={this.state.oldUserPass}
-                                                    onChange={this.oChangeInput.bind(this)}
-                                                    className="inputProfileData"
-                                                />
-                                                <br/>
-                                            </div>
-                                        ): (<div/>)}
-                                        <TextField
-                                            error={this.state.userPass.length === 0}
-                                            label={<LS msgId='your.pass' defaultMsg='Password'/>}
-                                            id="userPass"
-                                            name="userPass"
-                                            fullWidth
-                                            type="password"
-                                            inputProps={{
-                                                maxLength: 20,
-                                            }}
-                                            value={this.state.userPass}
-                                            onChange={this.oChangeInput.bind(this)}
-                                            className="inputProfileData"
                                         />
                                         <br/>
-                                        <GenreSelector 
+                                        <GenreSelector
+                                            readOnly={this.state.isPreview}
+                                            multiple
                                             genresSelected={this.state.userGenres} 
                                             onChange={this.onChangeGenre.bind(this)} 
                                         />
@@ -544,25 +561,28 @@ class ProfileView extends Component {
                                 </RootRef>
                             </Grid>
                         </Grid>
-                        <Grid container alignItems="flex-end">
-                            <Grid item sm={12}>
-                                {(this.state.noChanges) ? (<div className="redInfo"><LS msgId='no.changes' defaultMsg='No changes to save'/></div>) : (<div/>)}
-                                <div className="saveProfileButton">
-                                    <Button variant="flat" color="secondary" 
-                                        onClick={this.openDeleteProfile.bind(this)}
-                                        disabled={this.state.acceptDisabled}
-                                    >
-                                        <LS msgId='delete.profile' defaultMsg='Delete profile!'/>
-                                    </Button>
-                                    <Button variant="flat" color="primary" 
-                                        onClick={this.acceptSaveProfile.bind(this)}
-                                        disabled={this.state.acceptDisabled}
-                                    >
-                                        <LS msgId='save' defaultMsg='Save'/>
-                                    </Button>
-                                </div>
-                            </Grid>
-                        </Grid>
+                        {(!this.state.isPreview)
+                            ?   <Grid container alignItems="flex-end">
+                                    <Grid item sm={12}>
+                                        {(this.state.noChanges) ? (<div className="redInfo"><LS msgId='no.changes' defaultMsg='No changes to save'/></div>) : (<div/>)}
+                                        <div className="saveProfileButton">
+                                            <Button variant="flat" color="secondary" 
+                                                onClick={this.openDeleteProfile.bind(this)}
+                                                disabled={this.state.acceptDisabled}
+                                            >
+                                                <LS msgId='delete.profile' defaultMsg='Delete profile!'/>
+                                            </Button>
+                                            <Button variant="flat" color="primary" 
+                                                onClick={this.acceptSaveProfile.bind(this)}
+                                                disabled={this.state.acceptDisabled}
+                                            >
+                                                <LS msgId='save' defaultMsg='Save'/>
+                                            </Button>
+                                        </div>
+                                    </Grid>
+                                </Grid>
+                            :   <div/>
+                        }
                         <ContinueModal open={this.state.openContinueDeleteProfile} closeCallback={this.acceptDeleteProfile} />
                     </div>
                 )
@@ -583,7 +603,7 @@ export default connect(
         fetchUserData: (userId) => dispatch(fetchUserData(userId)),
         setEmailIsUniqueFalse: () => dispatch(setEmailIsUniqueFalse()),
         checkEmailIsUnique: (email) => dispatch(checkEmailIsUnique(email)),
-        saveUserData: (userData) => dispatch(saveUserData(userData)),
+        saveUserData: (newUserData, userDataForm) => dispatch(saveUserData(newUserData, userDataForm)),
         deleteUser: (userId) => dispatch(dissableUser(userId)),
         resetProccessStatus: (proccessName) => dispatch(resetProccess(proccessName)),
         // Do logOut in case of delete user success...

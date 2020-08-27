@@ -22,7 +22,7 @@ import Divider from '@material-ui/core/Divider';
 import CommentsGrid from '../common/CommentsGrid';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import LS from '../LanguageSelector';
-import { NUM_OF_BOOKS, DISPLAY_NONE, LANGUAGE_SPANISH } from '../../constants/appConstants';
+import { NUM_OF_BOOKS_PER_REQUEST, MIN_BOOK_ID, DISPLAY_NONE, LANGUAGE_SPANISH } from '../../constants/appConstants';
 import noBookDefaultEs from '../../resources/loadingBookEs.svg';
 import noBookDefaultEn from '../../resources/loadingBookEn.svg';
 import bookDefault from '../../resources/bookDefault.gif';
@@ -80,6 +80,7 @@ class ExploreView extends Component {
                     bookCoverUrl: bookCoverUrl,
                     bookDescription: props.shownBooks[props.bookIndex].bookDescription,
                     bookReview: props.shownBooks[props.bookIndex].bookReview,
+                    bookGenreId: props.shownBooks[props.bookIndex].genreId,
                     bookLikes: +props.shownBooks[props.bookIndex].bookLikes,
                     userLikesBook: +props.shownBooks[props.bookIndex].userLikesBook
                 },
@@ -131,9 +132,9 @@ class ExploreView extends Component {
     }
 
     handleForward(evt) {
-        if (this.props.bookIndex === NUM_OF_BOOKS / 2) {
+        if (this.props.bookIndex === NUM_OF_BOOKS_PER_REQUEST) {
             this.props.fetchBooks(this.props.currentUserId, this.props.shownBooks[this.props.shownBooks.length - 1].bookId, this.props.currentUserGenres, false);
-            this.props.nextBook();
+            this.props.nextBook(this.props.currentUserId, this.state.currentBook.bookId, this.state.currentBook.bookGenreId);
         } else if (this.state.isPreviousBook) {
             this.setState({
                 ...this.state,
@@ -143,8 +144,7 @@ class ExploreView extends Component {
             this.setState({
                 ...this.state,
                 previousBook: Object.assign({}, this.state.currentBook)
-            });
-            this.props.nextBook();
+            }, () => this.props.nextBook(this.props.currentUserId, this.state.currentBook.bookId, this.state.currentBook.bookGenreId));
         }
     }
 
@@ -269,7 +269,7 @@ class ExploreView extends Component {
                 <RootRef rootRef={this.cardRootRef}>
                     <Card classes={{ root: 'styleCardRoot' }} onScroll={this.displayScrollButton.bind(this)}>
                         <CardMedia style={material_styles.styleCard} src="empty"
-                        //overlay={<CardTitle title="Overlay title" subtitle="Overlay subtitle" />}
+                            //overlay={<CardTitle title="Overlay title" subtitle="Overlay subtitle" />}
                         >
                         <div className='imageExplore'>
                             <IconButton onClick={this.handleBack.bind(this)} style={material_styles.styleLeftArrow} disabled={(this.state.previousBook)? false: true}>
@@ -278,8 +278,9 @@ class ExploreView extends Component {
                             <IconButton 
                                     onClick={this.handleForward.bind(this)} 
                                     style={material_styles.styleRightArrow} 
-                                    disabled={!this.state.isPreviousBook && this.props.shownBooks.length === 1}>
-                                <ArrowRight style={(this.state.isPreviousBook || this.props.shownBooks.length > 1) ? material_styles.styleArrows : DISPLAY_NONE} />
+                                    disabled={!this.state.isPreviousBook && this.props.shownBooks.length === 1 && this.state.currentBook.bookId < MIN_BOOK_ID}>
+                                <ArrowRight style={(this.state.isPreviousBook || (this.props.shownBooks.length >= 1 && this.state.currentBook.bookId >= MIN_BOOK_ID)) 
+                                        ? material_styles.styleArrows : DISPLAY_NONE} />
                             </IconButton >
                             <div style= {(this.state.bookCoverErr.length)? { color: 'red', paddingTop: '1em' } : DISPLAY_NONE}>
                                 { this.state.bookCoverErr }
@@ -352,7 +353,7 @@ export default connect(
     }),
     (dispatch) => ({
         fetchBooks: (userId, lastBookId, genres, firstTime) => dispatch(fetchBooks(userId, lastBookId, genres, firstTime)),
-        nextBook: () => dispatch(nextBook()),
+        nextBook: (userId, bookId, genreId) => dispatch(nextBook(userId, bookId, genreId)),
         doLikeBook: (bookId, userId) => dispatch(doLikeBook(bookId, userId)),
         doDislikeBook: (bookId, userId) => dispatch(doDislikeBook(bookId, userId)),
         reportErrorMessage: (errorMsg) => dispatch(reportErrorMessage(errorMsg))

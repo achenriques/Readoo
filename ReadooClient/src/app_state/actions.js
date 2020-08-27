@@ -9,6 +9,7 @@ const actionTypes = {
     CHANGE_LANGUAGE: 'CHANGE_LANGUAGE',
     CHECK_TOKEN: 'CHECK_TOKEN',
     MODAL_ADD_BOOK: 'MODAL_ADD_BOOK',
+    MODAL_PROFILE_PREVIEW: 'MODAL_PROFILE_PREVIEW',
     UPLOAD_BOOK: 'UPLOAD_BOOK',
     DO_LOGIN: 'DO_LOGIN',
     DO_LOG_OUT: 'DO_LOG_OUT',
@@ -37,7 +38,7 @@ const actionTypes = {
     RESET_ERRORS: 'RESET_ERRORS',
     RESET_PROCCESS: 'RESET_PROCCESS',
     REPORT_ERROR_MESSAGE: 'REPORT_ERROR_MESSAGE'
-}
+};
 
 /* //ACTION CREATORS
 fetchTabsInicial = (userId) => ({
@@ -48,7 +49,7 @@ fetchTabsInicial = (userId) => ({
       id: userId
     }
   )
-}) */
+}); */
 
 // Change TAB in web
 const changeTab = (newTabID) => 
@@ -70,34 +71,34 @@ const resetErrLog = () => ({
     payload: {
         err: []
     }
-})
+});
 
 const resetLoadLog = () => ({
     type: actionTypes.RESET_LOADS,
     payload: {
         load: []
     }
-})
+});
 
 const resetProccess = (proccessName) => ({
     type: actionTypes.RESET_PROCCESS,
     payload: {
         nameOfProcess: proccessName
     }
-})
+});
 
 const changeLanguage = (languageCode) => ({
     type: actionTypes.CHANGE_LANGUAGE,
     payload: {
         languageCode: languageCode
     }
-})
+});
 
 // check user token using JWT
 const checkToken = () => ({
     type: actionTypes.CHECK_TOKEN,
     promise: loginApi.checkToken()
-})
+});
 
 // Open and close Modal Of Add Book
 const setIsOpenAddBook = (isOpen) => ({
@@ -105,145 +106,154 @@ const setIsOpenAddBook = (isOpen) => ({
     payload: {
         isOpen: isOpen
     }
-})
+});
+
+const setIsOpenProfilePreview = (isOpen) => ({
+    type: actionTypes.MODAL_PROFILE_PREVIEW,
+    payload: {
+        isOpen: isOpen
+    }
+});
 
 // Action of upload a new Book
 const uploadBook = (bookData) => ({
     type: actionTypes.UPLOAD_BOOK,
     //payload: {},
     promise: bookApi.uploadBook(bookData)
-})
+});
 
 const fetchGenres = () => ({
     type: actionTypes.FETCH_GENRES,
     promise: bookApi.fetchGenres()
-})
+});
 
 const fetchUserGenres = () => ({
     type: actionTypes.FETCH_USER_GENRES,
     promise: userApi.fetchUserGenres()
-})
+});
 
-const nextBook = () => ({
+const nextBook = (userId, bookId, genreId) => ({
     type: actionTypes.NEXT_BOOK,
-})
+    promise: bookApi.saveLastUserBook(userId, bookId, genreId)
+});
 
 const beforeBook = () => ({
     type: actionTypes.BEFORE_BOOK,
-})
+});
 
 const doLikeBook = (bookId, userId) => ({
     type: actionTypes.I_LIKE_BOOK,
     payload: { like: true},
     promise: userApi.doLikeBook(bookId, userId)
-})
+});
 
 const doDislikeBook = (bookId, userId) => ({
     type: actionTypes.I_LIKE_BOOK,
     payload: { bookId: bookId, like: false},
     promise: userApi.doDislikeBook(bookId, userId)
-})
+});
 
 const fetchBooks = (userId, lastBookId, genres, firstTime) => ({
     type: actionTypes.FETCH_LIBROS,
     payload: { firstTime: firstTime },
     promise: bookApi.fetchBooks(+userId, +lastBookId, genres, NUM_OF_BOOKS)
-})
+});
 
 const fetchMoreBooks = (lastBookId, genres) => ({
     type: actionTypes.FETCH_MORE_BOOKS,
     promise: bookApi.fetchMoreBooks(lastBookId,genres, NUM_OF_BOOKS)
-})
+});
 
 const doLogin = (nickEmail, pass, language) => ({
     type: actionTypes.DO_LOGIN,
     payload: { preferedLanguage: language },
     promise: loginApi.doLogin(nickEmail, pass)
-})
+});
 
 const doLogOut = () => ({
     type: actionTypes.DO_LOG_OUT,
     promise: loginApi.doLogOut()
-})
+});
 
 const doRegister = (nickEmail, pass, email, language) => ({
     type: actionTypes.DO_REGISTER,
     payload: { nickEmail, pass, email, preferedLanguage: language },
     promise: loginApi.doRegister(nickEmail, pass, email, language)
-})
+});
 
 const doneRegister = () => ({
     type: actionTypes.DONE_REGISTER
-})
+});
 
 const checkNickIsUnique = (nick) => ({
     type: actionTypes.CHECK_NICK,
     payload: { nick },
     promise: loginApi.checkNickIsUnique(nick)
-})
+});
 
 const checkEmailIsUnique = (email) => ({
     type: actionTypes.CHECK_EMAIL,
     payload: { email },
     promise: loginApi.checkEmailIsUnique(email)
-})
+});
 
 const setNickIsUniqueFalse = () => ({
     type: actionTypes.CHECKED_NICK
-})
+});
 
 const setEmailIsUniqueFalse = () => ({
     type: actionTypes.CHECKED_EMAIL
-})
+});
 
 const fetchCommentaries = (bookId, nCommentaries, lastDate, fetchMore) => ({
     type: actionTypes.FETCH_COMMENTARIES,
     payload: { fetchMore },
     promise: bookApi.fetchCommentaries(bookId, nCommentaries, lastDate)
-})
+});
 
 const fetchSubCommentaries = (bookId, fatherCommentaryId, nCommentaries, lastDate, fetchMore) => ({
     type: actionTypes.FETCH_SUB_COMMENTARIES,
     payload: { fetchMore },
     promise: bookApi.fetchSubCommentaries(bookId, fatherCommentaryId, nCommentaries, lastDate)
-})
+});
 
 const fetchUserData = (userId) => ({
     type: actionTypes.FETCH_USER_DATA,
     promise: userApi.fetchUserData(userId)
-})
+});
 
 const fetchUserAvatar = (avatarUrl) => ({
     type: actionTypes.FETCH_USER_AVATAR,
     promise: userApi.fetchUserAvatar(avatarUrl)
-})
+});
 
 
-const saveUserData = (userData) => ({
+const saveUserData = (newUserData, userDataForm) => ({
     type: actionTypes.SAVE_USER_DATA,
-    promise: userApi.saveUserData(userData)
-})
+    payload: { newUserData },
+    promise: userApi.saveUserData(userDataForm)
+});
 
 const dissableUser = (userId) => ({
     type: actionTypes.DELETE_USER,
     promise: userApi.dissableUser(userId)
-})
+});
 
 const writeComment = (newComment) => ({
     type: actionTypes.WRITE_COMMENTARY,
     payload: { newComment },
-})
+});
 
 const sendComment = (newComment) => ({
     type: actionTypes.SEND_COMMENTARY,
     payload: { newComment },
     promise: bookApi.sendComment(newComment.commentFatherId, newComment.bookId, newComment.userId, newComment.commentText)
-})
+});
 
 const reportErrorMessage = (errorMsg) => ({
     type: actionTypes.REPORT_ERROR_MESSAGE,
     payload: { errorMsg }
-})
+});
 
 export {
     actionTypes,
@@ -262,6 +272,7 @@ export {
     setNickIsUniqueFalse,
     setEmailIsUniqueFalse,
     setIsOpenAddBook,
+    setIsOpenProfilePreview,
     uploadBook,
     fetchGenres,
     nextBook,
@@ -280,4 +291,4 @@ export {
     saveUserData,
     dissableUser,
     reportErrorMessage
-}
+};

@@ -19,6 +19,7 @@ const initialState = {
     },
     dialogs: {
         isOpenAddBook: false,
+        isOpenProfilePreview: false
     },
     common: {
         appLanguage: constants.LANGUAGE_ENGLISH,
@@ -130,14 +131,21 @@ const tabs = (state = initialState.tabs, { type, payload, data }) => {
 const dialogs = (state = initialState.dialogs, { type, payload, data }) => {
     switch (type) {
         case actionTypes.MODAL_ADD_BOOK:
-        console.log('abro modal: ' + payload.isOpen)
-        return {
-            ...state,
-            isOpenAddBook: payload.isOpen,
-        };
+            console.log('abro modal: ' + payload.isOpen)
+            return {
+                ...state,
+                isOpenAddBook: payload.isOpen,
+            };
+
+        case actionTypes.MODAL_PROFILE_PREVIEW:
+            console.log('abro modal perfil: ' + payload.isOpen)
+            return {
+                ...state,
+                isOpenProfilePreview: payload.isOpen,
+            };
 
         default:
-        return state;
+            return state;
     }
 }
 
@@ -254,8 +262,20 @@ const user = (state = initialState.user, { type, payload, data }) => {
                 };
 
             case successType(actionTypes.FETCH_USER_DATA):
-                console.log(actionTypes.FETCH_USER_DATA)
+                console.log(actionTypes.FETCH_USER_DATA);
                 return userData;
+
+            case successType(actionTypes.SAVE_USER_DATA):
+                console.log(actionTypes.SAVE_USER_DATA);
+                if (payload.newUserData) {
+                    let nextUser = Object.assign({}, state);
+                    Object.keys(payload.newUserData).forEach(
+                        (key) => (payload.newUserData[key] == null || key === "userPass" || key === "oldUserPass") && delete payload.newUserData[key]
+                    );
+                    nextUser = Object.assign(nextUser, payload.newUserData);
+                    return nextUser;
+                }
+                return state;
 
             default:
                 return state;
@@ -271,7 +291,7 @@ const user = (state = initialState.user, { type, payload, data }) => {
  */
 const books = (state = initialState.books, { type, payload, data }) => {
   switch (type) {
-    case actionTypes.NEXT_BOOK:
+    case loadingType(actionTypes.NEXT_BOOK):
         console.log(actionTypes.NEXT_BOOK + ': ' + state.currentBook + '- m:' + state.shownBooks.length + '- c' + state.loaded.length);
         console.log(state.shownBooks);
         console.log(state.loaded);
@@ -517,7 +537,7 @@ const controllerStatus = (state = initialState.controllerStatus, { type, payload
                     // Its me failing... No user connected
                     if (err.response !== undefined) {
                             let info = (err.response.data !== undefined) ? err.response.data.info : "";
-                        switch (err.response) {
+                        switch (err.response.status) {
                             case constants.ERROR_401:
                                 if (info) {
                                     nextFailure.push(getStringMsg(info, 'Error at log portal.'));

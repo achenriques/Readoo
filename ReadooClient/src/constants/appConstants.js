@@ -13,8 +13,11 @@ export const pages = {
 
 export const SHORTCUT_HEIGHT_PX = 60;
 
+export const MIN_BOOK_ID = 1;
 export const NUM_OF_BOOKS = 10;
+export const NUM_OF_BOOKS_PER_REQUEST = NUM_OF_BOOKS / 2;
 export const NUM_OF_COMENTARIES = 5; // MAX COMMENTARIES PER REQUEST. IMPORTANT TO CHANGE THIS NUMBER ALSO IN THE BACK APP (MAX_COMMENTARIES).
+
 export const DISPLAY_NONE = {
     display: 'none'
 }

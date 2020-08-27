@@ -28,14 +28,16 @@ class GenreSelector extends Component {
     initialState = {
         genresToShow: [],
         genresSelected: [],
-        selectText: ''
+        selectText: '',
+        readOnly: false
     }
 
     constructor(props) {
         super(props);
         this.state = { 
             ...this.initialState, 
-            genresSelected: (props.genresSelected) ? props.genresSelected : [] 
+            genresSelected: (props.genresSelected) ? props.genresSelected : [],
+            readOnly: (props.readOnly) ? true : false
         };
     };
 
@@ -70,19 +72,21 @@ class GenreSelector extends Component {
     }
 
     handleGenreChange = (evt) => {
-        let value = (evt.target.value === null) ? [] : evt.target.value;   // list of ids type number
-        if (!Array.isArray(value)) {
-            value = [value]
+        if (!this.state.readOnly) {
+            let value = (evt.target.value === null) ? [] : evt.target.value;   // list of ids type number
+            if (!Array.isArray(value)) {
+                value = [value]
+            }
+            let genresSelected = this.props.genres.filter(genre => value.includes(genre.genreId));
+            // Set state
+            this.setState({
+                ...this.state,
+                genresSelected: value.slice(),
+                selectText: this.parseComponentText(genresSelected)
+            });
+    
+            this.props.onChange(genresSelected);
         }
-        let genresSelected = this.props.genres.filter(genre => value.includes(genre.genreId));
-        // Set state
-        this.setState({
-            ...this.state,
-            genresSelected: value.slice(),
-            selectText: this.parseComponentText(genresSelected)
-        });
-
-        this.props.onChange(genresSelected);
     }
 
     render = () => {

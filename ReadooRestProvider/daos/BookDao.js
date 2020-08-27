@@ -12,15 +12,15 @@ class BookDao extends DaoManager {
         return this.executeStatment(statement);
     }
 
-    getBunchOfBooks(userId, lastBookId, genres, lastDate, numberOfBooks) {
+    getBunchOfBooks(userId, genres, lastDate, numberOfBooks) {
         let statement = "";
         let toRet = null;
         if (genres.length) {
             statement = queries.getBunchGenre;
-            toRet = this.executeStatment(statement, [userId, lastBookId, genres, numberOfBooks]);
+            toRet = this.executeStatment(statement, [userId, userId, genres, numberOfBooks]);
         } else {
             statement = queries.getBunch;
-            toRet = this.executeStatment(statement, [userId, lastBookId, numberOfBooks]);
+            toRet = this.executeStatment(statement, [userId, userId, numberOfBooks]);
         }
         return toRet;
     }

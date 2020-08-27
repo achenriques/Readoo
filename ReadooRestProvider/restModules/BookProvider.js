@@ -39,6 +39,7 @@ class BookProvider {
     constructor(app, db) {
         this.bookDao = new BookDao(db);
         this.lastBookDao = new LastBookDao(db);
+        this.returnErrCode = functions.returnErrCode;
         this.getBookCover(app); //Get
         this.getAll(app); //Get
         this.deleteOne(app);  //Delete
@@ -122,9 +123,8 @@ class BookProvider {
         app.post('/book', middleware.verifyToken, function (req, res) {
             let lastOne = req.body.last;
             console.log("Deberia cojer n libros " + lastOne);
-            if (lastOne && lastOne.userId && lastOne.lastBookId && lastOne.numberOfBooks) {
+            if (lastOne && lastOne.userId && lastOne.numberOfBooks) {
                 let userId = lastOne.userId;
-                let lastBookId = lastOne.lastBookId;
                 let genres = lastOne.genres;
                 let lastDate = lastOne.lastDate;
                 let numberOfBooks = lastOne.numberOfBooks;
@@ -133,22 +133,21 @@ class BookProvider {
                     genres = [];
                 }
 
-                const getBunchOfBooks = function (userIdParam, lastBookIdParam, genresParam, lastDateParam, numberOfBooksParam) {
-                    that.bookDao.getBunchOfBooks(userIdParam, lastBookIdParam, genresParam, lastDateParam, numberOfBooksParam).then(
-                        function (result) {
-                            that.parseBookCoverImages(result).then(function (resultOfParse) {
-                                return res.header('Content-Type', 'application/json').status(200).json(resultOfParse);
-                            });
-                        }
-                    ).catch(
-                        function (err) {
-                            let reqError = functions.getRequestError(err);
-                            return res.status(reqError.code) 
-                                .send(reqError.text);
-                        }
-                    );
-                }
+                that.bookDao.getBunchOfBooks(+userId, genres, lastDate, numberOfBooks).then(
+                    function (result) {
+                        that.parseBookCoverImages(result).then(function (resultOfParse) {
+                            return res.header('Content-Type', 'application/json').status(200).json(resultOfParse);
+                        });
+                    }
+                ).catch(
+                    function (err) {
+                        let reqError = functions.getRequestError(err);
+                        return res.status(reqError.code) 
+                            .send(reqError.text);
+                    }
+                );
 
+                /*
                 if (lastBookId < MIN_DB_ID) {
                     that.lastBookDao.getLastBook(+userId).then(
                         function (resultOfLastBook) {
@@ -173,13 +172,9 @@ class BookProvider {
                         }
                     )
                 } else {
-                    that.lastBookDao.addOrUpdateBook(+userId, +lastBookId).catch(
-                        function (err) {
-                            console.log('Error at saving last bookId ' + lastBookId + 'for the userId ' + userId);
-                        }
-                    );
-                    return getBunchOfBooks(userId, lastBookId, genres, lastDate, numberOfBooks)
+                    return getBunchOfBooks(userId, lastBookId, genres, lastDate, numberOfBooks);
                 }
+                */
             } else {
                 res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Id or Data');

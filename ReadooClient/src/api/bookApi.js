@@ -73,6 +73,18 @@ const sendComment = (commentFatherId, bookId, userId, commentText) => axios.post
     }
 )
 
+const saveLastUserBook = (userId, bookId, genreId) => axios.post(
+    `${baseURL}/lastBook`,
+    {
+        lastBook: {
+            userId,
+            bookId,
+            genreId
+        }
+    }
+)
+
+
 export default {
     uploadBook,
     fetchBooks,
@@ -80,5 +92,6 @@ export default {
     fetchGenres,
     fetchCommentaries,
     fetchSubCommentaries,
-    sendComment
+    sendComment,
+    saveLastUserBook
 }
