@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {} from '../constants/appConstants';
+import LanguageSelector from '../components/LanguageSelector';
 const baseURL = 'http://localhost:3030';
 
 // Setted for evict cross-sitting error
@@ -51,10 +52,17 @@ const checkToken = () => axios.get(
     `${baseURL}/login/isme`, { withCredentials: true }
 )
 
+const setLanguageSelected = (languageCode) => axios.post(
+    `${baseURL}/login/languageSelector`,
+    {
+        languageCode
+    }
+)
+
 const setTabSelector = (tabSelector) => axios.post(
     `${baseURL}/login/tabSelector`,
     {
-        tabSelector: tabSelector
+        tabSelector
     }
 )
 
@@ -65,5 +73,6 @@ export default {
     checkEmailIsUnique,
     doLogOut,
     checkToken,
-    setTabSelector
+    setTabSelector,
+    setLanguageSelected
 }

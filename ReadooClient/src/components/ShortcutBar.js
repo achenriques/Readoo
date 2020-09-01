@@ -15,6 +15,7 @@ import LS from '../components/LanguageSelector';
 import { LANGUAGE_ENGLISH, LANGUAGE_SPANISH, pages } from '../constants/appConstants';
 import icon_en from '../resources/language_en.png';
 import icon_es from '../resources/language_es.png';
+import logo from '../resources/favicon.ico';
 import '../styles/ShortcutBar.css';
 
 const explore = <Explore />;
@@ -43,7 +44,11 @@ class ShortcutBar extends Component {
         return (
             <Paper zDepth={1} className='bar'>
                 <Grid container spacing={8}>
-                    <Grid item sm={2} xs={1} >
+                    <Grid item sm={1} xs='auto' className='readooIconGrid'>
+                        <img src={logo} className='readooIcon'/>
+                        <h4>READOO</h4>
+                    </Grid>
+                    <Grid item sm={1} xs={1} >
                         {(this.props.loading > 0) ? <CircularProgress className="loadingIcon" size='20' /> : <div/>}
                     </Grid>
                     <Grid item sm={8} xs={7} >

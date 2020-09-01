@@ -24,11 +24,13 @@ const actionTypes = {
     NEXT_BOOK: 'NEXT_BOOK',
     BEFORE_BOOK: 'BEFORE_BOOK',
     I_LIKE_BOOK: 'I_LIKE_BOOK',
-    FETCH_LIBROS: 'FETCH_LIBROS',
+    FETCH_BOOKS: 'FETCH_BOOKS',
     FETCH_MORE_BOOKS: 'FETCH_MORE_BOOKS',
     FETCH_COMMENTARIES: 'FETCH_COMMENTARIES',
     FETCH_SUB_COMMENTARIES: 'FETCH_SUB_COMMENTARIES',
+    FETCH_FAVOURITES: 'FETCH_FAVOURITES',
     FETCH_USER_DATA: 'FETCH_USER_DATA',
+    FETCH_USER_PREVIEW_DATA: 'FETCH_USER_PREVIEW_DATA',
     FETCH_USER_AVATAR: 'FETCH_USER_AVATAR',
     SAVE_USER_DATA: 'SAVE_USER_DATA',
     DELETE_USER: 'DELETE_USER',
@@ -87,12 +89,18 @@ const resetProccess = (proccessName) => ({
     }
 });
 
-const changeLanguage = (languageCode) => ({
-    type: actionTypes.CHANGE_LANGUAGE,
-    payload: {
-        languageCode: languageCode
+const changeLanguage = (languageCode) => {
+
+     // we do not need to wait a respose
+     loginApi.setLanguageSelected(languageCode);
+
+    return {
+        type: actionTypes.CHANGE_LANGUAGE,
+        payload: {
+            languageCode: languageCode
+        }
     }
-});
+};
 
 // check user token using JWT
 const checkToken = () => ({
@@ -154,7 +162,7 @@ const doDislikeBook = (bookId, userId) => ({
 });
 
 const fetchBooks = (userId, lastBookId, genres, firstTime) => ({
-    type: actionTypes.FETCH_LIBROS,
+    type: actionTypes.FETCH_BOOKS,
     payload: { firstTime: firstTime },
     promise: bookApi.fetchBooks(+userId, +lastBookId, genres, NUM_OF_BOOKS)
 });
@@ -217,9 +225,9 @@ const fetchSubCommentaries = (bookId, fatherCommentaryId, nCommentaries, lastDat
     promise: bookApi.fetchSubCommentaries(bookId, fatherCommentaryId, nCommentaries, lastDate)
 });
 
-const fetchUserData = (userId) => ({
-    type: actionTypes.FETCH_USER_DATA,
-    promise: userApi.fetchUserData(userId)
+const fetchUserData = (userId, isPreview) => ({
+    type: (!isPreview) ? actionTypes.FETCH_USER_DATA : actionTypes.FETCH_USER_PREVIEW_DATA,
+    promise: userApi.fetchUserData(userId, isPreview)
 });
 
 const fetchUserAvatar = (avatarUrl) => ({
@@ -248,6 +256,12 @@ const sendComment = (newComment) => ({
     type: actionTypes.SEND_COMMENTARY,
     payload: { newComment },
     promise: bookApi.sendComment(newComment.commentFatherId, newComment.bookId, newComment.userId, newComment.commentText)
+});
+
+const fetchFavourites = (userId, page, booksPerPage) => ({
+    type: actionTypes.FETCH_FAVOURITES,
+    payload: { page, booksPerPage },
+    promise: bookApi.fetchFavourites(userId, page, booksPerPage)
 });
 
 const reportErrorMessage = (errorMsg) => ({
@@ -283,6 +297,7 @@ export {
     fetchCommentaries,
     fetchSubCommentaries,
     fetchMoreBooks,
+    fetchFavourites,
     fetchUserData,
     fetchUserGenres,
     fetchUserAvatar,

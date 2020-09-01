@@ -25,9 +25,11 @@ class UserLikesBookDao extends DaoManager{
     insertOrUpdateUserLike(userId, bookId) {
         let statementUserLikesBook = queries.insertUserLike;
         let statementBookLikesCounter = queries.updateBookCounter;
+        let statementUserKarma = queries.updateKarma;
         let operationOfInsert = [statementUserLikesBook, [userId, bookId]];
-        let operationOfUpdate = [statementBookLikesCounter, [+1, +1, bookId]];
-        return this.executeStatmentOnSameTransaction([operationOfInsert, operationOfUpdate]);
+        let operationOfUpdateBook = [statementBookLikesCounter, [+1, +1, bookId]];
+        let operationOfUpdateUser = [statementUserKarma, [+1, +1, userId]];
+        return this.executeStatmentOnSameTransaction([operationOfInsert, operationOfUpdateBook, operationOfUpdateUser]);
     }
     
     updateUserBookLike(userId, bookId, likeBoolean) {
@@ -38,9 +40,11 @@ class UserLikesBookDao extends DaoManager{
     deleteUserLikes(userId, bookId) {
         let statementDeleteUserLikesBook = queries.deleteUserLikes;
         let statementBookLikesCounter = queries.updateBookCounter;
+        let statementUserKarma = queries.updateKarma;
         let operationOfDelete = [statementDeleteUserLikesBook, [userId, bookId]];
-        let operationOfUpdate = [statementBookLikesCounter, [-1, -1, bookId]];
-        return this.executeStatmentOnSameTransaction([operationOfDelete, operationOfUpdate]);
+        let operationOfUpdateBook = [statementBookLikesCounter, [-1, -1, bookId]];
+        let operationOfUpdateUser = [statementUserKarma, [-1, -1, userId]];
+        return this.executeStatmentOnSameTransaction([operationOfDelete, operationOfUpdateBook, operationOfUpdateUser]);
     }        
 }
 

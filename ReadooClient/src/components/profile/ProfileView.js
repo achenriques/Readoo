@@ -65,7 +65,7 @@ class ProfileView extends Component {
 
     constructor(props) {
         super(props);
-        this.helpIconRef = null;
+        this.helpIconRef = React.createRef();
         this.profileDataGridRef = React.createRef();
         this.profileDataGridHeight = 0;
         this.profileDataGridWidth = 0;
@@ -77,36 +77,60 @@ class ProfileView extends Component {
     };
 
     componentDidMount = () => {
-        this.props.fetchUserData(this.props.userId);
+        if (!this.state.isPreview) {
+            this.props.fetchUserData(this.props.userId, false);
+        } else {
+            this.props.fetchUserData(this.props.previewUser, true);
+        }
     }
 
     componentDidUpdate = (prevProps, prevState, snapshot) => {
-        if(this.state.loadingProfile !== RUNNING_PROFILE && !this.state.alreadyLoadedTab 
-                && this.props.userData != null) {
-            if (this.props.userData.userId != null) {
-                this.setState({
-                    ...this.state,
-                    loadingProfile: RUNNING_PROFILE,
-                    userData: this.props.userData,
-                    avatarImage: (this.props.userData.userAvatarUrl != null) ?  this.props.userData.userAvatarUrl.trim() : avatarDefault,
-                    userNick: this.props.userData.userNick,
-                    userPass: "******",
-                    userEmail: this.props.userData.userEmail,
-                    userName: (this.props.userData.userName != null) ? this.props.userData.userName : "",
-                    userSurname: (this.props.userData.userSurname != null) ? this.props.userData.userSurname : "",
-                    userAboutMe: (this.props.userData.userAboutMe != null) ? this.props.userData.userAboutMe : "",
-                    userKarma: +this.props.userData.userKarma,
-                    userGenres: (this.props.userData.userGenres != null) ? this.props.userData.userGenres : [],
-                    alreadyLoadedTab: true,
-                    helpKarmaOpen: false
-                });
+        if(this.state.loadingProfile === LOADING_PROFILE && !this.state.alreadyLoadedTab && !this.isLoadingUserData(this.state.isPreview)) {
+            let errorState = {
+                ...this.state,
+                loadingProfile: ERROR_PROFILE,
+            };
+            if (!this.state.isPreview) {
+                if (this.props.userData != null) {
+                    this.setState({
+                        ...this.state,
+                        loadingProfile: RUNNING_PROFILE,
+                        userData: this.props.userData,
+                        avatarImage: (this.props.userData.userAvatarUrl != null) ?  this.props.userData.userAvatarUrl.trim() : avatarDefault,
+                        userNick: this.props.userData.userNick,
+                        userPass: "******",
+                        userEmail: this.props.userData.userEmail,
+                        userName: (this.props.userData.userName != null) ? this.props.userData.userName : "",
+                        userSurname: (this.props.userData.userSurname != null) ? this.props.userData.userSurname : "",
+                        userAboutMe: (this.props.userData.userAboutMe != null) ? this.props.userData.userAboutMe : "",
+                        userKarma: +this.props.userData.userKarma,
+                        userGenres: (this.props.userData.userGenres != null) ? this.props.userData.userGenres : [],
+                        alreadyLoadedTab: true,
+                        helpKarmaOpen: false
+                    });
+                } else {
+                    this.setState(errorState);
+                }
             } else {
-                this.setState({
-                    ...this.state,
-                    loadingProfile: ERROR_PROFILE,
-                });
+                if (this.props.userPreviewData != null) {
+                    this.setState({
+                        ...this.state,
+                        loadingProfile: RUNNING_PROFILE,
+                        userData: this.props.userPreviewData,
+                        avatarImage: (this.props.userPreviewData.userAvatarUrl != null) ?  this.props.userPreviewData.userAvatarUrl.trim() : avatarDefault,
+                        userNick: this.props.userPreviewData.userNick,
+                        userAboutMe: (this.props.userPreviewData.userAboutMe != null) ? this.props.userPreviewData.userAboutMe : "",
+                        userKarma: +this.props.userPreviewData.userKarma,
+                        userGenres: (this.props.userPreviewData.userGenres != null) ? this.props.userPreviewData.userGenres : [],
+                        alreadyLoadedTab: true,
+                        helpKarmaOpen: false
+                    });
+                } else {
+                    this.setState(errorState);
+                }
             }
         }
+
         if (this.state.acceptDisabled && this.state.acceptDisabledText === 'loading' && this.props.failedProcesses && this.props.succeedProcesses && this.props.loadingProcesses) {
             let statusOfSaveUser = getProccessStatus(actionTypes.SAVE_USER_DATA, this.props.loadingProcesses, this.props.failedProcesses, this.props.succeedProcesses, () => { this.props.resetProccessStatus(actionTypes.SAVE_USER_DATA)});
             
@@ -172,6 +196,14 @@ class ProfileView extends Component {
             }
         }
         return;
+    }
+
+    isLoadingUserData = (isPreveiw) => {
+        if (isPreveiw) {
+            return this.props.loadingProcesses.includes(actionTypes.FETCH_USER_PREVIEW_DATA);
+        } else {
+            return this.props.loadingProcesses.includes(actionTypes.FETCH_USER_DATA);
+        }
     }
 
     checkEmail = (val) => {
@@ -328,9 +360,7 @@ class ProfileView extends Component {
     }
 
     showKarmaHelp = (evt) => {
-        if (this.helpIconRef === null) {
-            this.helpIconRef = evt.currentTarget;
-        }
+        this.helpIconRef = evt.currentTarget;
         this.setState({
             ...this.state,
             helpKarmaOpen: !this.state.helpKarmaOpen
@@ -353,13 +383,13 @@ class ProfileView extends Component {
         switch (this.state.loadingProfile) {
             case ERROR_PROFILE:
                 return (
-                    <div className="loadingCommentaries">
+                    <div className="loadingNewTab">
                         <h3><LS msgId='timeout.error' defaultMsg='An error has ocurred...'/></h3>
                     </div>
                 )
             case LOADING_PROFILE:
                 return (
-                    <div className="loadingCommentaries">
+                    <div className="loadingNewTab">
                         <h3><LS msgId='loading' defaultMsg='Loading...'/></h3>
                     </div>
                 )
@@ -443,7 +473,7 @@ class ProfileView extends Component {
                                                     className="inputProfileData"
                                                 />
                                             </Grid>
-                                            <Grid item sm={1} className='profileKarmaIconColumn'>
+                                            <Grid item sm={1} className='profileKarmaIconColumn' style={(this.state.isPreview) ? DISPLAY_NONE : {}}>
                                                 <div>
                                                     <IconButton ref={this.helpIconRef} onClick={this.showKarmaHelp.bind(this)}>
                                                         {iconHelp}
@@ -594,13 +624,14 @@ export default connect(
     (state) => ({
         userId: appState.getUserId(state),
         userData: appState.getUser(state),
+        userPreviewData: appState.getUserPreview(state),
         avaliableEmail: appState.getAvaliableEmail(state),
         loadingProcesses: appState.getLoadingProcesses(state),
         succeedProcesses: appState.getSucceedProcesses(state),
         failedProcesses: appState.getFailedProcesses(state)
     }),
     (dispatch) => ({
-        fetchUserData: (userId) => dispatch(fetchUserData(userId)),
+        fetchUserData: (userId, isPreveiw) => dispatch(fetchUserData(userId, isPreveiw)),
         setEmailIsUniqueFalse: () => dispatch(setEmailIsUniqueFalse()),
         checkEmailIsUnique: (email) => dispatch(checkEmailIsUnique(email)),
         saveUserData: (newUserData, userDataForm) => dispatch(saveUserData(newUserData, userDataForm)),

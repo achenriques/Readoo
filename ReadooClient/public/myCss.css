@@ -12,6 +12,10 @@ div#appDiv {
     height: 100%;
 }
 
+.displayNone {
+    display: none;
+}
+
 .styleRoot {
     position: relative;
     display: flex;
@@ -220,6 +224,13 @@ div#appDiv {
 .commentaryNickName {
     color: black;
     padding-left: 10px;
+}
+
+.centeredText {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 /*

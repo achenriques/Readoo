@@ -36,6 +36,11 @@ class LoginDao extends DaoManager{
         let statement = queries.informLog;
         return this.executeStatment(statement, [userId]);
     }
+
+    changeUserLanguage(userId, languageCode) {
+        let statement = queries.changeLanguage;
+        return this.executeStatment(statement, [languageCode, userId]);
+    }
             
 }
 

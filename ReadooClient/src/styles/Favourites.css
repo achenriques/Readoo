@@ -1,0 +1,62 @@
+.favouritesGrid {
+    position: relative;
+}
+
+.favouritesGridRight {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.grbookId {
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    top: 0;
+    padding: 5px;
+}
+
+.grSelectedBookId {
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    top: 0;
+    padding: 3px;
+    border: 2px solid red;
+}
+
+.tileBackGround {
+    background-color: lightgray;
+}
+
+.favouritesCover {
+    width: 100%;
+    height: auto;
+    transform: none;
+    top: 0%;
+    left: 0%;
+    right: 0%;
+    bottom: 0%;
+    margin: auto;
+    cursor: pointer;
+}
+
+.favouritesBookTitle {
+    text-align: left;
+}
+
+.inlineBlock {
+    display: inline-block;
+}
+
+.inlineBlockButton {
+    display: inline-block;
+    width: 88%;
+}
+
+.favouritesCommentDiv {
+    position: absolute;
+    height: auto;
+    max-height: 100%;
+    overflow-y: auto;
+}

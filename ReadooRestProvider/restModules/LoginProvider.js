@@ -25,6 +25,7 @@ class LoginProvider {
         this.isAvaliableEmail(app);     // Get
         this.newUser(app);              // Post
         this.selectTab(app);            // Post
+        this.selectLanguage(app);       // Post
     }
 
     login(app) {
@@ -151,6 +152,9 @@ class LoginProvider {
                                 if (decoded.tabSelector != null) {
                                     result.tabSelector = +decoded.tabSelector;
                                 }
+                                if (decoded.languageCode != null) {
+                                    result.languageCode = +decoded.languageCode;
+                                }
                                 return res.status(200).json(result);
                             }).catch(function (err) {
                                 console.log(err);
@@ -258,6 +262,15 @@ class LoginProvider {
                                 USER_CREDENTIAL, 
                                 { expiresIn: TOKEN_TIME } // expires in 24 hours}
                             );
+                            // Save date of login of all users.
+                            that.loginDao.registerLog(+result.userId).then(
+                                function (resultLog) {
+                                    console.log("Registered user with ID: " + result.userId + " logged at " + new Date().toString());
+                                }
+                            ).catch(function (err) {
+                                console.log("Error at saving log register: " + err);
+                            });
+                            // return ...
                             return res.cookie('token', token, { httpOnly: true }).status(200).json({
                                 success: true,
                                 message: 'Authentication successful!',
@@ -266,14 +279,6 @@ class LoginProvider {
                         } else {
                             console.log("Not user saved. Something did not work!");
                         }
-                        // Save date of login of all users.
-                        that.loginDao.registerLog(+result.userId).then(
-                            function (resultLog) {
-                                console.log("Registered user with ID: " + result.userId + " logged at " + new Date().toString());
-                            }
-                        ).catch(function (err) {
-                            console.log("Error at saving log register: " + err);
-                        });
                     }
                 ).catch(function(err) {
                     return that.returnErrCode(err, res);
@@ -319,6 +324,60 @@ class LoginProvider {
                         if (decoded.tabSelector != tabSelector) {
                             let tokenWithSelector = jwt.sign(
                                 { userId: decoded.userId, tabSelector: +tabSelector },
+                                USER_CREDENTIAL,
+                                { expiresIn: TOKEN_TIME } // expires in 24 hours 
+                            );
+                            return res.cookie('token', tokenWithSelector, { httpOnly: true }).status(200).json('success');
+                        }
+                    }
+                });
+            } else {
+                return res.status(200).send("");
+            }
+        });   
+    }
+
+    selectLanguage(app) {
+        const that = this;
+        app.post('/login/languageSelector', function (req, res) {
+            console.log("Estoy con languageSelector " + req.body.languageSelector);  
+            let languageCode = req.body.languageCode;   
+            if (languageCode != null) {
+                // Save on the token the current tab ID
+                let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
+                if (token === undefined && req.headers.cookie !== undefined) {
+                    let stringFromCookie = req.headers.cookie;
+                    let cookieTokenValues = new RegExp('token' + "=([^;]+)").exec(stringFromCookie);
+                    if (cookieTokenValues.length) {
+                        token = cookieTokenValues[1];
+                    }
+                }
+        
+                if (!token) {
+                    return res.status(403).send({ auth: false, info: 'no.token.provided', message: 'No token provided.' });
+                }
+                // No util info
+                if (token.startsWith('Bearer ')) {
+                    // Remove Bearer from string
+                    token = token.slice(7, token.length);
+                }
+              
+                jwt.verify(token, USER_CREDENTIAL, function(err, decoded) {
+                    if (err) {
+                        // We send 403 to identify when the session has expired
+                        return res.status(403).send({ auth: false, message: 'Failed to authenticate token.' });
+                    } else {
+                        // If language selector is not null or undefined this selector will be saved on the cookie
+                        that.loginDao.changeUserLanguage(+decoded.userId, +languageCode).then(
+                            function (resultLog) {
+                                console.log("Changed language");
+                            }
+                        ).catch(function (err) {
+                            console.log("Error at changing user language");
+                        });
+                        if (decoded.languageCode != +languageCode) {
+                            let tokenWithSelector = jwt.sign(
+                                { userId: decoded.userId, tabSelector: (decoded.tabSelector) ? decoded.tabSelector : 0, languageCode: +languageCode },
                                 USER_CREDENTIAL,
                                 { expiresIn: TOKEN_TIME } // expires in 24 hours 
                             );

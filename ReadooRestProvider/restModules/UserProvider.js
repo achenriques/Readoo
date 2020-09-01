@@ -93,9 +93,10 @@ class UserProvider {
         const that = this;
         app.get('/user', middleware.verifyToken, function (req, res) {
             let userId = req.query.id;
+            let isPreview = (req.query.isPreview == true) ? true : false;
             console.log("Estoy getteando " + userId);
             if (userId) {
-                that.userDao.getOneUser(+userId).then(function (result) {
+                that.userDao.getOneUser(+userId, isPreview).then(function (result) {
                     // Parse genres
                     if (result.userGenres != null) {
                         // The genres of the user are cast to an array of numbers with the genre ids

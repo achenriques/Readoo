@@ -26,6 +26,15 @@ const initialState = {
         userIsLogged : constants.USER_NOT_IS_LOGGED,
         avaliableNick : null,
         avaliableEmail: null,
+        userPreview: {
+            userId: '',
+            userNick: '',
+            userAvatarUrl: '',
+            userAboutMe: '',
+            userKarma: null,
+            userGenres: [],
+            userVisible: true
+        }
     },
     user: {
         userId: '',
@@ -65,11 +74,14 @@ const initialState = {
         currentBook: 0,
         shownBooks: [],
         loaded: [],
+        favourites: [],
+        favouritesLoaded: [],
         success_fetch: true,
+        favourites_success_fetch: true
     },
     comentaries: {
         bookCommentaries: [],
-        bookSubCommentaries: [],
+        bookSubCommentaries: []
     },
     genres: {
         all: []
@@ -161,10 +173,14 @@ const common = (state = initialState.common, { type, payload, data }) => {
 
         case successType(actionTypes.CHECK_TOKEN):
             console.log(actionTypes.CHECK_TOKEN);
-            return {
+            let nextState = {
                 ...state,
                 userIsLogged: constants.USER_IS_LOGGED
+            };
+            if (data.data && data.data.languageCode != null) {
+                nextState.appLanguage = +data.data.languageCode;
             }
+            return nextState;
             
         case successType(actionTypes.DO_LOGIN):
             return {
@@ -189,6 +205,20 @@ const common = (state = initialState.common, { type, payload, data }) => {
                 ...state,
                 userIsLogged: constants.USER_IS_LOGGED
             }
+
+        case successType(actionTypes.FETCH_USER_PREVIEW_DATA): {
+            if (data.data !== undefined) {
+                return {
+                    ...state,
+                    userPreview: data.data
+                }
+            } else {
+                return {
+                    ...state,
+                    userPreview: null
+                };
+            }
+        }
 
         case successType(actionTypes.CHECK_NICK):
             return {
@@ -283,81 +313,110 @@ const user = (state = initialState.user, { type, payload, data }) => {
     } else {
         return state;
     }
-    
 }
 
 /**
  * Reducer para los books a mostrar y operaciones de las mismas
  */
 const books = (state = initialState.books, { type, payload, data }) => {
-  switch (type) {
-    case loadingType(actionTypes.NEXT_BOOK):
-        console.log(actionTypes.NEXT_BOOK + ': ' + state.currentBook + '- m:' + state.shownBooks.length + '- c' + state.loaded.length);
-        console.log(state.shownBooks);
-        console.log(state.loaded);
+    switch (type) {
+        case loadingType(actionTypes.NEXT_BOOK):
+            console.log(actionTypes.NEXT_BOOK + ': ' + state.currentBook + '- m:' + state.shownBooks.length + '- c' + state.loaded.length);
+            console.log(state.shownBooks);
+            console.log(state.loaded);
 
-        let toRet = {};
-        if (state.currentBook +1 < state.shownBooks.length) {
-            toRet = {
-                ...state,
-                currentBook: state.currentBook + 1,
-            };
-        } else if (state.currentBook + 1 === state.shownBooks.length
-            && state.shownBooks.length === constants.NUM_OF_BOOKS) {
-            toRet = {
-                ...state,
-                shownBooks: state.loaded.slice(0),
-                currentBook: 0,
-            };
-        } else if (state.currentBook + 1 === state.shownBooks.length
-            && state.shownBooks.length < constants.NUM_OF_BOOKS) {
-            toRet = {
-                ...state,
-                shownBooks: [ state.bookDefault ],
-                currentBook: 0,
-            };
-        }
-        return toRet;      
+            let toRet = {};
+            if (state.currentBook +1 < state.shownBooks.length) {
+                toRet = {
+                    ...state,
+                    currentBook: state.currentBook + 1,
+                };
+            } else if (state.currentBook + 1 === state.shownBooks.length
+                && state.shownBooks.length === constants.NUM_OF_BOOKS) {
+                toRet = {
+                    ...state,
+                    shownBooks: state.loaded.slice(0),
+                    currentBook: 0,
+                };
+            } else if (state.currentBook + 1 === state.shownBooks.length
+                && state.shownBooks.length < constants.NUM_OF_BOOKS) {
+                toRet = {
+                    ...state,
+                    shownBooks: [ state.bookDefault ],
+                    currentBook: 0,
+                };
+            }
+            return toRet;      
 
-    case successType(actionTypes.FETCH_LIBROS):
-        console.log(successType(actionTypes.FETCH_LIBROS));
-        if (payload.firstTime) {
-            if (data.data.length) {
+        case successType(actionTypes.FETCH_BOOKS):
+            console.log(successType(actionTypes.FETCH_BOOKS));
+            if (payload.firstTime) {
+                if (data.data.length) {
+                    return {
+                        ...state,
+                        shownBooks: data.data,
+                        loaded: data.data,
+                        success_fetch: true,
+                    };
+                } else {
+                    // If no books returned
+                    return {
+                        ...state,
+                        shownBooks: [state.bookDefault],
+                        loaded: [],
+                        success_fetch: true,
+                    };
+                }
+                
+            } else {
                 return {
                     ...state,
-                    shownBooks: data.data,
                     loaded: data.data,
                     success_fetch: true,
                 };
+            }
+
+        case failureType(actionTypes.FETCH_BOOKS):
+            console.log(failureType(actionTypes.FETCH_BOOKS));
+            return {
+                ...state,
+                shownBooks: [ state.libroFailure ],
+                success_fetch: false,
+            };
+
+        case successType(actionTypes.FETCH_FAVOURITES):
+            console.log(successType(actionTypes.FETCH_FAVOURITES));
+            if (payload.page === 0) {
+                if (data.data.length) {
+                    return {
+                        ...state,
+                        favourites: data.data.slice(0, payload.booksPerPage),
+                        loaded: data.data.slice(payload.booksPerPage),
+                        success_fetch: true,
+                    };
+                } else {
+                    // If no books returned
+                    return state;
+                }
             } else {
-                // If no books returned
                 return {
                     ...state,
-                    shownBooks: [state.bookDefault],
-                    loaded: [],
+                    loaded: data.data,
                     success_fetch: true,
                 };
             }
-            
-        } else {
+
+        case failureType(actionTypes.FETCH_FAVOURITES):
+            console.log(failureType(actionTypes.FETCH_FAVOURITES));
             return {
                 ...state,
-                loaded: data.data,
-                success_fetch: true,
+                favourites: null,
+                favourites_success_fetch: false,
             };
-        }
 
-    case failureType(actionTypes.FETCH_LIBROS):
-        console.log(failureType(actionTypes.FETCH_LIBROS));
-        return {
-            ...state,
-            shownBooks: [ state.libroFailure ],
-            success_fetch: false,
-        };
-
-    default:
-        return state;
-  }
+        default:
+            return state;
+    }
 }
 
 const comentaries = (state = initialState.comentaries, { type, payload, data }) => {
@@ -626,10 +685,12 @@ export const getAvaliableEmail = (state) => state.common.avaliableEmail;
 export const getIsOpenModal = (state) => state.dialogs;
 export const getUserId = (state) => state.user.userId;
 export const getUser = (state) => state.user;
+export const getUserPreview = (state) => state.common.userPreview;
 export const getGenres = (state) => state.genres.all;
 export const getUserGenres = (state) => state.user.userGenres;
 export const getBookIndex = (state) => state.books.currentBook;
 export const getBooks = (state) => state.books.shownBooks;
+export const getFavourites = (state) => state.books.favourites;
 export const getCommentaries = (state) => state.comentaries.bookCommentaries;
 export const getSubCommentaries = (state) => state.comentaries.bookSubCommentaries;
 export const getLoadingStatus = (state) => state.controllerStatus.loading;

@@ -12,8 +12,8 @@ class UserDao extends DaoManager {
         return this.executeStatment(statement);
     }
 
-    getOneUser(userId) {
-        let statement = queries.oneUser;
+    getOneUser(userId, isPreview) {
+        let statement = (!isPreview) ? queries.oneUser : queries.oneUserPreview;
         return this.executeStatment(statement, [userId], function (result) { return result[0] });
     }
 

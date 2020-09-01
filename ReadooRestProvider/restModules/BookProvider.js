@@ -5,7 +5,7 @@ const functions = require('../util/functions');
 const middleware = require('./middlewares');
 const BookDao = require('../daos/BookDao');
 const LastBookDao = require('../daos/LastBookDao');
-const { resizeToBook } = require('../util/imageFormater');
+const { resizeToBook, resizeToIcon } = require('../util/imageFormater');
 
 const MIN_DB_ID = 0;
 
@@ -40,12 +40,13 @@ class BookProvider {
         this.bookDao = new BookDao(db);
         this.lastBookDao = new LastBookDao(db);
         this.returnErrCode = functions.returnErrCode;
-        this.getBookCover(app); //Get
-        this.getAll(app); //Get
-        this.deleteOne(app);  //Delete
-        this.getBunch(app); // Post
-        this.insertOne(app); // Post
-        this.dissableOne(app); // Post
+        this.getBookCover(app);     //Get
+        this.getAll(app);           //Get
+        this.deleteOne(app);        //Delete
+        this.getBunch(app);         // Post
+        this.getBunchOfFavourites(app);  // Post
+        this.insertOne(app);        // Post
+        this.dissableOne(app);      // Post
     }
 
     getBookCover(app) {
@@ -86,35 +87,74 @@ class BookProvider {
         });
     }
 
-    parseBookCoverImages (coverArray) {
-        if (coverArray) {
-            return Promise.all(coverArray.map(function(b, index, rSet) {
+    parseBookCoverImages (bookArray) {
+        const parseCover = function (coverPath, currentBook) {
+            return resizeToBook(coverPath).then(function (base64String) {
+                if (base64String) {
+                    currentBook.bookCoverUrl = base64String;
+                } else {
+                    currentBook.bookCoverUrl = null;
+                }
+            }).catch(function (err) {
+                console.log(err);
+                currentBook.bookCoverUrl = null;
+            });
+        }
+
+        const parseAvatar = function (avatarPath, currentBook) {
+            return resizeToIcon(avatarPath).then(function (base64String) {
+                if (base64String) {
+                    currentBook.userAvatarUrl = base64String;
+                } else {
+                    currentBook.userAvatarUrl = null;
+                }
+            }).catch(function (err) {
+                console.log(err);
+                currentBook.userAvatarUrl = null;
+            });
+        }
+
+        if (bookArray) {
+            return Promise.all(bookArray.map(function(b, index, rSet) {
+                let arrayOfPromises = [];
+                // Parse book covers
                 if (b.bookCoverUrl != null && b.bookCoverUrl.length !== 0) {
                     let coverFile = path.resolve('./ReadooRestProvider/uploads/coverPages/' + b.bookCoverUrl);
                     if (coverFile && fs.existsSync(coverFile)) {
-                        return resizeToBook(coverFile).then(function (base64String) {
-                            if (base64String) {
-                                b.bookCoverUrl = base64String;
-                            } else {
-                                b.bookCoverUrl = null;
-                            }
-                        }).catch(function (err) {
-                            console.log(err);
-                            b.bookCoverUrl = null;
-                        });
+                        arrayOfPromises.push(parseCover(coverFile, b));
                     } else {
                         console.log('Book cover image not found: ' + b.bookCoverUrl);
                         b.bookCoverUrl = null;
-                        return Promise.resolve();
+                        arrayOfPromises.push(Promise.resolve());
                     }
+                } else {
+                    console.log('Book cover was undefinde: ' + b.bookId);
+                    b.bookCoverUrl = null;
+                    arrayOfPromises.push(Promise.resolve());
                 }
+                // Parse user icons
+                if (b.userAvatarUrl != null && b.userAvatarUrl.length !== 0) {
+                    let avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + b.userAvatarUrl);
+                    if (avatarFile && fs.existsSync(avatarFile)) {
+                        arrayOfPromises.push(parseAvatar(avatarFile, b));
+                    } else {
+                        console.log('Book cover image not found: ' + b.bookCoverUrl);
+                        b.userAvatarUrl = null;
+                        arrayOfPromises.push(Promise.resolve());
+                    }
+                } else {
+                    console.log('User avatar was undefined: ' + b.userId);
+                    b.userAvatarUrl = null;
+                    arrayOfPromises.push(Promise.resolve());
+                }
+                return Promise.all(arrayOfPromises);
             })).then(function (promisesResult) {
-                return coverArray;
+                return bookArray;
             }).catch(function (err) {
                 console.log(err);
             });
         } else {
-            return Promise.resolve(coverArray);
+            return Promise.resolve(bookArray);
         }
     }
 
@@ -146,37 +186,38 @@ class BookProvider {
                             .send(reqError.text);
                     }
                 );
-
-                /*
-                if (lastBookId < MIN_DB_ID) {
-                    that.lastBookDao.getLastBook(+userId).then(
-                        function (resultOfLastBook) {
-                            if (resultOfLastBook.length) {
-                                if (resultOfLastBook && resultOfLastBook[0].bookId != null) {
-                                    lastBookId = resultOfLastBook[0].bookId;
-                                    return getBunchOfBooks(+userId, +lastBookId, genres, lastDate, numberOfBooks)
-                                } else {
-                                    // It could not get the last book of the user so must show err
-                                    res.status(400)        // HTTP status 400: BadRequest
-                                        .send('Missed Id or Data');
-                                }
-                            } else {
-                                return getBunchOfBooks(+userId, 0, genres, lastDate, numberOfBooks)
-                            }
-                        }
-                    ).catch(
-                        function (err) {
-                            let reqError = functions.getRequestError(err);
-                            return res.status(reqError.code) 
-                                .send(reqError.text);
-                        }
-                    )
-                } else {
-                    return getBunchOfBooks(userId, lastBookId, genres, lastDate, numberOfBooks);
-                }
-                */
             } else {
-                res.status(400)        // HTTP status 400: BadRequest
+                return res.status(400)        // HTTP status 400: BadRequest
+                    .send('Missed Id or Data');
+            }
+        });
+    }
+
+    getBunchOfFavourites(app) {
+        const that = this;
+        app.post('/bookFavourites', middleware.verifyToken, function (req, res) {
+            let favourite = req.body.favourite;
+            console.log("Deberia cojer favoritos " + favourite.booksPerPage);
+            if (favourite && favourite.userId, favourite.page != null && favourite.booksPerPage != null) {
+                let userId = favourite.userId;
+                let betweenA = (favourite.page * favourite.booksPerPage) + 1;
+                let betweenB = (favourite.page === 0) ? 2 * favourite.booksPerPage : ((favourite.page + 1) * favourite.booksPerPage) + 1;
+                
+                that.bookDao.getBunchOfFavourites(+userId, betweenA, betweenB).then(
+                    function (result) {
+                        that.parseBookCoverImages(result).then(function (resultOfParse) {
+                            return res.header('Content-Type', 'application/json').status(200).json(resultOfParse);
+                        });
+                    }
+                ).catch(
+                    function (err) {
+                        let reqError = functions.getRequestError(err);
+                        return res.status(reqError.code) 
+                            .send(reqError.text);
+                    }
+                );                
+            } else {
+                return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Id or Data');
             }
         });

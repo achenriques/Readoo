@@ -8,8 +8,8 @@ axios.defaults.withCredentials = true;
 // Default basic auth
 //axios.defaults.headers.common['Authorization'] = bAuth.bUser;
 
-const fetchUserData = (userId) => axios.get(
-    `${baseURL}/user?id=${userId}`,{
+const fetchUserData = (userId, isPreview) => axios.get(
+    `${baseURL}/user?id=${userId}&isPreview=${isPreview}`,{
     }
 )
 

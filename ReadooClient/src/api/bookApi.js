@@ -84,6 +84,16 @@ const saveLastUserBook = (userId, bookId, genreId) => axios.post(
     }
 )
 
+const fetchFavourites = (userId, page, booksPerPage) => axios.post(
+    `${baseURL}/bookFavourites`,
+    {
+        favourite: {
+            userId,
+            page,
+            booksPerPage
+        }
+    }
+)
 
 export default {
     uploadBook,
@@ -93,5 +103,6 @@ export default {
     fetchCommentaries,
     fetchSubCommentaries,
     sendComment,
-    saveLastUserBook
+    saveLastUserBook,
+    fetchFavourites
 }

@@ -110,7 +110,7 @@ class ExploreView extends Component {
         }
     }
 
-    componentDidUpdate = () => {
+    componentDidUpdate() {
         // This props contains current props.
         if (this.props.shownBooks.length 
                 && !this.state.isPreviousBook

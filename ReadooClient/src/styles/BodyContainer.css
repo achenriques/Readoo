@@ -30,8 +30,6 @@ div#root {
 }
 
 .bodyFavoritos {
-    margin-top: 70px;
-    padding-bottom: 30px;
     overflow: hidden;
 }
 
@@ -147,7 +145,7 @@ a:hover {
     z-index: -1;
 }
 
-.textoBlanco {
+.whiteText {
     color: white;
 }
 

@@ -32,7 +32,7 @@ class ProfilePreviewModal extends Component {
     render() {
         return (
             <Dialog
-                title={LS.getStringMsg('upload.my.book', 'Upload Book')}
+                title={LS.getStringMsg('profile.preview', 'Readoo User')}
                 open={this.props.isOpenModal}
                 aria-labelledby="responsive-dialog-title"
                 classes={{

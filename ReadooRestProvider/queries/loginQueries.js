@@ -7,5 +7,6 @@ module.exports = {
     avaliableNick: "SELECT userId FROM AppUser WHERE userNick = ? ;",
     addUser: "INSERT INTO AppUser (userId, userNick, userPass, userEmail, userName, userSurname, " + 
         "userKarma, userLanguage, userAvatarUrl, userVisible) VALUES (0, ?, ?, ?, '', '', 0, ?, NULL, 1) ;",
-    informLog: "INSERT INTO LoginRegister (userId, loginRegisterDate) VALUES (?, CURRENT_TIMESTAMP()) ;"
+    informLog: "INSERT INTO LoginRegister (userId, loginRegisterDate) VALUES (?, CURRENT_TIMESTAMP()) ;",
+    changeLanguage: "UPDATE AppUser SET userLanguage = ? WHERE userId = ? ;"
 }

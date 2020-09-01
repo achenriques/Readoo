@@ -276,13 +276,13 @@ class CommentsGrid extends Component {
         switch (this.state.loadedComment) {
             case REST_FAILURE:
                 return (
-                    <div className="loadingCommentaries">
+                    <div className="loadingNewTab">
                         <h3><LS msgId='commentaries.load.error' defaultMsg='Something failed while fetching commentaries. Sorry!'/></h3>
                     </div>
                 )
             case REST_DEFAULT:
                 return (
-                    <div className="loadingCommentaries">
+                    <div className="loadingNewTab">
                         <h3><LS msgId='loading' defaultMsg='Loading...'/></h3>
                     </div>
                 )

@@ -21,6 +21,7 @@ export default [
         'your.surname': 'Write your surname',
         'register': 'Register new user',
         'login': 'Log In',
+        'log.out': 'Log out',
         'cancel.register': 'Cancel',
         'pass.arnt.same': 'Both pass must be equal',
         'close': 'Close',
@@ -33,6 +34,7 @@ export default [
         'favourites': 'My favourites',
         'chats': 'My chats',
         'profile': 'Profile',
+        'profile.preview': 'Readoo user',
         'user.image.avatar': 'User presentation image',
         'add.portrait.image': 'Add image as portrait',
         'about.you': 'Write something to share about you. (MAX: {0})',
@@ -62,6 +64,7 @@ export default [
         'what.book.by': 'By:',
         'write.commentary': 'Write here a great commentary about the book (MAX: {0})',
         'write.commentary.answer': 'You can write an answer here... (MAX: {0})',
+        'commentaries': 'Commentaries:',
         'no.commentaries.yet': 'No commentaries yet. Yours will be the first, just do it!',
         'hide.commentaries': 'Hide commentaries',
         'show.commentaries': 'Show commentaries',
@@ -72,6 +75,7 @@ export default [
         'number.of.answers': '{0} answers',
         'answer': 'Answer{0}',
         'nothing.to.see': 'Nothing to see here! Continue your exploration in other button.',
+        'no.image.avaliable': 'No image avaliable.',
         // Genres
         'theater': 'Theater',
         'drama': 'Drama',
@@ -90,6 +94,7 @@ export default [
         'data.not.found': 'Some required data has not been provided',
         'please.reload': 'Some error has occurred, please try to reload the page. Sorry for the inconveniences!',
         'commentaries.load.error': 'An error ocurred while fetching commentaries, it might be a fail with the NET or the server...',
+        'favourites.load.error': 'An error ocurred while fetching your favourite books, it might be a fail with the NET or the server...',
         'not.hire.jastel': 'Bad connection again. Do not play Fornite!',
     },
     // Spanish
@@ -112,6 +117,7 @@ export default [
         'isnot.email': 'Escribe una dirección de correo creíble',
         'register': 'Registrate',
         'login': 'Entrar',
+        'log.out': 'Salir',
         'cancel.register': 'Cancelar registro',
         'pass.arnt.same': 'Las contraseñas no coenciden',
         'close': 'Cerrar',
@@ -124,6 +130,7 @@ export default [
         'favourites': 'Mis favoritos',
         'chats': 'Mis conversaciones',
         'profile': 'Perfil',
+        'profile.preview': 'Usuario de Readoo',
         'user.image.avatar': 'Imagen de presentación',
         'add.portrait.image': 'Añadir imagen como retrato',
         'about.you': 'Escribe algo sobre tí para darte a conocer. (MAX: {0})',
@@ -153,6 +160,7 @@ export default [
         'what.book.by': 'De:',
         'write.commentary': 'Escribe aquí un buen comentario (MAX: {0})',
         'write.commentary.answer': '¿Quires compartir tu punto de vista? (MAX: {0})',
+        'commentaries': 'Comentarios:',
         'no.commentaries.yet': 'No hay comentarios todavía. ¡Sé el primero en escribir!',
         'hide.commentaries': 'Ocultar comentarios',
         'show.commentaries': 'Mostrar comentarios',
@@ -163,6 +171,7 @@ export default [
         'number.of.answers': '{0} respuestas',
         'answer': 'Respuesta{0}',
         'nothing.to.see': 'Aquí no hay nada que ver! Continua tu exploración en otra parte.',
+        'no.image.avaliable': 'No hay ninguna imagen.',
         // Genres
         'theater': 'Teatro',
         'drama': 'Drama',
@@ -180,7 +189,8 @@ export default [
         'image.exceds.limit': 'La imagen supera nuestro limite de 5MB. Recortala!',
         'data.not.found': 'Falta algún dato requerido',
         'please.reload': 'Ha ocurrido un error, prueba a recargar la página. ¡Disculpa las molestias!',
-        'commentaries.load.error': 'Error en la carga de comentaries puede ser un problema de red o fallo del servidor...',
+        'commentaries.load.error': 'Error en la carga de comentaries, puede ser un problema de red o fallo del servidor...',
+        'favourites.load.error': 'Error en la carga de tus libros favoritos, puede ser un problema de red o fallo del servidor...',
         'not.hire.jastel': 'No contrates Jastel!'
     }
 ]

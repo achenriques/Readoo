@@ -25,7 +25,7 @@ export const DISPLAY_NONE = {
 export const FILE_BYTE_LIMIT = 5000000;
 
 export const ROWS_PER_PAGE = 3;
-export const BOOKS_PER_PAGE = 9;
+export const BOOKS_PER_PAGE = 6;
 
 export const USER_HAS_EXPIRED = -1;
 export const USER_NOT_IS_LOGGED = 0;

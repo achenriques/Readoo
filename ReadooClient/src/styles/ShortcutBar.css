@@ -8,6 +8,17 @@
     z-index: 1;
 }
 
+.readooIconGrid {
+    display: flex;
+    margin: auto;
+    text-align: center;
+}
+
+.readooIcon {
+    max-height: 50px;
+    max-width: 50px;
+}
+
 .countryFlagIcon {
     display: inline-block;
     padding-right: 5px;

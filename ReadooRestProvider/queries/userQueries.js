@@ -4,6 +4,9 @@ module.exports = {
         "u.userKarma, u.userAvatarUrl, u.userVisible, GROUP_CONCAT(g.genreId ORDER BY g.genreId ASC) AS userGenres " +
         "FROM appUser u LEFT JOIN usergenre g ON u.userId = g.userId WHERE u.userId = ? ",
     oneUserPass: "SELECT userPass FROM appUser WHERE userId = ? ; ",
+    oneUserPreview: "SELECT u.userId, u.userNick, u.userAboutMe, " +
+        "u.userKarma, u.userAvatarUrl, GROUP_CONCAT(g.genreId ORDER BY g.genreId ASC) AS userGenres " +
+        "FROM appUser u LEFT JOIN usergenre g ON u.userId = g.userId WHERE u.userId = ? AND u.userVisible = 1 ;",
 /*    
     updateUser: "UPDATE appUser SET userName = (case when ? IS NULL then userName else ? end), userSurname = (case when ? IS NULL then userSurname else ? end), " + 
         "userNick = (case when ? IS NULL then userNick else ? end) , userPass = (case when ? IS NULL then userPass else ? end) , " + 
