@@ -8,21 +8,17 @@ import Grid from '@material-ui/core/Grid';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import Paper from '@material-ui/core/Paper';
 import FirstPageIcon from 'material-ui/svg-icons/navigation/first-page';
 import KeyboardArrowLeft from 'material-ui/svg-icons/navigation/chevron-left';
 import KeyboardArrowRight from 'material-ui/svg-icons/navigation/chevron-right';
 import LastPageIcon from 'material-ui/svg-icons/navigation/last-page';
-import Collapse from '@material-ui/core/Collapse';
 import Favorite from 'material-ui/svg-icons/action/favorite';
-// import ExpandMoreIcon from 'material-ui/svg-icons/navigation/expand-more';
-// import ExpandLessIcon from 'material-ui/svg-icons/navigation/expand-less';
 import { Avatar, Divider } from '@material-ui/core';
 import Close from 'material-ui/svg-icons/content/clear';
 import LS from '../LanguageSelector';
 import CommentsGrid from '../common/CommentsGrid';
 import ProfilePreviewModal from '../profile/ProfilePreviewModal';
+import FavouritesSelector from './FavouritesSelector';
 import * as constants from '../../constants/appConstants';
 import avatarDefault from '../../resources/avatarDefault.svg';
 import bookDefault from '../../resources/bookDefault.gif';
@@ -42,7 +38,8 @@ class FavouritesView extends Component {
         shownBooks: [],
         selectedCell: null,
         selectedBook: null,
-        previewUser: null
+        previewUser: null,
+        selectorValue: constants.MY_FAVOURITES
     };
 
     constructor(props) {
@@ -52,8 +49,7 @@ class FavouritesView extends Component {
 
     // Ciclo de vida de react
     componentDidMount() {
-        this.props.fetchFavourites(this.props.currentUserId, this.state.page, this.state.booksPerPage);
-//        this.props.fetchBooks(0, [], true);
+        this.props.fetchFavourites(this.props.currentUserId, this.state.page, this.state.booksPerPage, this.state.selectorValue === constants.MY_BOOKS);
     }
 
     componentDidUpdate() {
@@ -183,6 +179,14 @@ class FavouritesView extends Component {
         }     
     }
 
+    handleCloseClick(evt) {
+        this.setState({
+            ...this.state, 
+            selectedCell: null, 
+            selectedBook: null
+        });
+    }
+
     handleAvatarClick(evt, userId) {
         evt.stopPropagation();
         if (userId) {
@@ -191,6 +195,24 @@ class FavouritesView extends Component {
                 ...this.state,
                 previewUser: userId
             }, () => this.props.openProfilePreview(true));
+        }
+    }
+
+    handleChangeFavouriteType(evt, newValue) {
+        if (newValue !== undefined) {
+            if (newValue !== this.state.selectorValue) {
+                this.setState({
+                        ...this.state,
+                        selectorValue: newValue,
+                        loadingState: constants.REST_DEFAULT,
+                        selectedCell: null,
+                        selectedBook: null,
+                        previewUser: null,
+                        total: 0
+                    }, () => this.props.fetchFavourites(this.props.currentUserId, this.state.page, 
+                            this.state.booksPerPage, this.state.selectorValue === constants.MY_BOOKS)
+                );
+            }
         }
     }
 
@@ -216,37 +238,48 @@ class FavouritesView extends Component {
         const { total, page, booksPerPage } = this.state;
 
         return (
-          <div className="favouritePages">
-                <span>Página: {this.state.page + 1} de {Math.floor(this.state.total/this.state.booksPerPage) + 1} </span>
-                <IconButton
-                    onClick= {(evt) => {this.handleFirstPageButtonClick(evt)}}
-                    disabled={page === 0}
-                    aria-label="Primera página"
-                >
-                    <FirstPageIcon />
-                </IconButton>
-                <IconButton
-                    onClick={(evt) => {this.handleBackButtonClick(evt)}}
-                    disabled={page === 0}
-                    aria-label="Página anterior"
-                >
-                    <KeyboardArrowLeft />
-                </IconButton>
-                <IconButton
-                    onClick={(evt) => {this.handleNextButtonClick(evt)}}
-                    disabled={page >= Math.ceil(total / booksPerPage) - 1}
-                    aria-label="Página siguiente"
-                >
-                    <KeyboardArrowRight />
-                </IconButton>
-                <IconButton
-                    onClick={(evt) => {this.handleLastPageButtonClick(evt)}}
-                    disabled={page >= Math.ceil(total / booksPerPage) - 1}
-                    aria-label="Última página"
-                >
-                    <LastPageIcon />
-                </IconButton>
-          </div>
+            <div className="favouriteFoot">
+                <div className="favouriteSelector">
+                    <FavouritesSelector
+                        disabled={this.isLoading()}
+                        firstOption={this.state.selectorValue}
+                        onChangeFavourite={(evt, newValue) => this.handleChangeFavouriteType(evt, newValue)}
+                    />
+                </div>
+                <div className="favouritePages">
+                    <span>
+                        <LS msgId='page.one.of' defaultMsg={"Page: " + this.state.page + 1} params={[this.state.page + 1, Math.floor(this.state.total/this.state.booksPerPage) + 1]}/>
+                    </span>
+                    <IconButton
+                        onClick= {(evt) => {this.handleFirstPageButtonClick(evt)}}
+                        disabled={page === 0}
+                        aria-label="Primera página"
+                    >
+                        <FirstPageIcon />
+                    </IconButton>
+                    <IconButton
+                        onClick={(evt) => {this.handleBackButtonClick(evt)}}
+                        disabled={page === 0}
+                        aria-label="Página anterior"
+                    >
+                        <KeyboardArrowLeft />
+                    </IconButton>
+                    <IconButton
+                        onClick={(evt) => {this.handleNextButtonClick(evt)}}
+                        disabled={page >= Math.ceil(total / booksPerPage) - 1}
+                        aria-label="Página siguiente"
+                    >
+                        <KeyboardArrowRight />
+                    </IconButton>
+                    <IconButton
+                        onClick={(evt) => {this.handleLastPageButtonClick(evt)}}
+                        disabled={page >= Math.ceil(total / booksPerPage) - 1}
+                        aria-label="Última página"
+                    >
+                        <LastPageIcon />
+                    </IconButton>
+                </div>
+            </div>
         );
     }
 
@@ -274,7 +307,7 @@ class FavouritesView extends Component {
             case constants.REST_SUCCESS:
                 if (this.props.favouriteBooks !== null && this.props.favouriteBooks.length > 0) {
                     return (
-                        <div>
+                        <div className="favouritesDiv">
                             <Grid container spacing={24}>
                                 <Grid item sm={8} xs={12} className="favouritesGrid">
                                     <div className="gridDiv">
@@ -286,13 +319,14 @@ class FavouritesView extends Component {
                                                             className={(this.state.selectedCell !== index) ? "grbookId": "grSelectedBookId"}
                                                             classes={{tile: "tileBackGround"}}
                                                         >
-                                                            <img className="favouritesCover"
-                                                                src={(book.bookCoverUrl !== null) ? book.bookCoverUrl : bookDefault} 
-                                                                alt={book.bookTitle} 
-                                                                onClick={(evt) => this.handleImageClick(evt, index, book.bookId)}
-                                                            />
-                                                            <div className={(book.bookCoverUrl === null) ? "centeredText": "displayNone"}>
-                                                                <LS msgId='no.image.avaliable' defaultMsg='No image encountered '/>
+                                                            <div className="favouritesCoverDiv" onClick={(evt) => this.handleImageClick(evt, index, book.bookId)}>
+                                                                <img className="favouritesCover"
+                                                                    src={(book.bookCoverUrl !== null) ? book.bookCoverUrl : bookDefault} 
+                                                                    alt={book.bookTitle}
+                                                                />
+                                                                <div className={(book.bookCoverUrl === null) ? "centeredText": "displayNone"}>
+                                                                    <LS msgId='no.image.avaliable' defaultMsg='No image encountered '/>
+                                                                </div>
                                                             </div>
                                                             <GridListTileBar
                                                                 key={'tileBar_' + book.bookId}
@@ -301,9 +335,12 @@ class FavouritesView extends Component {
                                                                 className="favouritesBookTitle"
                                                                 actionIcon={
                                                                     <div>
-                                                                        <Favorite style={this.heartType(-1)}/>
-                                                                            <span className="whiteText">{" " + +book.bookLikes}</span>
-                                                                        <IconButton>
+                                                                        <Favorite className="favouriteLikesHeart" style={this.heartType(-1)}/>
+                                                                        <span className="favouriteLikesText">{" " + +book.bookLikes}</span>
+                                                                        <IconButton 
+                                                                            className="favouriteAvatarButton"
+                                                                            style={(this.state.selectorValue === constants.MY_BOOKS) ? constants.DISPLAY_NONE : { margin: 'auto' } }
+                                                                        >
                                                                             <Avatar src={(book.userAvatarUrl !== null) ? book.userAvatarUrl : avatarDefault }
                                                                                 onClick={(evt) => this.handleAvatarClick(evt, book.userId)}
                                                                             />
@@ -323,11 +360,11 @@ class FavouritesView extends Component {
                                 <Grid item sm={4} xs={12}>
                                     { (this.state.selectedBook != null)? (
                                         <div className="favouritesGridRight">
-                                            <div>
+                                            <div className="favouritesRightUp">
                                                 <Typography gutterBottom variant='headline' className="inlineBlockButton">
                                                     {data[this.state.selectedCell * (this.state.page + 1)].bookTitle}
                                                 </Typography>
-                                                <IconButton style={material_styles.inlineBlock} onClick={(evt) => {this.handleImageClick(evt, null, null)}}>
+                                                <IconButton style={material_styles.inlineBlock} onClick={(evt) => {this.handleCloseClick(evt)}}>
                                                     <Close/>
                                                 </IconButton>
                                                 <br/>
@@ -343,20 +380,19 @@ class FavouritesView extends Component {
                                                     <LS msgId='what.book.opinion' defaultMsg='Opinion by the book owner'/>
                                                 </h4>
                                                 {data[this.state.selectedCell * (this.state.page + 1)].bookReview}
-                                                <br/>
-                                                <Divider/>
+                                                <Divider className="favouritesRightDivider"/>
                                                 <h3 style={{marginBottom: '15px'}}>
                                                     <LS msgId='commentaries' defaultMsg='Let´s see people´s opinion:'/>
                                                 </h3>
                                             </div>
-                                            <div className="favouritesCommentDiv">
+                                            <div className="favouritesRightDown">
                                                 <CommentsGrid bookId={this.state.selectedBook} commentFatherId={null} isFavorite={true}/>
                                             </div>
                                         </div>
                                         ) : (
                                         <div>
                                             <Typography gutterBottom variant='headline'>
-                                                Haz clic sobre una imgen para ver su contenido...
+                                                <LS msgId='click.containt' defaultMsg='Do click on covers to see its content...'/>
                                             </Typography>
                                         </div>
                                         )
@@ -385,7 +421,7 @@ export default connect(
         loadingProcesses: appState.getLoadingProcesses(state)
     }),
     (dispatch) => ({
-        fetchFavourites: (userId, page, booksPerPage) => dispatch(fetchFavourites(userId, page, booksPerPage)),
+        fetchFavourites: (userId, page, booksPerPage, myUploads) => dispatch(fetchFavourites(userId, page, booksPerPage, myUploads)),
         openProfilePreview: (isOpen) => dispatch(setIsOpenProfilePreview(isOpen))
     })
 )(FavouritesView);

@@ -35,6 +35,9 @@ export const USER_FIRST_TIME_LOGGED = 2;
 export const LANGUAGE_ENGLISH = 0;
 export const LANGUAGE_SPANISH = 1;
 
+export const MY_FAVOURITES = 0;
+export const MY_BOOKS = 1;
+
 export const PROCCESS_STATUS_WORD_LENGTH = 8; // "_FAILURE".length = "_SUCCESS".length == "_LOADING".length
 
 export const CODE_200 = 200;

@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userConfig = require('../util/serverOptions');
-const functions = require('../util/functions');
+const returnErrCode = require('../').returnErrCode;
 const LoginDao = require('../daos/LoginDao');
 const path = require('path');
 const UserGenreDao = require('../daos/UserGenreDao');
@@ -17,7 +17,6 @@ class LoginProvider {
     constructor(app, db) {
         this.loginDao = new LoginDao(db);
         this.userGenreDao = new UserGenreDao(db);
-        this.returnErrCode = functions.returnErrCode;
         this.login(app);                // Post
         this.isMe(app);                 // Get
         this.logOut(app);               // Get
@@ -84,7 +83,7 @@ class LoginProvider {
                                         });
                                     }
                                 }).catch(function(err) {
-                                    return that.returnErrCode(err, res);
+                                    return returnErrCode(err, res);
                                 });
                             } else {
                                 return res.status(401).send({ auth: false, info: 'wrong.pass'});
@@ -94,7 +93,7 @@ class LoginProvider {
                         }
                     }
                 ).catch(function(err) {
-                    return that.returnErrCode(err, res);
+                    return returnErrCode(err, res);
                 });
             } else {
                 return res.status(400)        // HTTP status 400: BadRequest
@@ -163,7 +162,7 @@ class LoginProvider {
                         }
                     }
                 ).catch(function(err) {
-                    return that.returnErrCode(err, res);
+                    return returnErrCode(err, res);
                 });
             });
         });
@@ -214,7 +213,7 @@ class LoginProvider {
                         return res.status(200).send(result.length === 0);
                     }
                 ).catch(function(err) {
-                    return that.returnErrCode(err, res);
+                    return returnErrCode(err, res);
                 });
             } else {
                 return res.status(400)        // HTTP status 400: BadRequest
@@ -233,7 +232,7 @@ class LoginProvider {
                         return res.status(200).send(result.length === 0);
                     }
                 ).catch(function(err) {
-                    return that.returnErrCode(err, res);
+                    return returnErrCode(err, res);
                 });
             } else {
                 return res.status(400)        // HTTP status 400: BadRequest
@@ -281,7 +280,7 @@ class LoginProvider {
                         }
                     }
                 ).catch(function(err) {
-                    return that.returnErrCode(err, res);
+                    return returnErrCode(err, res);
                 });
             } else {
                 return res.status(400)        // HTTP status 400: BadRequest

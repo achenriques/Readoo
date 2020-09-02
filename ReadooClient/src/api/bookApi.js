@@ -84,13 +84,14 @@ const saveLastUserBook = (userId, bookId, genreId) => axios.post(
     }
 )
 
-const fetchFavourites = (userId, page, booksPerPage) => axios.post(
+const fetchFavourites = (userId, page, booksPerPage, myUploads) => axios.post(
     `${baseURL}/bookFavourites`,
     {
         favourite: {
             userId,
             page,
-            booksPerPage
+            booksPerPage,
+            myUploads
         }
     }
 )

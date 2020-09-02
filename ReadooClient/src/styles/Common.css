@@ -1,3 +1,13 @@
+.styleRootFavourites {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    width: 100%;
+    margin-right: 15px;
+    padding: 15px;
+}
+
 .continueModal {
     background-color: white;
     position: absolute;

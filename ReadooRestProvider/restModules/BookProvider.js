@@ -201,9 +201,10 @@ class BookProvider {
             if (favourite && favourite.userId, favourite.page != null && favourite.booksPerPage != null) {
                 let userId = favourite.userId;
                 let betweenA = (favourite.page * favourite.booksPerPage) + 1;
-                let betweenB = (favourite.page === 0) ? 2 * favourite.booksPerPage : ((favourite.page + 1) * favourite.booksPerPage) + 1;
+                let betweenB = (favourite.page === 0) ? 2 * favourite.booksPerPage : ((favourite.page + 1) * favourite.booksPerPage) + 1;3
+                let myUploads = favourite.myUploads == true;
                 
-                that.bookDao.getBunchOfFavourites(+userId, betweenA, betweenB).then(
+                that.bookDao.getBunchOfFavourites(+userId, betweenA, betweenB, myUploads).then(
                     function (result) {
                         that.parseBookCoverImages(result).then(function (resultOfParse) {
                             return res.header('Content-Type', 'application/json').status(200).json(resultOfParse);

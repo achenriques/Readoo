@@ -132,19 +132,6 @@ a:hover {
     overflow-y: auto;
 }
 
-.favouritePages {
-    text-align: right;
-    padding-right: 30px;
-}
-
-.imagenesFavoritos {
-    position: relative;
-    width: auto;
-    height: auto;
-    top: '0%';
-    z-index: -1;
-}
-
 .whiteText {
     color: white;
 }

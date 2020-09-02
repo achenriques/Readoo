@@ -258,10 +258,10 @@ const sendComment = (newComment) => ({
     promise: bookApi.sendComment(newComment.commentFatherId, newComment.bookId, newComment.userId, newComment.commentText)
 });
 
-const fetchFavourites = (userId, page, booksPerPage) => ({
+const fetchFavourites = (userId, page, booksPerPage, myUploads) => ({
     type: actionTypes.FETCH_FAVOURITES,
-    payload: { page, booksPerPage },
-    promise: bookApi.fetchFavourites(userId, page, booksPerPage)
+    payload: { page, booksPerPage, myUploads },
+    promise: bookApi.fetchFavourites(userId, page, booksPerPage, myUploads)
 });
 
 const reportErrorMessage = (errorMsg) => ({

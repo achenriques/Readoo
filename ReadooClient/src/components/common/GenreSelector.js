@@ -11,6 +11,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import LS from '../LanguageSelector';
 import { fetchGenres } from '../../app_state/actions';
 import { DISPLAY_NONE } from '../../constants/appConstants';
+import '../../styles/Common.css';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;

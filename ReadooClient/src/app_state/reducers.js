@@ -384,6 +384,15 @@ const books = (state = initialState.books, { type, payload, data }) => {
                 success_fetch: false,
             };
 
+        case loadingType(actionTypes.FETCH_FAVOURITES):
+            console.log(loadingType(actionTypes.FETCH_FAVOURITES));
+            return {
+                ...state,
+                favourites: [],
+                loaded: [],
+                success_fetch: true,
+            };
+
         case successType(actionTypes.FETCH_FAVOURITES):
             console.log(successType(actionTypes.FETCH_FAVOURITES));
             if (payload.page === 0) {

@@ -12,7 +12,11 @@ module.exports = {
             " INNER JOIN appUser us ON us.userId = b.userId " +
             " WHERE b.genreID IN (?) AND b.bookVisible = 1 AND (l.bookId IS NULL OR b.bookId > l.bookId) " +
             " ORDER BY b.bookDate ASC LIMIT ? ;",
-    getFavourites: "WITH fav AS ( SELECT ROW_NUMBER() OVER ( ORDER BY b.bookDate ASC ) AS row_num, b.*, u.userAvatarUrl " +
+    getMyBooks: "WITH fav AS ( SELECT ROW_NUMBER() OVER ( ORDER BY b.bookDate DESC ) AS row_num, b.*, u.userAvatarUrl " +
+            " FROM book b INNER JOIN appUser u ON u.userId = ? AND u.userId = b.userId AND b.bookVisible = 1 ) " +
+            " SELECT bookId, bookTitle, bookAuthor, bookDescription, bookReview, bookLikes, bookDate, bookCoverUrl, " +
+            " userId, genreId, userAvatarUrl FROM fav WHERE fav.row_num BETWEEN ? AND ? ; ",
+    getFavourites: "WITH fav AS ( SELECT ROW_NUMBER() OVER ( ORDER BY b.bookDate DESC ) AS row_num, b.*, u.userAvatarUrl " +
             " FROM book b INNER JOIN userLikesBook l " + 
             " ON l.userId = ? AND l.bookId = b.bookId AND b.bookVisible = 1 INNER JOIN appUser u ON u.userId = b.userId) " + 
             " SELECT bookId, bookTitle, bookAuthor, bookDescription, bookReview, bookLikes, bookDate, bookCoverUrl, " +

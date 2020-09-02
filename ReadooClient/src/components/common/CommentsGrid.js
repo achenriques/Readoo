@@ -21,6 +21,7 @@ import avatarDefault from '../../resources/avatarDefault.svg';
 import { parseInputText } from '../../utils/AppUtils';
 import { DISPLAY_NONE, NUM_OF_COMENTARIES, REST_FAILURE, REST_SUCCESS, REST_DEFAULT } from '../../constants/appConstants';
 import ProfilePreviewModal from '../profile/ProfilePreviewModal';
+import '../../styles/Common.css';
 
 class CommentsGrid extends Component {
 
@@ -31,12 +32,16 @@ class CommentsGrid extends Component {
         commentFatherId: null,
         expandComment: null,
         loadMoreCount: 1,
-        previewUser: null
+        previewUser: null,
+        isFavourites: false
     }
 
     constructor(props) {
         super(props);
-        this.state = { ...this.initialState };
+        this.state = { 
+            ...this.initialState,
+            isFavourites: (this.props.isFavorite !== undefined) ? this.props.isFavorite : false
+        };
     };
 
     componentDidMount() {
@@ -290,7 +295,7 @@ class CommentsGrid extends Component {
             case REST_SUCCESS:
                 if (this.state.bookCommentaries.length) {
                     return (
-                        <div className="styleRoot">
+                        <div className={(!this.state.isFavourites) ? "styleRoot" : "styleRootFavourites"}>
                             <GridList
                                 cols={2}
                                 rows={1.5}
@@ -299,7 +304,7 @@ class CommentsGrid extends Component {
                                 className="styleGridList"
                             >
                             {this.state.bookCommentaries.map((commentary) => (
-                                <Paper key={commentary.commentId} elevation={4} variant="outlined" className="commentMargin">
+                                <Paper key={commentary.commentId} elevation={4} variant="outlined" className={(!this.state.isFavourites) ? "commentMargin" : "commentMarginFavourites"}>
                                     <GridListTile
                                         key={commentary.commentId}
                                         style={{heigth: '30px'}}

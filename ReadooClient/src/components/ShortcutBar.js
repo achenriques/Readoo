@@ -44,14 +44,14 @@ class ShortcutBar extends Component {
         return (
             <Paper zDepth={1} className='bar'>
                 <Grid container spacing={8}>
-                    <Grid item sm={1} xs='auto' className='readooIconGrid'>
+                    <Grid item sm={1} xs={1} className='readooIconGrid'>
                         <img src={logo} className='readooIcon'/>
                         <h4>READOO</h4>
                     </Grid>
                     <Grid item sm={1} xs={1} >
                         {(this.props.loading > 0) ? <CircularProgress className="loadingIcon" size='20' /> : <div/>}
                     </Grid>
-                    <Grid item sm={8} xs={7} >
+                    <Grid item sm={8} xs={6} >
                         {(this.props.userIsLogged) ? (
                         <BottomNavigation selectedIndex={this.props.selectedIndex}>
                             <BottomNavigationItem
@@ -77,7 +77,7 @@ class ShortcutBar extends Component {
                         </BottomNavigation>
                         ) : (<div/>) }
                     </Grid>
-                    <Grid item sm={1} xs={4} >
+                    <Grid item sm={1} xs={2} >
                         <BottomNavigation selectedIndex={this.props.currengLanguage}>
                             <BottomNavigationItem
                                 label={<LS msgId='english' defaultMsg='English'/>}
@@ -91,7 +91,7 @@ class ShortcutBar extends Component {
                             />
                         </BottomNavigation>
                     </Grid>
-                    <Grid item sm={1} xs={4} >
+                    <Grid item sm={1} xs={2} >
                         {(this.props.userIsLogged) ? (
                             <BottomNavigationItem
                                 label={<LS msgId='log.out' defaultMsg='Log Out'/>}

@@ -76,6 +76,12 @@ div#appDiv {
     margin-bottom: 15px;
 }
 
+.commentMarginFavourites {
+    width: 100% !important;
+    margin-right: 25px;
+    margin-bottom: 15px;
+}
+
 .commentBackground {
     background-color: #eeeeee;
 }
