@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as appState from '../../app_state/reducers';
-import { fetchFavourites, setIsOpenProfilePreview, actionTypes } from '../../app_state/actions';
+import { favouritePageRequest, fetchFavourites, setIsOpenProfilePreview, actionTypes } from '../../app_state/actions';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from '@material-ui/core/Grid';
 import GridList from '@material-ui/core/GridList';
@@ -18,6 +19,7 @@ import Close from 'material-ui/svg-icons/content/clear';
 import LS from '../LanguageSelector';
 import CommentsGrid from '../common/CommentsGrid';
 import ProfilePreviewModal from '../profile/ProfilePreviewModal';
+import ContinueModal from '../common/ContinueModal';
 import FavouritesSelector from './FavouritesSelector';
 import * as constants from '../../constants/appConstants';
 import avatarDefault from '../../resources/avatarDefault.svg';
@@ -32,6 +34,7 @@ class FavouritesView extends Component {
         expanded: false,
         page: 0,
         total: 0,
+        loadingPage: 0,
         rowsPerPage: constants.ROWS_PER_PAGE,
         booksPerPage: constants.BOOKS_PER_PAGE,
         booksPerRow: constants.BOOKS_PER_PAGE / constants.ROWS_PER_PAGE,
@@ -39,7 +42,8 @@ class FavouritesView extends Component {
         selectedCell: null,
         selectedBook: null,
         previewUser: null,
-        selectorValue: constants.MY_FAVOURITES
+        selectorValue: constants.MY_FAVOURITES,
+        openContinueDeleteBook: false
     };
 
     constructor(props) {
@@ -49,15 +53,24 @@ class FavouritesView extends Component {
 
     // Ciclo de vida de react
     componentDidMount() {
-        this.props.fetchFavourites(this.props.currentUserId, this.state.page, this.state.booksPerPage, this.state.selectorValue === constants.MY_BOOKS);
+        this.props.fetchFavourites(this.props.currentUserId, this.state.page, this.state.booksPerPage, 
+                this.state.selectorValue === constants.MY_BOOKS, null);
     }
 
     componentDidUpdate() {
-        if (this.state.loadingState === constants.REST_DEFAULT && !this.isLoading()) {
+        if (this.isLoading()) {
+            if (this.state.loadingState !== constants.REST_DEFAULT) {
+                this.setState({
+                    ...this.state,
+                    loadingState: constants.REST_DEFAULT
+                });
+            }
+        } else if (this.state.loadingState === constants.REST_DEFAULT) {
             if (this.props.favouriteBooks !== null) {
                 this.setState({
                     ...this.state,
-                    total: this.props.favouriteBooks.length,
+                    total: this.props.totalOfFavourites,
+                    loadingPage: null,
                     loadingState: constants.REST_SUCCESS,
                 });
             } else {
@@ -75,31 +88,49 @@ class FavouritesView extends Component {
         return this.props.loadingProcesses.includes(actionTypes.FETCH_FAVOURITES);
     }
 
-    // Table event handlers
-    handleFirstPageButtonClick (event) {
-        //this.props.onChangePage(event, this.state.page + 1);
-        this.handleChangePage(event, 0)
-    };
-
-    handleBackButtonClick (event) {
-        this.handleChangePage(event, this.state.page - 1);
-    };
-
-    handleNextButtonClick (event) {
-        //this.props.onChangePage(event, this.state.page + 1);
-        this.handleChangePage(event, this.state.page + 1)
-    };
-
-    handleLastPageButtonClick (event) {
-        this.handleChangePage(event, Math.ceil(this.state.total / this.state.rowsPerPage) - 1);
-        /* this.props.onChangePage(
-            event,
-            Math.max(0, Math.ceil(this.state.total / this.state.rowsPerPage) - 1),
-        ); */
-    };
-
-    handleChangePage = (event, page) => {
-        this.setState({ ...this.state, page: page });
+    // Table event handler
+    handleChangePage = (evt, buttonCode) => {
+        if (buttonCode) {
+            let page = this.state.page;
+            let pageToFetch = page;
+            switch (buttonCode) {
+                case constants.NEXT_PAGE:
+                    page = page + 1;
+                    pageToFetch = page + 1;
+                    break;
+    
+                case constants.BEFORE_PAGE:
+                    page = (page > 0) ? (page - 1) : page;
+                    pageToFetch = (page > 0) ? (page - 1) : page;
+                    break;
+                        
+                case constants.LAST_PAGE:
+                    page = this.state.total / constants.BOOKS_PER_PAGE;
+                    pageToFetch = (page > 0) ? (page - 1) : page;
+                    break; 
+    
+                case constants.FIRST_PAGE:
+                    page = 0;
+                    pageToFetch = page + 1;
+                    break; 
+            
+                default:
+                    break;
+            }
+            const needFetch = this.state.total > this.state.booksPerPage;
+            this.setState({ 
+                ...this.state, 
+                page: page, 
+                loadingPage: (needFetch) ? pageToFetch  : null
+            });
+            // Change the current page
+            this.props.favouritePageRequest(buttonCode, needFetch);
+            // Fetch the data
+            if (needFetch) {
+                this.props.fetchFavourites(this.props.currentUserId, pageToFetch, 
+                    this.state.booksPerPage, this.state.selectorValue === constants.MY_BOOKS, buttonCode);
+            }
+        }
     };
 
     // bookLikes
@@ -210,10 +241,30 @@ class FavouritesView extends Component {
                         previewUser: null,
                         total: 0
                     }, () => this.props.fetchFavourites(this.props.currentUserId, this.state.page, 
-                            this.state.booksPerPage, this.state.selectorValue === constants.MY_BOOKS)
+                            this.state.booksPerPage, this.state.selectorValue === constants.MY_BOOKS, null)
                 );
             }
         }
+    }
+
+    handleDeleteBook(evt) {
+        if (this.state.selectorValue === constants.MY_BOOKS && this.state.selectedBook !== null) {
+            this.setState({
+                ...this.state,
+                openContinueDeleteBook: true
+            });
+        }
+    }
+
+    acceptDeleteBook(selectedOption) {
+        if (selectedOption) {
+            // TODO: call event to delte BOOK
+        }
+
+        this.setState({
+            ...this.state,
+            openContinueDeleteBook: false
+        });
     }
 
     // returns double click style over the images clicked
@@ -246,35 +297,41 @@ class FavouritesView extends Component {
                         onChangeFavourite={(evt, newValue) => this.handleChangeFavouriteType(evt, newValue)}
                     />
                 </div>
+                {(this.state.selectorValue === constants.MY_BOOKS && this.state.selectedBook !== null)
+                    ? ( <div className="favouritesDelete">
+                            <Button key="deleteBook" color="secondary" size="small" onClick={() => this.handleDeleteBook()}>
+                                    <LS msgId='delete.book' defaultMsg='Delete my book!'/>
+                            </Button>
+                        </div>) : (<div/>)}
                 <div className="favouritePages">
                     <span>
                         <LS msgId='page.one.of' defaultMsg={"Page: " + this.state.page + 1} params={[this.state.page + 1, Math.floor(this.state.total/this.state.booksPerPage) + 1]}/>
                     </span>
                     <IconButton
-                        onClick= {(evt) => {this.handleFirstPageButtonClick(evt)}}
+                        onClick= {(evt) => {this.handleChangePage(evt, constants.FIRST_PAGE)}}
                         disabled={page === 0}
-                        aria-label="Primera página"
+                        aria-label={LS.getStringMsg('first.page', 'To First Page')}
                     >
                         <FirstPageIcon />
                     </IconButton>
                     <IconButton
-                        onClick={(evt) => {this.handleBackButtonClick(evt)}}
+                        onClick={(evt) => {this.handleChangePage(evt, constants.BEFORE_PAGE)}}
                         disabled={page === 0}
-                        aria-label="Página anterior"
+                        aria-label={LS.getStringMsg('before.page', 'To Page Before')}
                     >
                         <KeyboardArrowLeft />
                     </IconButton>
                     <IconButton
-                        onClick={(evt) => {this.handleNextButtonClick(evt)}}
+                        onClick={(evt) => {this.handleChangePage(evt, constants.NEXT_PAGE)}}
                         disabled={page >= Math.ceil(total / booksPerPage) - 1}
-                        aria-label="Página siguiente"
+                        aria-label={LS.getStringMsg('next.page', 'To Page Next')}
                     >
                         <KeyboardArrowRight />
                     </IconButton>
                     <IconButton
-                        onClick={(evt) => {this.handleLastPageButtonClick(evt)}}
+                        onClick={(evt) => {this.handleChangePage(evt, constants.LAST_PAGE)}}
                         disabled={page >= Math.ceil(total / booksPerPage) - 1}
-                        aria-label="Última página"
+                        aria-label={LS.getStringMsg('last.page', 'To Last Before')}
                     >
                         <LastPageIcon />
                     </IconButton>
@@ -400,6 +457,7 @@ class FavouritesView extends Component {
                                 </Grid>                  
                             </Grid>
                             <ProfilePreviewModal previewUser={this.state.previewUser}/>
+                            <ContinueModal open={this.state.openContinueDeleteBook} text={LS.getStringMsg('continue.delete.book')} closeCallback={this.acceptDeleteBook.bind(this)} />
                         </div>
                     )
                 }
@@ -418,10 +476,12 @@ export default connect(
     (state) => ({
         currentUserId: appState.getUserId(state),
         favouriteBooks: appState.getFavourites(state),
+        totalOfFavourites: appState.getTotalOfFavourites(state),
         loadingProcesses: appState.getLoadingProcesses(state)
     }),
     (dispatch) => ({
-        fetchFavourites: (userId, page, booksPerPage, myUploads) => dispatch(fetchFavourites(userId, page, booksPerPage, myUploads)),
+        favouritePageRequest: (buttonCode, fetchData) => dispatch(favouritePageRequest(buttonCode, fetchData)),
+        fetchFavourites: (userId, page, booksPerPage, myUploads, buttonCode) => dispatch(fetchFavourites(userId, page, booksPerPage, myUploads, buttonCode)),
         openProfilePreview: (isOpen) => dispatch(setIsOpenProfilePreview(isOpen))
     })
 )(FavouritesView);

@@ -41,6 +41,11 @@ div#appDiv {
     */
 }
 
+.loadingNewTab {
+    text-align: center;
+    margin: 25px;
+}
+
 .loadingIconCommentaries {
     height: 20px;
     width: 20px;

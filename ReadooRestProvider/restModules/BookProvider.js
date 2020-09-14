@@ -117,6 +117,8 @@ class BookProvider {
         if (bookArray) {
             return Promise.all(bookArray.map(function(b, index, rSet) {
                 let arrayOfPromises = [];
+                // in case of favourites...
+                delete b.total;
                 // Parse book covers
                 if (b.bookCoverUrl != null && b.bookCoverUrl.length !== 0) {
                     let coverFile = path.resolve('./ReadooRestProvider/uploads/coverPages/' + b.bookCoverUrl);
@@ -201,13 +203,17 @@ class BookProvider {
             if (favourite && favourite.userId, favourite.page != null && favourite.booksPerPage != null) {
                 let userId = favourite.userId;
                 let betweenA = (favourite.page * favourite.booksPerPage) + 1;
-                let betweenB = (favourite.page === 0) ? 2 * favourite.booksPerPage : ((favourite.page + 1) * favourite.booksPerPage) + 1;3
+                let betweenB = (favourite.page === 0) ? 2 * favourite.booksPerPage : ((favourite.page + 1) * favourite.booksPerPage) + 1;
                 let myUploads = favourite.myUploads == true;
                 
-                that.bookDao.getBunchOfFavourites(+userId, betweenA, betweenB, myUploads).then(
+                that.bookDao.getBunchOfFavourites(+userId, betweenA, betweenB, myUploads, +favourite.page === 0, +favourite.booksPerPage).then(
                     function (result) {
+                        let toRet = {
+                            total: (result.length > 0) ? result[0].total : 0
+                        };
                         that.parseBookCoverImages(result).then(function (resultOfParse) {
-                            return res.header('Content-Type', 'application/json').status(200).json(resultOfParse);
+                            toRet.data = resultOfParse;
+                            return res.header('Content-Type', 'application/json').status(200).json(toRet);
                         });
                     }
                 ).catch(

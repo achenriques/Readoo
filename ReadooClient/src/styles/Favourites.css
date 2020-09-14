@@ -97,16 +97,24 @@
 
 .favouriteFoot {
     display: block;
+    text-align: center;
     padding-top: 10px;
 }
 
 .favouriteSelector {
+    position: inline-block;
     float: left;
     text-align: left;
     margin-left: 30px;
 }
 
+.favouritesDelete {
+    position: inline-block;
+    margin: auto;
+}
+
 .favouritePages {
+    position: inline-block;
     float: right;
     text-align: right;
     margin-right: 30px;

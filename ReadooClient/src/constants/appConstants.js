@@ -22,10 +22,16 @@ export const DISPLAY_NONE = {
     display: 'none'
 }
 
+// LIMIT OF IMAGE SIZE TO UPLOAD
 export const FILE_BYTE_LIMIT = 5000000;
 
+// FAVOURITES PAGES
 export const ROWS_PER_PAGE = 3;
 export const BOOKS_PER_PAGE = 6;
+export const FIRST_PAGE = 'f';
+export const BEFORE_PAGE = 'b';
+export const NEXT_PAGE = 'n';
+export const LAST_PAGE = 'l';
 
 export const USER_HAS_EXPIRED = -1;
 export const USER_NOT_IS_LOGGED = 0;

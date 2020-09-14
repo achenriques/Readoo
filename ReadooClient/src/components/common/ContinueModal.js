@@ -23,7 +23,7 @@ class ContinueModal extends Component {
 
     handleClose = (selectedOption) => {
         // Calback onClose
-        if (this.props.closeCallback !== undefined) {
+        if (this.props.closeCallback !== undefined && typeof this.props.closeCallback === "function") {
             this.props.closeCallback(selectedOption === true);
         }
     };
@@ -37,7 +37,7 @@ class ContinueModal extends Component {
                 onClose={this.handleClose}
             >
                 <div className="continueModal">
-                    <h2 id="simple-modal-title"><LS msgId='continue.modal.title' defaultMsg='Continue?'/></h2>
+                    <h2 id="simple-modal-title">{(this.props.text) ? this.props.text : LS.getStringMsg('continue.modal.title', 'Continue?')}</h2>
                     <p id="simple-modal-description">
                         <Button variant="flat" color="secondary" 
                             onClick={this.handleClose.bind(this, false)}

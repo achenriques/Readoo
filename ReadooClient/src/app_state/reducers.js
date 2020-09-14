@@ -74,8 +74,14 @@ const initialState = {
         currentBook: 0,
         shownBooks: [],
         loaded: [],
-        favourites: [],
-        favouritesLoaded: [],
+        favourites: {
+            firstPage: [],
+            beforePage: [],
+            currentPage: [],
+            nextPage: [],
+            lastPage: []
+        },
+        favouritesTotal: 0,
         success_fetch: true,
         favourites_success_fetch: true
     },
@@ -384,35 +390,94 @@ const books = (state = initialState.books, { type, payload, data }) => {
                 success_fetch: false,
             };
 
-        case loadingType(actionTypes.FETCH_FAVOURITES):
-            console.log(loadingType(actionTypes.FETCH_FAVOURITES));
-            return {
-                ...state,
-                favourites: [],
-                loaded: [],
-                success_fetch: true,
-            };
-
         case successType(actionTypes.FETCH_FAVOURITES):
             console.log(successType(actionTypes.FETCH_FAVOURITES));
             if (payload.page === 0) {
-                if (data.data.length) {
+                if (data.data && data.data.total) {
+                    let totalFavourites = data.data.total;
+                    let currentAndPrevious = data.data.data.slice(0, (payload.booksPerPage < totalFavourites) ? payload.booksPerPage : totalFavourites);
+                    let nextPage = (totalFavourites > payload.booksPerPage) 
+                            ? data.data.data.slice(payload.booksPerPage, ((payload.booksPerPage * 2) > totalFavourites) 
+                                    ? payload.booksPerPage * 2 : totalFavourites)
+                            : [];
+                    let lastPage = (nextPage !== [] && totalFavourites > (payload.booksPerPage * 2)) 
+                            ? data.data.data.slice(payload.booksPerPage * 2, ((payload.booksPerPage * 3) > totalFavourites) 
+                            ? payload.booksPerPage * 3 : totalFavourites)
+                            : [];
                     return {
                         ...state,
-                        favourites: data.data.slice(0, payload.booksPerPage),
-                        loaded: data.data.slice(payload.booksPerPage),
-                        success_fetch: true,
+                        favouritesTotal: data.data.total,
+                        favourites: {
+                            firstPage: currentAndPrevious,
+                            beforePage: currentAndPrevious,
+                            currentPage: currentAndPrevious,
+                            nextPage: nextPage,
+                            lastPage: lastPage
+                        },
+                        favourites_success_fetch: true,
                     };
                 } else {
                     // If no books returned
                     return state;
                 }
             } else {
-                return {
-                    ...state,
-                    loaded: data.data,
-                    success_fetch: true,
-                };
+                switch (payload.buttonCode) {
+                    case constants.NEXT_PAGE:
+                        return {
+                            ...state,
+                            favouritesTotal: data.data.total,
+                            favourites: {
+                                ...state.favourites,
+                                beforePage: state.favourites.currentPage.slice(),
+                                currentPage: state.favourites.nextPage.slice(),
+                                nextPage: data.data.data
+                            }
+                        };
+
+                    case constants.BEFORE_PAGE:
+                        return {
+                            ...state,
+                            favouritesTotal: data.data.total,
+                            favourites: {
+                                ...state.favourites,
+                                beforePage: data.data.data,
+                                currentPage: state.beforePage.slice(),
+                                nextPage: state.currentPage.slice(),
+                            }
+                        };
+
+                    case constants.LAST_PAGE:
+                        return {
+                            ...state,
+                            favouritesTotal: data.data.total,
+                            favourites: {
+                                ...state.favourites,
+                                beforePage: data.data.data,
+                                currentPage: state.favourites.lastPage.slice()
+                            }
+                        };
+
+                    case constants.FIRST_PAGE:
+                        return {
+                            ...state,
+                            favouritesTotal: data.data.total,
+                            favourites: {
+                                ...state.favourites,
+                                nextPage: data.data.data,
+                                currentPage: state.favourites.firstPage.slice()
+                            }
+                        };
+                
+                    default:
+                        return {
+                            ...state,
+                            favouritesTotal: data.data.total,
+                            favourites: {
+                                ...state.favourites,
+                                currentPage: data.data.data
+                            }
+                        };
+                }
             }
 
         case failureType(actionTypes.FETCH_FAVOURITES):
@@ -422,6 +487,48 @@ const books = (state = initialState.books, { type, payload, data }) => {
                 favourites: null,
                 favourites_success_fetch: false,
             };
+
+        case(actionTypes.FAVOURITE_PAGE_REQUEST):
+            switch (payload.buttonCode) { 
+                case constants.NEXT_PAGE:
+                    return {
+                        ...state,
+                        favourites: {
+                            ...state.favourites,
+                            currentPage: state.favourites.nextPage.slice(),
+                        }
+                    };
+
+                case constants.BEFORE_PAGE:
+                    return {
+                        ...state,
+                        favourites: {
+                            ...state.favourites,
+                            currentPage: state.beforePage.slice(),
+                        }
+                    };
+
+                case constants.LAST_PAGE:
+                    return {
+                        ...state,
+                        favourites: {
+                            ...state.favourites,
+                            currentPage: state.favourites.lastPage.slice()
+                        }
+                    };
+
+                case constants.FIRST_PAGE:
+                    return {
+                        ...state,
+                        favourites: {
+                            ...state.favourites,
+                            currentPage: state.favourites.firstPage.slice()
+                        }
+                    };
+            
+                default:
+                    return state;
+            }
 
         default:
             return state;
@@ -699,7 +806,8 @@ export const getGenres = (state) => state.genres.all;
 export const getUserGenres = (state) => state.user.userGenres;
 export const getBookIndex = (state) => state.books.currentBook;
 export const getBooks = (state) => state.books.shownBooks;
-export const getFavourites = (state) => state.books.favourites;
+export const getTotalOfFavourites = (state) => state.books.favouritesTotal;
+export const getFavourites = (state) => state.books.favourites.currentPage;
 export const getCommentaries = (state) => state.comentaries.bookCommentaries;
 export const getSubCommentaries = (state) => state.comentaries.bookSubCommentaries;
 export const getLoadingStatus = (state) => state.controllerStatus.loading;

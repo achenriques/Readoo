@@ -613,7 +613,7 @@ class ProfileView extends Component {
                                 </Grid>
                             :   <div/>
                         }
-                        <ContinueModal open={this.state.openContinueDeleteProfile} closeCallback={this.acceptDeleteProfile} />
+                        <ContinueModal open={this.state.openContinueDeleteProfile} text={LS.getStringMsg('continue.delete.profile')} closeCallback={this.acceptDeleteProfile} />
                     </div>
                 )
         }
