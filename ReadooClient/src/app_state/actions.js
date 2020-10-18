@@ -37,6 +37,7 @@ const actionTypes = {
     DELETE_USER: 'DELETE_USER',
     WRITE_COMMENTARY: 'WRITE_COMMENTARY',
     SEND_COMMENTARY: 'SEND_COMMENTARY',
+    DELETE_BOOK: 'DELETE_BOOK',
     RESET_LOADS: 'RESET_LOADS',
     RESET_ERRORS: 'RESET_ERRORS',
     RESET_PROCCESS: 'RESET_PROCCESS',
@@ -270,6 +271,12 @@ const fetchFavourites = (userId, page, booksPerPage, myUploads, buttonCode) => (
     promise: bookApi.fetchFavourites(userId, page, booksPerPage, myUploads)
 });
 
+const unsubscribeBook = (bookId, userId) => ({
+    type: actionTypes.DELETE_BOOK,
+    payload: {bookId, userId},
+    promise: bookApi.unsubscribeBook(bookId, userId)
+});
+
 const reportErrorMessage = (errorMsg) => ({
     type: actionTypes.REPORT_ERROR_MESSAGE,
     payload: { errorMsg }
@@ -312,5 +319,6 @@ export {
     sendComment,
     saveUserData,
     dissableUser,
+    unsubscribeBook,
     reportErrorMessage
 };

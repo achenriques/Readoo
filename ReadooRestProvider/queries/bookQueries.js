@@ -2,13 +2,13 @@ module.exports = {
     allBooks: "SELECT * FROM book",
     getBunch: "SELECT b.*, COALESCE(u.likeBoolean, FALSE) AS userLikesBook, us.userAvatarUrl FROM book b " + 
             " LEFT JOIN userlikesbook u ON b.bookId = u.bookId AND u.userId = ? " +
-            " LEFT JOIN lastuserbook l ON l.userId = ? AND b.genreId = l.genreId " +
+            " LEFT JOIN lastUserBook l ON l.userId = ? AND b.genreId = l.genreId " +
             " INNER JOIN appUser us ON us.userId = b.userId " +
             " WHERE b.bookVisible = 1 AND (l.bookId IS NULL OR b.bookId > l.bookId) " +
             " ORDER BY b.bookDate ASC LIMIT ? ;",
     getBunchGenre: "SELECT b.*, COALESCE(u.likeBoolean, FALSE) AS userLikesBook, us.userAvatarUrl FROM book b " + 
             " LEFT JOIN userlikesbook u ON b.bookId = u.bookId AND u.userId = ? " + 
-            " LEFT JOIN lastuserbook l ON l.userId = ? AND b.genreId = l.genreId " +
+            " LEFT JOIN lastUserBook l ON l.userId = ? AND b.genreId = l.genreId " +
             " INNER JOIN appUser us ON us.userId = b.userId " +
             " WHERE b.genreID IN (?) AND b.bookVisible = 1 AND (l.bookId IS NULL OR b.bookId > l.bookId) " +
             " ORDER BY b.bookDate ASC LIMIT ? ;",
@@ -28,6 +28,9 @@ module.exports = {
     insertBook: "INSERT INTO book (bookId, bookTitle, bookAuthor, bookDescription, bookReview, " +
             " bookLikes, bookDate, bookCoverUrl, userId, genreId, bookVisible) " + 
             " VALUES (0, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP(), ?, ?, ?, 1) ;",
-    dissableBook: "UPDATE book SET bookVisible = 0 WHERE bookId = ? ;",
+    dissableBook: "UPDATE book SET bookVisible = 0 WHERE bookId = ? AND userId = ? ;",
+    deleteBookLikes: "DELETE FROM userlikesbook WHERE bookId = ? AND userId = ? ;",
+    lessKarmaStatement: "UPDATE appUser u INNER JOIN book b ON b.bookId = ? AND b.userId = u.userId " + 
+            "SET u.userKarma = (CASE WHEN userKarma - b.bookLikes < 0 THEN 0 ELSE userKarma - b.bookLikes END) ;",
     deleteBook: "DELETE FROM book WHERE bookId = ? ;",
 }

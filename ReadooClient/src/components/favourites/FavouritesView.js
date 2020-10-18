@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as appState from '../../app_state/reducers';
-import { favouritePageRequest, fetchFavourites, setIsOpenProfilePreview, actionTypes } from '../../app_state/actions';
+import { 
+    favouritePageRequest, fetchFavourites, 
+    setIsOpenProfilePreview, doLikeBook, doDislikeBook,
+    unsubscribeBook, actionTypes } from '../../app_state/actions';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
@@ -26,6 +29,7 @@ import avatarDefault from '../../resources/avatarDefault.svg';
 import bookDefault from '../../resources/bookDefault.gif';
 import material_styles from './material_styles';
 import '../../styles/Favourites.css';
+import InfoModal from '../common/InfoModal';
 
 class FavouritesView extends Component {
 
@@ -35,15 +39,17 @@ class FavouritesView extends Component {
         page: 0,
         total: 0,
         loadingPage: 0,
+        currentBooksPerPage: 0,
         rowsPerPage: constants.ROWS_PER_PAGE,
         booksPerPage: constants.BOOKS_PER_PAGE,
         booksPerRow: constants.BOOKS_PER_PAGE / constants.ROWS_PER_PAGE,
-        shownBooks: [],
         selectedCell: null,
         selectedBook: null,
         previewUser: null,
+        dislikeBooks: [],
         selectorValue: constants.MY_FAVOURITES,
-        openContinueDeleteBook: false
+        openContinueDeleteBook: false,
+        openInfoModal: false
     };
 
     constructor(props) {
@@ -58,17 +64,19 @@ class FavouritesView extends Component {
     }
 
     componentDidUpdate() {
-        if (this.isLoading()) {
-            if (this.state.loadingState !== constants.REST_DEFAULT) {
+        let isLoading = this.isLoading();
+        if (isLoading) {
+            if (this.state.loadingState != constants.REST_DEFAULT) {
                 this.setState({
                     ...this.state,
                     loadingState: constants.REST_DEFAULT
                 });
             }
-        } else if (this.state.loadingState === constants.REST_DEFAULT) {
+        } else if (constants.REST_DEFAULT === this.state.loadingState) {
             if (this.props.favouriteBooks !== null) {
                 this.setState({
                     ...this.state,
+                    currentBooksPerPage: this.props.favouriteBooks.length,
                     total: this.props.totalOfFavourites,
                     loadingPage: null,
                     loadingState: constants.REST_SUCCESS,
@@ -81,6 +89,14 @@ class FavouritesView extends Component {
                     loadingState: constants.REST_FAILURE
                 });
             }
+        } if (this.props.successProcesses.includes(actionTypes.DELETE_BOOK)) {
+                // status of delete book...
+                this.setState({
+                    ...this.state,
+                    openInfoModal: true,
+                    currentBooksPerPage: this.props.favouriteBooks.length,
+                    total: this.props.totalOfFavourites,
+                });
         }
     }
 
@@ -105,7 +121,7 @@ class FavouritesView extends Component {
                     break;
                         
                 case constants.LAST_PAGE:
-                    page = this.state.total / constants.BOOKS_PER_PAGE;
+                    page = Math.floor(this.state.total / constants.BOOKS_PER_PAGE);
                     pageToFetch = (page > 0) ? (page - 1) : page;
                     break; 
     
@@ -117,7 +133,7 @@ class FavouritesView extends Component {
                 default:
                     break;
             }
-            const needFetch = this.state.total > this.state.booksPerPage;
+            const needFetch = this.state.total > this.state.booksPerPage * 2;
             this.setState({ 
                 ...this.state, 
                 page: page, 
@@ -256,9 +272,16 @@ class FavouritesView extends Component {
         }
     }
 
+    closeInfoModal() {
+        this.setState({
+            ...this.state,
+            openInfoModal: false
+        })
+    }
+
     acceptDeleteBook(selectedOption) {
         if (selectedOption) {
-            // TODO: call event to delte BOOK
+            this.props.unsubscribeBook(this.state.selectedBook, this.props.currentUserId)
         }
 
         this.setState({
@@ -267,21 +290,42 @@ class FavouritesView extends Component {
         });
     }
 
-    // returns double click style over the images clicked
-    heartType = (typeId) => {
-        switch (typeId) {
-            case 0:
-                return (constants.DISPLAY_NONE);
-        
-            case 1:
-                return ({ ...material_styles.heartStyle, fill: 'red' });
+    getIsPossibleToHandleLike() {
+        return !this.props.loadingProcesses.includes(actionTypes.I_LIKE_BOOK);
+    }
 
-            case 2:
-                return (material_styles.heartStyle)
-                
-            default:
-                return ({ ...material_styles.heartStyle, fill: 'red', fontSize:'15px' });
+    handleLikeClick(evt, bookId) {
+        if (bookId && this.getIsPossibleToHandleLike()) {
+            let dislikes = this.state.dislikeBooks;
+            if (this.state.dislikeBooks.includes(bookId)) {
+                dislikes = this.state.dislikeBooks.filter(b => b !== bookId);
+                this.props.doLikeBook(bookId, this.props.currentUserId);
+            } else {
+                dislikes.push(bookId);
+                this.props.doDislikeBook(bookId, this.props.currentUserId);
+            }
+            
+            this.setState({
+                ...this.state,
+                dislikeBooks: dislikes
+            });
         }
+    }
+
+    // returns the style of favourite hearts
+    heartType = (bookId) => {
+        let heartStyle = {};
+        if (this.state.dislikeBooks.includes(bookId)) {
+            heartStyle = { fill: 'black', fontSize:'15px' };
+        } else {
+            heartStyle = { fill: 'red', fontSize:'15px' };
+        }
+
+        heartStyle.cursor = (this.state.selectorValue === constants.MY_BOOKS)
+                ? 'not-allowed'
+                : 'pointer';
+        
+        return heartStyle;
     }
 
     // funcion de carga de pie de tabla
@@ -299,7 +343,7 @@ class FavouritesView extends Component {
                 </div>
                 {(this.state.selectorValue === constants.MY_BOOKS && this.state.selectedBook !== null)
                     ? ( <div className="favouritesDelete">
-                            <Button key="deleteBook" color="secondary" size="small" onClick={() => this.handleDeleteBook()}>
+                            <Button key="deleteBook" color="secondary" size="small" onClick={(evt) => this.handleDeleteBook(evt)}>
                                     <LS msgId='delete.book' defaultMsg='Delete my book!'/>
                             </Button>
                         </div>) : (<div/>)}
@@ -323,7 +367,7 @@ class FavouritesView extends Component {
                     </IconButton>
                     <IconButton
                         onClick={(evt) => {this.handleChangePage(evt, constants.NEXT_PAGE)}}
-                        disabled={page >= Math.ceil(total / booksPerPage) - 1}
+                        disabled={page >= Math.floor(total / booksPerPage) - 1}
                         aria-label={LS.getStringMsg('next.page', 'To Page Next')}
                     >
                         <KeyboardArrowRight />
@@ -365,11 +409,11 @@ class FavouritesView extends Component {
                 if (this.props.favouriteBooks !== null && this.props.favouriteBooks.length > 0) {
                     return (
                         <div className="favouritesDiv">
-                            <Grid container spacing={24}>
+                            <Grid container spacing={24} className="favouritesGrid">
                                 <Grid item sm={8} xs={12} className="favouritesGrid">
                                     <div className="gridDiv">
                                         <GridList cellHeight={'auto'} cols={3} spacing={0} style={material_styles.gridList}>
-                                            {this.props.favouriteBooks.slice(page * booksPerPage, page * booksPerPage + booksPerPage).map((book, index, list) => {
+                                            {this.props.favouriteBooks.map((book, index, list) => {
                                                 return (
                                                     <div key={'div_' + book.bookId}>
                                                         <GridListTile key={'tile_' + book.bookId} 
@@ -392,8 +436,12 @@ class FavouritesView extends Component {
                                                                 className="favouritesBookTitle"
                                                                 actionIcon={
                                                                     <div>
-                                                                        <Favorite className="favouriteLikesHeart" style={this.heartType(-1)}/>
-                                                                        <span className="favouriteLikesText">{" " + +book.bookLikes}</span>
+                                                                        <Favorite 
+                                                                            className="favouriteLikesHeart" 
+                                                                            style={this.heartType(+book.bookId)}
+                                                                            onClick={(evt) => this.handleLikeClick(evt, +book.bookId)}
+                                                                        />
+                                                                        <span className="favouriteLikesText">{(this.state.dislikeBooks.includes(+book.bookId)) ? (+book.bookLikes - 1) : +book.bookLikes}</span>
                                                                         <IconButton 
                                                                             className="favouriteAvatarButton"
                                                                             style={(this.state.selectorValue === constants.MY_BOOKS) ? constants.DISPLAY_NONE : { margin: 'auto' } }
@@ -458,6 +506,7 @@ class FavouritesView extends Component {
                             </Grid>
                             <ProfilePreviewModal previewUser={this.state.previewUser}/>
                             <ContinueModal open={this.state.openContinueDeleteBook} text={LS.getStringMsg('continue.delete.book')} closeCallback={this.acceptDeleteBook.bind(this)} />
+                            <InfoModal open={this.state.openInfoModal} text={LS.getStringMsg('success.delete.book')} closeCallback={this.closeInfoModal.bind(this)} />
                         </div>
                     )
                 }
@@ -477,11 +526,16 @@ export default connect(
         currentUserId: appState.getUserId(state),
         favouriteBooks: appState.getFavourites(state),
         totalOfFavourites: appState.getTotalOfFavourites(state),
-        loadingProcesses: appState.getLoadingProcesses(state)
+        loadingProcesses: appState.getLoadingProcesses(state),
+        successProcesses: appState.getSucceedProcesses(state),
+        failedProcesses: appState.getFailedProcesses(state)
     }),
     (dispatch) => ({
         favouritePageRequest: (buttonCode, fetchData) => dispatch(favouritePageRequest(buttonCode, fetchData)),
         fetchFavourites: (userId, page, booksPerPage, myUploads, buttonCode) => dispatch(fetchFavourites(userId, page, booksPerPage, myUploads, buttonCode)),
-        openProfilePreview: (isOpen) => dispatch(setIsOpenProfilePreview(isOpen))
+        openProfilePreview: (isOpen) => dispatch(setIsOpenProfilePreview(isOpen)),
+        doLikeBook: (bookId, userId) => dispatch(doLikeBook(bookId, userId)),
+        doDislikeBook: (bookId, userId) => dispatch(doDislikeBook(bookId, userId)),
+        unsubscribeBook: (bookId, userId) => dispatch(unsubscribeBook(bookId, userId))
     })
 )(FavouritesView);

@@ -54,7 +54,7 @@ class CommentsGrid extends Component {
             }
             // todo date
             if (this.props.commentFatherId === null) {
-                this.props.fetchCommentaries(this.props.bookId, NUM_OF_COMENTARIES, lastCommentaryDate);
+                this.props.fetchCommentaries(this.props.bookId, NUM_OF_COMENTARIES, lastCommentaryDate, false);
             } else {
                 this.props.fetchSubCommentaries(this.props.bookId, this.props.commentFatherId, NUM_OF_COMENTARIES, lastCommentaryDate);
             }
@@ -73,11 +73,6 @@ class CommentsGrid extends Component {
         let isSubs = this.props.commentFatherId !== null;
         if (this.props.bookId && this.props.bookId !== this.state.currentBookId) {
             let lastCommentaryDate = null;
-            if (this.state.bookCommentaries && this.state.bookCommentaries.length) {
-                lastCommentaryDate = new Date(Math.max.apply(null, this.state.bookCommentaries.map(function(e) {
-                    return new Date(e.date);
-                  })));
-            }
             let nextState = {
                 ...this.state,
                 loadedComment: REST_DEFAULT,
@@ -86,7 +81,7 @@ class CommentsGrid extends Component {
             if (isSubs) {
                 nextState["expandSubs_" + this.state.commentFatherId] = undefined;
             }
-            this.props.fetchCommentaries(this.props.bookId, NUM_OF_COMENTARIES, lastCommentaryDate);
+            this.props.fetchCommentaries(this.props.bookId, NUM_OF_COMENTARIES, lastCommentaryDate, false);
             this.setState(nextState);
         } else if (!isSubs) {
             if (this.state.loadedComment === REST_DEFAULT && !this.isLoading() && this.props.shownCommentaries === null) {

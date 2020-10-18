@@ -251,7 +251,7 @@ class BookProvider {
                     }
                 );
             } else {
-                res.status(400)        // HTTP status 400: BadRequest
+                return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Id or Data');
             }
         });
@@ -261,7 +261,7 @@ class BookProvider {
         const that = this;
         app.post('/dissableBook', middleware.verifyToken, function (req, res) {
             console.log("Estoy deshabilitando libro");
-            let bookId = req.body.id;
+            let bookId = req.body.bookId;
             if (bookId) {
                 that.bookDao.dissableBook(bookId).then(
                     function (result) {
@@ -284,11 +284,11 @@ class BookProvider {
 
     deleteOne(app) {
         const that = this;
-        app.delete('/commentary', function (req, res) {
+        app.delete('/book', function (req, res) {
             console.log("Estoy deleteando " + req.body.id);
             let bookId = req.body.id;
             if (bookId) {
-                that.bookDao.deleteOne(bookId).then(
+                that.bookDao.deleteBook(bookId).then(
                     function (result) {
                         res.setHeader('Content-Type', 'application/json');
                         return res.status(200).json(result);

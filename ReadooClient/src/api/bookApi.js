@@ -13,7 +13,7 @@ const uploadBook = (bookData) => axios.post(
     {
         headers: { 'Content-Type': 'multipart/form-data' }
     }
-)
+);
 
 const fetchBooks = (userId, lastBookId, genres, numberOfBooks) => axios.post(
     `${baseURL}/book`,
@@ -25,7 +25,7 @@ const fetchBooks = (userId, lastBookId, genres, numberOfBooks) => axios.post(
             numberOfBooks: numberOfBooks
         }
     }
-)
+);
 
 const fetchMoreBooks = (userId, lastBookId, numberOfBooks) => axios.post(
     `${baseURL}/book`,
@@ -36,13 +36,13 @@ const fetchMoreBooks = (userId, lastBookId, numberOfBooks) => axios.post(
             numberOfBooks
         }
     }
-)
+);
 
 // ---- RELATED WITH BOOKS -----
 const fetchGenres = () => axios.get(
     `${baseURL}/genre`,
     {}
-)
+);
 
 const fetchCommentaries = (bookId, nCommentaries, lastDate) => axios.post(
     `${baseURL}/commentary/fetch`,
@@ -51,7 +51,7 @@ const fetchCommentaries = (bookId, nCommentaries, lastDate) => axios.post(
         nCommentaries,
         lastDate
     }
-)
+);
 
 const fetchSubCommentaries = (bookId, fatherCommentaryId, nCommentaries, lastDate) => axios.post(
     `${baseURL}/commentary/fetchSubs`,
@@ -61,7 +61,7 @@ const fetchSubCommentaries = (bookId, fatherCommentaryId, nCommentaries, lastDat
         nCommentaries,
         lastDate
     }
-)
+);
 
 const sendComment = (commentFatherId, bookId, userId, commentText) => axios.post(
     `${baseURL}/commentary/new`,
@@ -71,7 +71,7 @@ const sendComment = (commentFatherId, bookId, userId, commentText) => axios.post
         userId,
         commentText
     }
-)
+);
 
 const saveLastUserBook = (userId, bookId, genreId) => axios.post(
     `${baseURL}/lastBook`,
@@ -82,7 +82,7 @@ const saveLastUserBook = (userId, bookId, genreId) => axios.post(
             genreId
         }
     }
-)
+);
 
 const fetchFavourites = (userId, page, booksPerPage, myUploads) => axios.post(
     `${baseURL}/bookFavourites`,
@@ -94,7 +94,15 @@ const fetchFavourites = (userId, page, booksPerPage, myUploads) => axios.post(
             myUploads
         }
     }
-)
+);
+
+const unsubscribeBook = (bookId, userId) => axios.post(
+    `${baseURL}/dissableBook`,
+    {
+        bookId,
+        userId
+    }
+);
 
 export default {
     uploadBook,
@@ -105,5 +113,6 @@ export default {
     fetchSubCommentaries,
     sendComment,
     saveLastUserBook,
-    fetchFavourites
+    fetchFavourites,
+    unsubscribeBook
 }

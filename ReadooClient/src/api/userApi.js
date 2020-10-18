@@ -11,12 +11,12 @@ axios.defaults.withCredentials = true;
 const fetchUserData = (userId, isPreview) => axios.get(
     `${baseURL}/user?id=${userId}&isPreview=${isPreview}`,{
     }
-)
+);
 
 const fetchUserGenres = (userId) => axios.get(
     `${baseURL}/userGenre?id=${userId}`, {
     }
-)
+);
 
 const saveUserData = (userData) => axios.put(
     `${baseURL}/user`,
@@ -24,14 +24,14 @@ const saveUserData = (userData) => axios.put(
     {
         headers: { 'Content-Type': 'multipart/form-data' }
     }
-)
+);
 
 const dissableUser = (userId) => axios.post(
     `${baseURL}/dissableUser`,
     {
         userId
     }
-)
+);
 
 // ---- RELATED WITH USERS -----
 const doLikeBook = (bookId, userId) => axios.post(
@@ -40,7 +40,7 @@ const doLikeBook = (bookId, userId) => axios.post(
         bookId,
         userId
     }
-)
+);
 
 const doDislikeBook = (bookId, userId) => axios.delete(
     `${baseURL}/userLikesBook`,
@@ -50,7 +50,7 @@ const doDislikeBook = (bookId, userId) => axios.delete(
             userId
         }
     }
-)
+);
 
 export default {
     fetchUserData,

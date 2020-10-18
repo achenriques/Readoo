@@ -44,7 +44,7 @@ class BodyContainer extends Component {
 
             case 1:
                 return (
-                    <div className='bodyFavoritos'>
+                    <div className='favouritesBody'>
                         <FavouritesView/>
                     </div>
                 );

@@ -400,10 +400,14 @@ const books = (state = initialState.books, { type, payload, data }) => {
                             ? data.data.data.slice(payload.booksPerPage, ((payload.booksPerPage * 2) > totalFavourites) 
                                     ? payload.booksPerPage * 2 : totalFavourites)
                             : [];
-                    let lastPage = (nextPage !== [] && totalFavourites > (payload.booksPerPage * 2)) 
-                            ? data.data.data.slice(payload.booksPerPage * 2, ((payload.booksPerPage * 3) > totalFavourites) 
-                            ? payload.booksPerPage * 3 : totalFavourites)
-                            : [];
+                    let lastPage = nextPage;
+                    if (nextPage.length && totalFavourites > (payload.booksPerPage * 2)) {
+                        lastPage = data.data.data.slice(
+                                payload.booksPerPage * 2, 
+                                ((payload.booksPerPage * 3) > totalFavourites) 
+                                        ? payload.booksPerPage * 3 
+                                        : totalFavourites)
+                    }
                     return {
                         ...state,
                         favouritesTotal: data.data.total,
@@ -504,7 +508,7 @@ const books = (state = initialState.books, { type, payload, data }) => {
                         ...state,
                         favourites: {
                             ...state.favourites,
-                            currentPage: state.beforePage.slice(),
+                            currentPage: state.favourites.beforePage.slice(),
                         }
                     };
 

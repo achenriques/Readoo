@@ -15,7 +15,7 @@ const doLogin = (userNickEmail, pass) => axios.post(
         userNickEmail: userNickEmail,
         pass: pass
     }
-)
+);
 
 const doRegister = (userNickEmail, pass, email, language) => axios.post(
     `${baseURL}/login/new`,
@@ -25,7 +25,7 @@ const doRegister = (userNickEmail, pass, email, language) => axios.post(
         email: email,
         language: language
     }
-)
+);
 
 const checkNickIsUnique = (userNick) => axios.get(
     `${baseURL}/login/avaliable`, {
@@ -33,7 +33,7 @@ const checkNickIsUnique = (userNick) => axios.get(
             userNickEmail: userNick
         }
     }
-)
+);
 
 const checkEmailIsUnique = (email) => axios.get(
     `${baseURL}/login/avaliableEmail`, {
@@ -41,30 +41,30 @@ const checkEmailIsUnique = (email) => axios.get(
             email: email
         }
     }
-)
+);
 
 
 const doLogOut = () => axios.get( 
     `${baseURL}/login/logout`
-)
+);
 
 const checkToken = () => axios.get(
     `${baseURL}/login/isme`, { withCredentials: true }
-)
+);
 
 const setLanguageSelected = (languageCode) => axios.post(
     `${baseURL}/login/languageSelector`,
     {
         languageCode
     }
-)
+);
 
 const setTabSelector = (tabSelector) => axios.post(
     `${baseURL}/login/tabSelector`,
     {
         tabSelector
     }
-)
+);
 
 export default {
     doLogin,

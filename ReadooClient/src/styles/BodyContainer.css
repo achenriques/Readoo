@@ -29,7 +29,8 @@ div#root {
     right: 50px;
 }
 
-.bodyFavoritos {
+.favouritesBody {
+    height: 91%;
     overflow: hidden;
 }
 
@@ -127,9 +128,7 @@ a:hover {
 
 .gridDiv {
     position: relative;
-    height: auto;
-    max-height: 99%;
-    overflow-y: auto;
+    height: 98%;
 }
 
 .whiteText {

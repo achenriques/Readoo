@@ -1,11 +1,12 @@
 .favouritesDiv {
     position: relative;
     width: 100%;
-    max-height: inherit;
+    height: 100%;
 }
 
 .favouritesGrid {
     position: relative;
+    height: 100%;
 }
 
 .favouritesGridRight {
@@ -98,7 +99,6 @@
 .favouriteFoot {
     display: block;
     text-align: center;
-    padding-top: 10px;
 }
 
 .favouriteSelector {
@@ -109,7 +109,7 @@
 }
 
 .favouritesDelete {
-    position: inline-block;
+    display: inline;
     margin: auto;
 }
 
@@ -134,4 +134,5 @@
 
 .favouriteLikesHeart {
     transform: translateY(25%);
+    cursor: pointer;
 }

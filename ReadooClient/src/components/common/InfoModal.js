@@ -4,7 +4,7 @@ import Button from '@material-ui/core/Button';
 import LS from '../LanguageSelector';
 import '../../styles/Common.css';
 
-class ContinueModal extends Component {
+class InfoModal extends Component {
 
     initialState = {
         open: false
@@ -21,10 +21,10 @@ class ContinueModal extends Component {
         });
     };
 
-    handleClose = (selectedOption) => {
+    handleClose = () => {
         // Calback onClose
         if (this.props.closeCallback !== undefined && typeof this.props.closeCallback === "function") {
-            this.props.closeCallback(selectedOption === true);
+            this.props.closeCallback();
         }
     };
 
@@ -37,17 +37,12 @@ class ContinueModal extends Component {
                 onClose={this.handleClose}
             >
                 <div className="continueModal">
-                    <h2 id="simple-modal-title" style={{margin: '25px'}}>{(this.props.text) ? this.props.text : LS.getStringMsg('continue.modal.title', 'Continue?')}</h2>
+                    <h2 id="simple-modal-title" style={{margin: '25px'}}>{(this.props.text) ? this.props.text : LS.getStringMsg('info.modal.title', 'INFO')}</h2>
                     <p id="simple-modal-description">
-                        <Button variant="flat" color="secondary" 
-                            onClick={this.handleClose.bind(this, false)}
-                        >
-                            <LS msgId='cancel' defaultMsg='Cancel'/>
-                        </Button>
                         <Button variant="flat" color="primary" 
-                            onClick={this.handleClose.bind(this, true)}
+                            onClick={this.handleClose.bind(this)}
                         >
-                            <LS msgId='continue' defaultMsg='Continue'/>
+                            <LS msgId='ok' defaultMsg='Ok!'/>
                         </Button>
                     </p>
                 </div>
@@ -56,4 +51,4 @@ class ContinueModal extends Component {
     }
 }
 
-export default ContinueModal;
+export default InfoModal;
