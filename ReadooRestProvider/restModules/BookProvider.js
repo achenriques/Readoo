@@ -262,8 +262,9 @@ class BookProvider {
         app.post('/dissableBook', middleware.verifyToken, function (req, res) {
             console.log("Estoy deshabilitando libro");
             let bookId = req.body.bookId;
-            if (bookId) {
-                that.bookDao.dissableBook(bookId).then(
+            let userId = req.body.userId;
+            if (bookId, userId) {
+                that.bookDao.dissableBook(bookId, userId).then(
                     function (result) {
                         res.setHeader('Content-Type', 'application/json');
                         return res.status(200).json(result);
@@ -286,9 +287,10 @@ class BookProvider {
         const that = this;
         app.delete('/book', function (req, res) {
             console.log("Estoy deleteando " + req.body.id);
-            let bookId = req.body.id;
-            if (bookId) {
-                that.bookDao.deleteBook(bookId).then(
+            let bookId = req.body.bookId;
+            let userId = req.body.userId;
+            if (bookId, userId) {
+                that.bookDao.deleteBook(bookId, userId).then(
                     function (result) {
                         res.setHeader('Content-Type', 'application/json');
                         return res.status(200).json(result);

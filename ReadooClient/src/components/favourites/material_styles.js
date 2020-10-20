@@ -39,8 +39,8 @@ export default {
         overflowY: 'scroll',
     },
 
-    grbookId: {
-        height: '100%',
+    grBookId: {
+        height: '50%',
         width: '100%',
         textAlign: 'center',
         top: 0,
@@ -48,7 +48,7 @@ export default {
     },
 
     grSelectedBookId: {
-        height: '100%',
+        height: '50%',
         width: '100%',
         textAlign: 'center',
         top: 0,

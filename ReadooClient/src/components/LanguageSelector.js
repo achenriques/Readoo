@@ -101,7 +101,11 @@ class LanguageSelector extends Component {
     }
 
     render = () => {
-        return (<span>{ this.msg(this.props.msgId, this.props.defaultMsg, this.props.params) }</span>);
+        return (
+            <span className="languageSelector">
+                { this.msg(this.props.msgId, this.props.defaultMsg, this.props.params) }
+            </span>
+        );
     }
 }
 

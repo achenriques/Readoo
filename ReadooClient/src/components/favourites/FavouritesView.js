@@ -4,7 +4,7 @@ import * as appState from '../../app_state/reducers';
 import { 
     favouritePageRequest, fetchFavourites, 
     setIsOpenProfilePreview, doLikeBook, doDislikeBook,
-    unsubscribeBook, actionTypes } from '../../app_state/actions';
+    unsubscribeBook, resetProccess, actionTypes } from '../../app_state/actions';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
@@ -27,7 +27,6 @@ import FavouritesSelector from './FavouritesSelector';
 import * as constants from '../../constants/appConstants';
 import avatarDefault from '../../resources/avatarDefault.svg';
 import bookDefault from '../../resources/bookDefault.gif';
-import material_styles from './material_styles';
 import '../../styles/Favourites.css';
 import InfoModal from '../common/InfoModal';
 
@@ -47,6 +46,7 @@ class FavouritesView extends Component {
         selectedBook: null,
         previewUser: null,
         dislikeBooks: [],
+        deletedBooks: [],
         selectorValue: constants.MY_FAVOURITES,
         openContinueDeleteBook: false,
         openInfoModal: false
@@ -64,7 +64,7 @@ class FavouritesView extends Component {
     }
 
     componentDidUpdate() {
-        let isLoading = this.isLoading();
+        let isLoading = this.isLoading(actionTypes.FETCH_FAVOURITES);
         if (isLoading) {
             if (this.state.loadingState != constants.REST_DEFAULT) {
                 this.setState({
@@ -79,7 +79,7 @@ class FavouritesView extends Component {
                     currentBooksPerPage: this.props.favouriteBooks.length,
                     total: this.props.totalOfFavourites,
                     loadingPage: null,
-                    loadingState: constants.REST_SUCCESS,
+                    loadingState: constants.REST_SUCCESS
                 });
             } else {
                 // Fetch has failed...
@@ -91,17 +91,19 @@ class FavouritesView extends Component {
             }
         } if (this.props.successProcesses.includes(actionTypes.DELETE_BOOK)) {
                 // status of delete book...
+                this.props.resetProccessStatus(actionTypes.DELETE_BOOK);
                 this.setState({
                     ...this.state,
                     openInfoModal: true,
-                    currentBooksPerPage: this.props.favouriteBooks.length,
-                    total: this.props.totalOfFavourites,
+                    deletedBooks: this.state.deletedBooks.concat(this.state.selectedBook),
+                    selectedBook: null,
+                    selectedCell: null
                 });
         }
     }
 
-    isLoading() {
-        return this.props.loadingProcesses.includes(actionTypes.FETCH_FAVOURITES);
+    isLoading(actionName) {
+        return this.props.loadingProcesses.includes(actionName);
     }
 
     // Table event handler
@@ -137,7 +139,9 @@ class FavouritesView extends Component {
             this.setState({ 
                 ...this.state, 
                 page: page, 
-                loadingPage: (needFetch) ? pageToFetch  : null
+                loadingPage: (needFetch) ? pageToFetch  : null,
+                selectedCell: null,
+                selectedBook: null
             });
             // Change the current page
             this.props.favouritePageRequest(buttonCode, needFetch);
@@ -216,7 +220,7 @@ class FavouritesView extends Component {
                 selectedBook: bookId
             };
        
-            if (this.state.selectedCell === cellNumber) {
+            if (this.state.selectedCell === cellNumber || this.state.deletedBooks.includes(bookId)) {
                 nextState.selectedCell = null;
                 nextState.selectedBook = null;
             }
@@ -336,20 +340,26 @@ class FavouritesView extends Component {
             <div className="favouriteFoot">
                 <div className="favouriteSelector">
                     <FavouritesSelector
-                        disabled={this.isLoading()}
+                        disabled={this.isLoading(actionTypes.FETCH_FAVOURITES)}
                         firstOption={this.state.selectorValue}
                         onChangeFavourite={(evt, newValue) => this.handleChangeFavouriteType(evt, newValue)}
                     />
                 </div>
                 {(this.state.selectorValue === constants.MY_BOOKS && this.state.selectedBook !== null)
                     ? ( <div className="favouritesDelete">
-                            <Button key="deleteBook" color="secondary" size="small" onClick={(evt) => this.handleDeleteBook(evt)}>
-                                    <LS msgId='delete.book' defaultMsg='Delete my book!'/>
+                            <Button 
+                                key="deleteBook" 
+                                color="secondary" 
+                                size="small" 
+                                onClick={(evt) => this.handleDeleteBook(evt)}
+                                disabled={this.isLoading(actionTypes.DELETE_BOOK)}
+                            >
+                                <LS msgId='delete.book' defaultMsg='Delete my book!'/>
                             </Button>
                         </div>) : (<div/>)}
                 <div className="favouritePages">
                     <span>
-                        <LS msgId='page.one.of' defaultMsg={"Page: " + this.state.page + 1} params={[this.state.page + 1, Math.floor(this.state.total/this.state.booksPerPage) + 1]}/>
+                        <LS msgId='page.one.of' defaultMsg={"Page: " + this.state.page + 1} params={[this.state.page + 1, Math.ceil(this.state.total/this.state.booksPerPage)]}/>
                     </span>
                     <IconButton
                         onClick= {(evt) => {this.handleChangePage(evt, constants.FIRST_PAGE)}}
@@ -367,7 +377,7 @@ class FavouritesView extends Component {
                     </IconButton>
                     <IconButton
                         onClick={(evt) => {this.handleChangePage(evt, constants.NEXT_PAGE)}}
-                        disabled={page >= Math.floor(total / booksPerPage) - 1}
+                        disabled={page >= Math.ceil(total / booksPerPage) - 1}
                         aria-label={LS.getStringMsg('next.page', 'To Page Next')}
                     >
                         <KeyboardArrowRight />
@@ -412,49 +422,55 @@ class FavouritesView extends Component {
                             <Grid container spacing={24} className="favouritesGrid">
                                 <Grid item sm={8} xs={12} className="favouritesGrid">
                                     <div className="gridDiv">
-                                        <GridList cellHeight={'auto'} cols={3} spacing={0} style={material_styles.gridList}>
+                                        <GridList cellHeight={'auto'} cols={3} spacing={0} className="gridList">
                                             {this.props.favouriteBooks.map((book, index, list) => {
                                                 return (
-                                                    <div key={'div_' + book.bookId}>
-                                                        <GridListTile key={'tile_' + book.bookId} 
-                                                            className={(this.state.selectedCell !== index) ? "grbookId": "grSelectedBookId"}
-                                                            classes={{tile: "tileBackGround"}}
-                                                        >
-                                                            <div className="favouritesCoverDiv" onClick={(evt) => this.handleImageClick(evt, index, book.bookId)}>
-                                                                <img className="favouritesCover"
-                                                                    src={(book.bookCoverUrl !== null) ? book.bookCoverUrl : bookDefault} 
-                                                                    alt={book.bookTitle}
-                                                                />
-                                                                <div className={(book.bookCoverUrl === null) ? "centeredText": "displayNone"}>
-                                                                    <LS msgId='no.image.avaliable' defaultMsg='No image encountered '/>
-                                                                </div>
-                                                            </div>
-                                                            <GridListTileBar
-                                                                key={'tileBar_' + book.bookId}
-                                                                title={book.bookTitle}
-                                                                subtitle={<span><LS msgId='what.book.by' defaultMsg='By: '/> {book.bookAuthor} </span>}
-                                                                className="favouritesBookTitle"
-                                                                actionIcon={
-                                                                    <div>
-                                                                        <Favorite 
-                                                                            className="favouriteLikesHeart" 
-                                                                            style={this.heartType(+book.bookId)}
-                                                                            onClick={(evt) => this.handleLikeClick(evt, +book.bookId)}
-                                                                        />
-                                                                        <span className="favouriteLikesText">{(this.state.dislikeBooks.includes(+book.bookId)) ? (+book.bookLikes - 1) : +book.bookLikes}</span>
-                                                                        <IconButton 
-                                                                            className="favouriteAvatarButton"
-                                                                            style={(this.state.selectorValue === constants.MY_BOOKS) ? constants.DISPLAY_NONE : { margin: 'auto' } }
-                                                                        >
-                                                                            <Avatar src={(book.userAvatarUrl !== null) ? book.userAvatarUrl : avatarDefault }
-                                                                                onClick={(evt) => this.handleAvatarClick(evt, book.userId)}
-                                                                            />
-                                                                        </IconButton>
-                                                                    </div>
-                                                                }
+                                                    <GridListTile key={'tile_' + book.bookId} 
+                                                        className={(this.state.deletedBooks.includes(+book.bookId)) ? "grDeletedBook" : (this.state.selectedCell !== index) ? "grBookId": "grSelectedBookId"}
+                                                        classes={{tile: "tileBackGround"}}
+                                                    >
+                                                        <div className="favouritesCoverDiv" onClick={(evt) => this.handleImageClick(evt, index, book.bookId)}>
+                                                            <img className="favouritesCover"
+                                                                src={(book.bookCoverUrl !== null) ? book.bookCoverUrl : bookDefault} 
+                                                                alt={book.bookTitle}
                                                             />
-                                                        </GridListTile>
-                                                    </div>
+                                                            <div className={(book.bookCoverUrl === null && !this.state.deletedBooks.includes(book.bookId)) ? "centeredText": "displayNone"}>
+                                                                <h3>
+                                                                    <LS msgId='no.image.avaliable' defaultMsg='No image encountered'/>
+                                                                </h3>
+                                                            </div>
+                                                            <div className={(this.state.deletedBooks.includes(book.bookId)) ? "centeredText": "displayNone"}>
+                                                                <h3>
+                                                                    <LS msgId='book.was.deleted' defaultMsg='Deleted!'/>
+                                                                </h3>
+                                                            </div>
+                                                        </div>
+                                                        <GridListTileBar
+                                                            key={'tileBar_' + book.bookId}
+                                                            title={book.bookTitle}
+                                                            subtitle={<span><LS msgId='what.book.by' defaultMsg='By: '/> {book.bookAuthor} </span>}
+                                                            className="favouritesBookTitle"
+                                                            actionIcon={
+                                                                <div>
+                                                                    <Favorite 
+                                                                        className="favouriteLikesHeart" 
+                                                                        style={this.heartType(+book.bookId)}
+                                                                        disabled={this.state.selectorValue === constants.MY_BOOKS}
+                                                                        onClick={(evt) => this.handleLikeClick(evt, +book.bookId)}
+                                                                    />
+                                                                    <span className="favouriteLikesText">{(this.state.dislikeBooks.includes(+book.bookId)) ? (+book.bookLikes - 1) : +book.bookLikes}</span>
+                                                                    <IconButton 
+                                                                        className="favouriteAvatarButton"
+                                                                        style={(this.state.selectorValue === constants.MY_BOOKS) ? constants.DISPLAY_NONE : { margin: 'auto' } }
+                                                                    >
+                                                                        <Avatar src={(book.userAvatarUrl !== null) ? book.userAvatarUrl : avatarDefault }
+                                                                            onClick={(evt) => this.handleAvatarClick(evt, book.userId)}
+                                                                        />
+                                                                    </IconButton>
+                                                                </div>
+                                                            }
+                                                        />
+                                                    </GridListTile>
                                                 );
                                             })}
                                         </GridList>
@@ -466,25 +482,25 @@ class FavouritesView extends Component {
                                     { (this.state.selectedBook != null)? (
                                         <div className="favouritesGridRight">
                                             <div className="favouritesRightUp">
-                                                <Typography gutterBottom variant='headline' className="inlineBlockButton">
-                                                    {data[this.state.selectedCell * (this.state.page + 1)].bookTitle}
-                                                </Typography>
-                                                <IconButton style={material_styles.inlineBlock} onClick={(evt) => {this.handleCloseClick(evt)}}>
+                                                <IconButton className="inlineBlock floatRight" onClick={(evt) => {this.handleCloseClick(evt)}}>
                                                     <Close/>
                                                 </IconButton>
+                                                <Typography gutterBottom variant='headline' className="inlineBlockButton">
+                                                    {data[this.state.selectedCell].bookTitle}
+                                                </Typography>
                                                 <br/>
                                                 <div className="writtenBy"><LS msgId='what.book.by' defaultMsg='By: '/></div><Typography gutterBottom variant='title' className="inlineBlock">
-                                                    {data[this.state.selectedCell * (this.state.page + 1)].bookAuthor}
+                                                    {data[this.state.selectedCell].bookAuthor}
                                                 </Typography>
-                                                <h3 style={(data[this.state.selectedCell * (this.state.page + 1)].bookDescription)? {marginBottom: '5px'}: {display: 'none'}}>
+                                                <h3 style={(data[this.state.selectedCell].bookDescription)? {marginBottom: '5px'}: {display: 'none'}}>
                                                     <LS msgId='what.book.about' defaultMsg='Explanation about the book'/>
                                                 </h3>
-                                                {data[this.state.selectedCell * (this.state.page + 1)].bookDescription}
+                                                {data[this.state.selectedCell].bookDescription}
                                                 <br/>
-                                                <h4 style={(data[this.state.selectedCell * (this.state.page + 1)].bookReview)? {marginBottom: '5px'}: {display: 'none'}}>
+                                                <h4 style={(data[this.state.selectedCell].bookReview)? {marginBottom: '5px'}: {display: 'none'}}>
                                                     <LS msgId='what.book.opinion' defaultMsg='Opinion by the book owner'/>
                                                 </h4>
-                                                {data[this.state.selectedCell * (this.state.page + 1)].bookReview}
+                                                {data[this.state.selectedCell].bookReview}
                                                 <Divider className="favouritesRightDivider"/>
                                                 <h3 style={{marginBottom: '15px'}}>
                                                     <LS msgId='commentaries' defaultMsg='Let´s see people´s opinion:'/>
@@ -536,6 +552,7 @@ export default connect(
         openProfilePreview: (isOpen) => dispatch(setIsOpenProfilePreview(isOpen)),
         doLikeBook: (bookId, userId) => dispatch(doLikeBook(bookId, userId)),
         doDislikeBook: (bookId, userId) => dispatch(doDislikeBook(bookId, userId)),
-        unsubscribeBook: (bookId, userId) => dispatch(unsubscribeBook(bookId, userId))
+        unsubscribeBook: (bookId, userId) => dispatch(unsubscribeBook(bookId, userId)),
+        resetProccessStatus: (proccessName) => dispatch(resetProccess(proccessName))
     })
 )(FavouritesView);

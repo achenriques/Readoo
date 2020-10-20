@@ -35,11 +35,11 @@ class BookDao extends DaoManager {
         return this.executeStatment(statement, [bookTitle, bookAuthor, bookDescription, bookReview, bookCoverUrl, userId, genreId]);
     }
 
-    dissableBook(bookId) {
+    dissableBook(bookId, userId) {
         let disableStatement = queries.dissableBook;
         let deleteLikesStatement = queries.deleteBookLikes;
         let lessKarmaStatement = queries.lessKarma;
-        let operationOfDisable = [disableStatement, [bookId]];
+        let operationOfDisable = [disableStatement, [bookId, userId]];
         let operationOfDeleteLikes = [deleteLikesStatement, [bookId, userId]];
         let operationOfLessKarma = [lessKarmaStatement, [bookId]];
         return this.executeStatmentOnSameTransaction([operationOfDisable, operationOfDeleteLikes, operationOfLessKarma]);

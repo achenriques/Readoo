@@ -100,7 +100,12 @@ class UploadBookModal extends Component {
                 default:
                     break;
             }
-            let statusOfDeleteUser = getProccessStatus(actionTypes.DELETE_USER, this.props.loadingProcesses, this.props.failedProcesses, this.props.succeedProcesses, () => { this.props.resetProccessStatus(actionTypes.SAVE_USER_DATA)});
+            let statusOfDeleteUser = getProccessStatus(
+                    actionTypes.DELETE_USER, this.props.loadingProcesses, 
+                    this.props.failedProcesses, 
+                    this.props.succeedProcesses, 
+                    () => { this.props.resetProccessStatus(actionTypes.SAVE_USER_DATA)}
+            );
             switch (statusOfDeleteUser) {
                 case REST_SUCCESS:
                     let callbackSuccessDeleteUser = () => {

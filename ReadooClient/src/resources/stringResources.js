@@ -37,6 +37,7 @@ export default [
         'profile': 'Profile',
         'profile.preview': 'Readoo user',
         'delete.profile': 'Delete this Profile',
+        'continue': 'Continue',
         'continue.modal.title': 'Continue?',
         'info.modal.title': 'Some info...',
         'continue.delete.profile': 'Are you sure about to delete your profile?',
@@ -92,6 +93,7 @@ export default [
         'nothing.to.see': 'Nothing to see here! Continue your exploration in other button.',
         'no.image.avaliable': 'No image avaliable.',
         'no.books.yet': 'Are you a hater or you just do not like anything?',
+        'book.was.deleted': 'Defeated!',
         // Genres
         'theater': 'Theater',
         'drama': 'Drama',
@@ -149,6 +151,7 @@ export default [
         'profile': 'Perfil',
         'profile.preview': 'Usuario de Readoo',
         'delete.profile': 'Borrar este perfil',
+        'continue': 'Continuar',
         'continue.modal.title': '¿Continuar?',
         'info.modal.title': 'Información',
         'continue.delete.profile': '¿Estás segur@ de que quieres eliminar tu perfil?',
@@ -204,6 +207,7 @@ export default [
         'nothing.to.see': 'Aquí no hay nada que ver! Continua tu exploración en otra parte.',
         'no.image.avaliable': 'No hay ninguna imagen.',
         'no.books.yet': '¿Que pasa, no te gusta leer o es que simplemente aun no has empezado?',
+        'book.was.deleted': '¡Hasta luego Lucas!',
         // Genres
         'theater': 'Teatro',
         'drama': 'Drama',

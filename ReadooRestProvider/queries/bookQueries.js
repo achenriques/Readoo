@@ -30,7 +30,7 @@ module.exports = {
             " VALUES (0, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP(), ?, ?, ?, 1) ;",
     dissableBook: "UPDATE book SET bookVisible = 0 WHERE bookId = ? AND userId = ? ;",
     deleteBookLikes: "DELETE FROM userlikesbook WHERE bookId = ? AND userId = ? ;",
-    lessKarmaStatement: "UPDATE appUser u INNER JOIN book b ON b.bookId = ? AND b.userId = u.userId " + 
+    lessKarma: "UPDATE appUser u INNER JOIN book b ON b.bookId = ? AND b.userId = u.userId " + 
             "SET u.userKarma = (CASE WHEN userKarma - b.bookLikes < 0 THEN 0 ELSE userKarma - b.bookLikes END) ;",
     deleteBook: "DELETE FROM book WHERE bookId = ? ;",
 }

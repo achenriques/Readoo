@@ -41,6 +41,13 @@ div#appDiv {
     */
 }
 
+.languageSelector {
+    white-space: normal;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 100%;
+}
+
 .loadingNewTab {
     text-align: center;
     margin: 25px;
