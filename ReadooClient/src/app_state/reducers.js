@@ -149,17 +149,10 @@ const tabs = (state = initialState.tabs, { type, payload, data }) => {
 const dialogs = (state = initialState.dialogs, { type, payload, data }) => {
     switch (type) {
         case actionTypes.MODAL_ADD_BOOK:
-            console.log('abro modal: ' + payload.isOpen)
+            console.log('modal is open: ' + payload.isOpen)
             return {
                 ...state,
                 isOpenAddBook: payload.isOpen,
-            };
-
-        case actionTypes.MODAL_PROFILE_PREVIEW:
-            console.log('abro modal perfil: ' + payload.isOpen)
-            return {
-                ...state,
-                isOpenProfilePreview: payload.isOpen,
             };
 
         default:

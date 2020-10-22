@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import * as appState from '../../app_state/reducers';
 import { 
     favouritePageRequest, fetchFavourites, 
-    setIsOpenProfilePreview, doLikeBook, doDislikeBook,
-    unsubscribeBook, resetProccess, actionTypes } from '../../app_state/actions';
+    doLikeBook, doDislikeBook, unsubscribeBook,
+    resetProccess, actionTypes } from '../../app_state/actions';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
@@ -245,7 +245,7 @@ class FavouritesView extends Component {
             this.setState({
                 ...this.state,
                 previewUser: userId
-            }, () => this.props.openProfilePreview(true));
+            });
         }
     }
 
@@ -314,6 +314,13 @@ class FavouritesView extends Component {
                 dislikeBooks: dislikes
             });
         }
+    }
+
+    hadleProfilePreviewClose() {
+        this.setState({
+            ...this.state,
+            previewUser: null
+        });
     }
 
     // returns the style of favourite hearts
@@ -520,7 +527,7 @@ class FavouritesView extends Component {
                                     }
                                 </Grid>                  
                             </Grid>
-                            <ProfilePreviewModal previewUser={this.state.previewUser}/>
+                            <ProfilePreviewModal previewUser={this.state.previewUser} isOpen={this.state.previewUser !== null} closeCallback={this.hadleProfilePreviewClose.bind(this)} />
                             <ContinueModal open={this.state.openContinueDeleteBook} text={LS.getStringMsg('continue.delete.book')} closeCallback={this.acceptDeleteBook.bind(this)} />
                             <InfoModal open={this.state.openInfoModal} text={LS.getStringMsg('success.delete.book')} closeCallback={this.closeInfoModal.bind(this)} />
                         </div>
@@ -549,7 +556,6 @@ export default connect(
     (dispatch) => ({
         favouritePageRequest: (buttonCode, fetchData) => dispatch(favouritePageRequest(buttonCode, fetchData)),
         fetchFavourites: (userId, page, booksPerPage, myUploads, buttonCode) => dispatch(fetchFavourites(userId, page, booksPerPage, myUploads, buttonCode)),
-        openProfilePreview: (isOpen) => dispatch(setIsOpenProfilePreview(isOpen)),
         doLikeBook: (bookId, userId) => dispatch(doLikeBook(bookId, userId)),
         doDislikeBook: (bookId, userId) => dispatch(doDislikeBook(bookId, userId)),
         unsubscribeBook: (bookId, userId) => dispatch(unsubscribeBook(bookId, userId)),

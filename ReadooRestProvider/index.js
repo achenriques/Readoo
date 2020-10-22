@@ -59,6 +59,9 @@ new UserLikesBookProvider(app, db);
 const CommentProvider = require('./restModules/CommentProvider');
 new CommentProvider(app, db);
 
+const ChatProvider = require('./restModules/ChatProvider');
+new ChatProvider(app, db);
+
 const UserReportsCommentaryProvider = require('./restModules/UserReportsCommentaryProvider');
 new UserReportsCommentaryProvider(app, db);
 

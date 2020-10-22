@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { actionTypes, setIsOpenProfilePreview } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -26,14 +25,22 @@ class ProfilePreviewModal extends Component {
     };
 
     handleClose = () => {
-        this.props.openProfilePreview(false);
+        // Calback onClose
+        if (this.props.closeCallback !== undefined && typeof this.props.closeCallback === "function") {
+            this.props.closeCallback();
+        }
+    };
+
+    handleChat = () => {
+        // this.props.previewUser
+        this.handleClose();
     }
 
     render() {
         return (
             <Dialog
                 title={LS.getStringMsg('profile.preview', 'Readoo User')}
-                open={this.props.isOpenModal}
+                open={this.props.isOpen}
                 aria-labelledby="responsive-dialog-title"
                 classes={{
                     paper: 'dialogUploadBook'
@@ -44,14 +51,18 @@ class ProfilePreviewModal extends Component {
                     <ProfileView previewUser={this.props.previewUser}/>
                 </DialogContent>
                 <DialogActions>
-                    <div>
-                        <Button variant="contained" color="primary"
-                            onClick={this.handleClose.bind(this)}
-                            className="primaryButton"
-                        >
-                            <LS msgId='close' defaultMsg='Close'/>
-                        </Button>
-                    </div>
+                    <Button variant="contained" color="secondary"
+                        onClick={this.handleClose.bind(this)}
+                        className="primaryButton"
+                    >
+                        <LS msgId='close' defaultMsg='Close'/>
+                    </Button>
+                    <Button variant="contained" color="primary"
+                        onClick={this.handleChat.bind(this)}
+                        className="primaryButton"
+                    >
+                        <LS msgId='chat' defaultMsg='Go chat!'/>
+                    </Button>
                 </DialogActions>
             </Dialog>
         );
@@ -60,11 +71,9 @@ class ProfilePreviewModal extends Component {
 
 export default connect(
     (state) => ({
-        isOpenModal: appState.getIsOpenModal(state).isOpenProfilePreview,
         currentUserId: appState.getUserId(state),
         loadingProcesses: appState.getLoadingProcesses(state)
     }),
     (dispatch) => ({
-        openProfilePreview: (isOpen) => dispatch(setIsOpenProfilePreview(isOpen))
     })
 )(ProfilePreviewModal);

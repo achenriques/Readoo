@@ -58,7 +58,8 @@ typings/
 .env
 
 # mySQL Workbench config
-.mwb
+*.mwb
+*.mwb.*
 
 # image folder
 ReadooRestProvider/uploads/*

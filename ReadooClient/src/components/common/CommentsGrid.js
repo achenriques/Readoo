@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchCommentaries, fetchSubCommentaries, writeComment, sendComment, setIsOpenProfilePreview, actionTypes } from '../../app_state/actions';
+import { fetchCommentaries, fetchSubCommentaries, writeComment, sendComment, actionTypes } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Grid from '@material-ui/core/Grid';
 import { GridList, GridListTile, GridListTileBar } from '@material-ui/core';
@@ -124,7 +124,7 @@ class CommentsGrid extends Component {
         }
     }
 
-    radomColor () {
+    radomColor() {
         let ran = Math.round(Math.random() * 5);
         
         switch (ran) {
@@ -167,7 +167,7 @@ class CommentsGrid extends Component {
         }
     }
 
-    changeNewCommentaries (textFieldId, commentFatherId, evt) {
+    changeNewCommentaries(textFieldId, commentFatherId, evt) {
         if (textFieldId && evt && evt.target.value !== "\n") {
             let nameOfErrorParam = "commentError_" + textFieldId;
             let nameOfNewParam = "newCommentary_" + textFieldId;
@@ -179,7 +179,7 @@ class CommentsGrid extends Component {
         }
     }
 
-    getNewCommentaryIndex () {
+    getNewCommentaryIndex() {
         let toRet = -1;
         if (this.props.shownCommentaries !== null) {
             toRet = this.props.shownCommentaries.reduce((accumulator, currentValue) => (currentValue.commentId > accumulator) ? currentValue.commentId : accumulator, toRet);
@@ -190,7 +190,7 @@ class CommentsGrid extends Component {
         return toRet + 1;
     }
 
-    sendCommentary (evt, commentFatherId, bookId, textFieldId) {
+    sendCommentary(evt, commentFatherId, bookId, textFieldId) {
         evt.stopPropagation();
         let nameOfParam = "newCommentary_" + textFieldId;
         if (this.state[nameOfParam]) {
@@ -228,7 +228,7 @@ class CommentsGrid extends Component {
         }
     }
 
-    handleCollapseSubs (evt, commentaryId) {
+    handleCollapseSubs(evt, commentaryId) {
         console.log("I made click on show subcommentaries of: " + commentaryId);
         if (commentaryId !== null) {
             if (this.state.expandComment === commentaryId) {
@@ -246,7 +246,7 @@ class CommentsGrid extends Component {
         }
     }
 
-    handleLoadMore (evt) {
+    handleLoadMore(evt) {
         if (this.state.commentFatherId === null) {
             this.props.fetchCommentaries(this.state.currentBookId, 
                     NUM_OF_COMENTARIES, this.state.bookCommentaries[this.state.bookCommentaries.length - 1].date, true);
@@ -260,17 +260,23 @@ class CommentsGrid extends Component {
         });
     }
 
-    handleAvatarClick (evt, userId) {
+    handleAvatarClick(evt, userId) {
         evt.stopPropagation();
         if (userId) {
             console.log("I made click on avatar: " + userId);
             this.setState({
                 ...this.state,
-                previewUser: userId
-            }, () => this.props.openProfilePreview(true));
+                previewUser: +userId
+            });
         }
     }
 
+    hadleProfilePreviewClose() {
+        this.setState({
+            ...this.state,
+            previewUser: null
+        });
+    }
 
     render() {
         switch (this.state.loadedComment) {
@@ -421,7 +427,7 @@ class CommentsGrid extends Component {
                                 {(this.isLoading() || this.isLoadingSubs()) ? <CircularProgress className="loadingIcon" size='20' /> : <ExpandMoreIcon />}
                             </Button >
                             </p>
-                            <ProfilePreviewModal previewUser={this.state.previewUser}/>
+                            <ProfilePreviewModal previewUser={this.state.previewUser} isOpen={this.state.previewUser !== null} closeCallback={this.hadleProfilePreviewClose.bind(this)} />
                         </div>
                     );
                 }
@@ -482,7 +488,6 @@ export default connect(
         fetchCommentaries: (bookId, nCommentaries, lastDate, fetchMore) => dispatch(fetchCommentaries(bookId, nCommentaries, lastDate, fetchMore)),
         fetchSubCommentaries: (bookId, fatherCommentaryId, nCommentaries, lastDate, fetchMore) => dispatch(fetchSubCommentaries(bookId, fatherCommentaryId, nCommentaries, lastDate, fetchMore)),
         writeComment: (newComment) => dispatch(writeComment(newComment)),
-        sendCommentary: (newComment) => dispatch(sendComment(newComment)),
-        openProfilePreview: (isOpen) => dispatch(setIsOpenProfilePreview(isOpen))
+        sendCommentary: (newComment) => dispatch(sendComment(newComment))
     })
 )(CommentsGrid);

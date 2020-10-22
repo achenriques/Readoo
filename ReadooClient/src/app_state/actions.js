@@ -9,7 +9,6 @@ const actionTypes = {
     CHANGE_LANGUAGE: 'CHANGE_LANGUAGE',
     CHECK_TOKEN: 'CHECK_TOKEN',
     MODAL_ADD_BOOK: 'MODAL_ADD_BOOK',
-    MODAL_PROFILE_PREVIEW: 'MODAL_PROFILE_PREVIEW',
     UPLOAD_BOOK: 'UPLOAD_BOOK',
     DO_LOGIN: 'DO_LOGIN',
     DO_LOG_OUT: 'DO_LOG_OUT',
@@ -113,13 +112,6 @@ const checkToken = () => ({
 // Open and close Modal Of Add Book
 const setIsOpenAddBook = (isOpen) => ({
     type: actionTypes.MODAL_ADD_BOOK,
-    payload: {
-        isOpen: isOpen
-    }
-});
-
-const setIsOpenProfilePreview = (isOpen) => ({
-    type: actionTypes.MODAL_PROFILE_PREVIEW,
     payload: {
         isOpen: isOpen
     }
@@ -299,7 +291,6 @@ export {
     setNickIsUniqueFalse,
     setEmailIsUniqueFalse,
     setIsOpenAddBook,
-    setIsOpenProfilePreview,
     uploadBook,
     fetchGenres,
     nextBook,
