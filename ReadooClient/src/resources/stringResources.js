@@ -94,6 +94,8 @@ export default [
         'no.image.avaliable': 'No image avaliable.',
         'no.books.yet': 'Are you a hater or you just do not like anything?',
         'book.was.deleted': 'Defeated!',
+        'conversations': 'Conversations',
+        'message': 'Write your message (Max: {0})',
         // Genres
         'theater': 'Theater',
         'drama': 'Drama',
@@ -114,6 +116,7 @@ export default [
         'commentaries.load.error': 'An error ocurred while fetching commentaries, it might be a fail with the NET or the server...',
         'favourites.load.error': 'An error ocurred while fetching your favourite books, it might be a fail with the NET or the server...',
         'not.hire.jastel': 'Bad connection again. Do not play Fornite!',
+        'error.sendig.message': 'An error ocurred while sending the message! Please, try to reload.'
     },
     // Spanish
     {
@@ -208,6 +211,8 @@ export default [
         'no.image.avaliable': 'No hay ninguna imagen.',
         'no.books.yet': '¿Que pasa, no te gusta leer o es que simplemente aun no has empezado?',
         'book.was.deleted': '¡Hasta luego Lucas!',
+        'conversations': 'Conversaciones',
+        'message': 'Escribe tu mensaje (Max: {0})',
         // Genres
         'theater': 'Teatro',
         'drama': 'Drama',
@@ -227,6 +232,7 @@ export default [
         'please.reload': 'Ha ocurrido un error, prueba a recargar la página. ¡Disculpa las molestias!',
         'commentaries.load.error': 'Error en la carga de comentaries, puede ser un problema de red o fallo del servidor...',
         'favourites.load.error': 'Error en la carga de tus libros favoritos, puede ser un problema de red o fallo del servidor...',
-        'not.hire.jastel': 'No contrates Jastel!'
+        'not.hire.jastel': '¡No contrates Jastel!',
+        'error.sendig.message': '¡Ha ocurrido un error durante el envio de mensages! Prueba a recargar la página antes de continuar.'
     }
 ]

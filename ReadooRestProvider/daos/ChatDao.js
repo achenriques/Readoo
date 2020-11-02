@@ -14,24 +14,34 @@ class ChatDao extends DaoManager {
 
     getHistory(userId) {
         let statement = queries.chatHistory;
-        return this.executeStatment(statement, [userId]);
+        return this.executeStatment(statement, [userId, userId]);
     }
 
-    getBunch(chatId) {
+    getChatById(chatId) {
         let statement = queries.chatBunch;
         return this.executeStatment(statement, [chatId]);
     }
 
-    insertOne(chatId, userId, messageText) {
-        let statement = queries.sendMessage;
+    insertOne(userIdFrom, userIdTo) {
+        let statement = queries.insertInHistory;
+        return this.executeStatment(statement, [userIdFrom, userIdTo]);
+    }
+
+    saveOne(chatId, userId, messageText) {
+        let statement = queries.saveOne;
         return this.executeStatment(statement, [chatId, userId, messageText]);
     }
 
-    deleteOne(chatId) {
-        let statement = queries.deleteConversation;
+    getVisibility(chatId) {
+        let statement = queries.getVisibility;
         return this.executeStatment(statement, [chatId]);
+    }
+
+    updateVisibility(chatId, chatVisibility) {
+        let statement = queries.updateVisibility;
+        return this.executeStatment(statement, [chatVisibility, chatId]);
     }
             
 }
 
-module.exports = BookDao;
+module.exports = ChatDao;

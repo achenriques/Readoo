@@ -1,22 +1,25 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { actionTypes } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';import Grid from '@material-ui/core/Grid';
-import Avatar from '@material-ui/core/Avatar';
-import IconButton from '@material-ui/core/IconButton';
-import DeleteIcon from '@material-ui/icons/Delete';
+import Grid from '@material-ui/core/Grid';
 import LS from '../LanguageSelector';
-import avatarDefault from '../../resources/avatarDefault.svg';
-import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
+import { REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
+import '../../styles/Chat.css';
+import MessagesView from './MessagesView';
+import HistoryView from './HistoryView';
+import { actionTypes } from '../../app_state/actions';
 
 class ChatView extends Component {
 
     initialState = {
-        
+        chatHistory: [],
+        chatMessages: [],
+        newChat: null,
+        currentChat: null,
+        selectedChatId: null,
+        messageText: "",
+        openContinueDeleteChat: false,
+        loadingChatHistory: REST_SUCCESS
     };
 
     constructor(props) {
@@ -26,30 +29,25 @@ class ChatView extends Component {
         };
     };
 
-    componentDidMount = () => {
-        // fetch chat history
-    }
-
     componentDidUpdate = () => {
         
     }
 
-    oChangeInput = (evt) => {
-        const value = evt.target.value;
-        const name = evt.target.name;
+    isLoadingProcess(action) {
+        return this.props.loadingProcesses.includes(action)
+    }
 
+    hadleChatClick(evt, chat) {
+        console.log("Chat con id: " + chat.chatId)
         this.setState({
             ...this.state,
-            [name]: value
+            selectedChatId: chat.chatId,
+            currentChat: chat
         });
     }
 
-    sendMessage(evt) {
-
-    }
-
     render = () => {
-        switch (this.state.loadingProcesses(xx)) {
+        switch (this.state.loadingChatHistory) {
             case REST_FAILURE:
                 return (
                     <div className="loadingNewTab">
@@ -65,37 +63,16 @@ class ChatView extends Component {
         
             default:
                 return (
-                    <div>
-                        <Grid container className="">
-                            <Grid item sm={4} className="">
-                                <Paper elevation={16}>
-                                    <List className={classes.root}>
-                                        {this.props.chatHistory.map((chat) => (
-                                        <ListItem alignItems="flex-start">
-                                            <ListItemAvatar>
-                                                <Avatar>
-                                                    <ImageIcon />
-                                                </Avatar>
-                                            </ListItemAvatar>
-                                            <ListItemText primary="chat.chatNick" secondary="Date" />
-                                            <ListItemSecondaryAction>
-                                                <IconButton edge="end" aria-label="delete">
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            </ListItemSecondaryAction>
-                                        </ListItem>
-                                        ))}
-                                    </List>
-                                </Paper>
-                                {/* List of chat users*/}
+                    <div className="chatRootDiv">
+                        <Grid container spacing={24}className="chatRootGrid">
+                            <Grid item sm={3} className="chatConversationGrid">
+                                <h3><LS msgId='conversations' defaultMsg='Conversations'/></h3>
+                                <HistoryView onClickSelectChat={this.hadleChatClick.bind(this)}/>
                             </Grid>
-                            <Grid item sm={8} className="">
-                                <Paper elevation={16}>
-                                    {/* Chat text*/}
-                                </Paper>
+                            <Grid item sm={9} className="chatMessagesGrid">
+                                {(this.state.currentChat != null) ? (<MessagesView chat={this.state.currentChat}/>) : (<div/>) }
                             </Grid>
                         </Grid>
-                        <ContinueModal open={this.state.openContinueDeleteChat} text={LS.getStringMsg('continue.delete.chat', 'Delete?')} closeCallback={this.acceptDeleteChat.bind(this)} />
                     </div>
                 )
         }
@@ -104,22 +81,14 @@ class ChatView extends Component {
 
 export default connect(
     (state) => ({
-        userId: appState.getUserId(state),
-        userData: appState.getUser(state),
-        userPreviewData: appState.getUserPreview(state),
-        avaliableEmail: appState.getAvaliableEmail(state),
+        currentUserId: appState.getUserId(state),
+        currentUser: appState.getUser(state),
+        userPreview: appState.getUserPreview(state),
+        appLanguage: appState.getAppLanguage(state),
         loadingProcesses: appState.getLoadingProcesses(state),
         succeedProcesses: appState.getSucceedProcesses(state),
         failedProcesses: appState.getFailedProcesses(state)
     }),
     (dispatch) => ({
-        fetchUserData: (userId, isPreveiw) => dispatch(fetchUserData(userId, isPreveiw)),
-        setEmailIsUniqueFalse: () => dispatch(setEmailIsUniqueFalse()),
-        checkEmailIsUnique: (email) => dispatch(checkEmailIsUnique(email)),
-        saveUserData: (newUserData, userDataForm) => dispatch(saveUserData(newUserData, userDataForm)),
-        deleteUser: (userId) => dispatch(dissableUser(userId)),
-        resetProccessStatus: (proccessName) => dispatch(resetProccess(proccessName)),
-        // Do logOut in case of delete user success...
-        doLogOut: () => dispatch(doLogOut())
     })
 )(ChatView);

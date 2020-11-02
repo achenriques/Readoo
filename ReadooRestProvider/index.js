@@ -4,6 +4,7 @@ if (dotenv.error) {
      console.log("Something goes wrong at reading .env file: " + dotenv.error);
 }
 // Express
+const http = require("http");
 const express = require('express');
 const app = express();
 // Cors
@@ -29,6 +30,9 @@ app.use(cors({
      credentials: true,
      allowedHeaders: 'Content-Type,x-access-token,Authorization'
 }));
+
+// Create a http server...
+const server = http.createServer(app);
 
 // Create a dbConnection
 const Connection = require('./Util/dbConnection');
@@ -60,7 +64,7 @@ const CommentProvider = require('./restModules/CommentProvider');
 new CommentProvider(app, db);
 
 const ChatProvider = require('./restModules/ChatProvider');
-new ChatProvider(app, db);
+new ChatProvider(app, server, db);
 
 const UserReportsCommentaryProvider = require('./restModules/UserReportsCommentaryProvider');
 new UserReportsCommentaryProvider(app, db);
@@ -69,6 +73,6 @@ const UserReportsBookProvider = require('./restModules/UserReportsBookProvider')
 new UserReportsBookProvider(app, db);
 
 // All services are now listening in the port 3030
-app.listen(3030, function () {
+server.listen(3030, function () {
   console.log('App is listening on port 3030!');
 });

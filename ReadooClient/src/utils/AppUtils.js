@@ -1,4 +1,5 @@
-import { REST_FAILURE, REST_DEFAULT, REST_SUCCESS, FILE_BYTE_LIMIT } from '../constants/appConstants';
+import { REST_FAILURE, REST_DEFAULT, REST_SUCCESS, 
+    FILE_BYTE_LIMIT, LANGUAGE_ENGLISH, LANGUAGE_SPANISH } from '../constants/appConstants';
 
 /*
  *  Remove a proccess from the proccesses list and at the end returns where the proccess was if it was found in other cases returns null.
@@ -29,4 +30,45 @@ export const parseInputText = (inputText) => inputText.trim().replace(/(\r\n|\r|
 // LIMITS the file size
 export const excedsLimit = (file) => {
     return file.size > FILE_BYTE_LIMIT;
+}
+
+export const compareArrays = (array1, array2) => {
+    return array1.length === array2.length && array1.every((value, index) => value === array2[index]);
+}
+
+// Parse the date
+export const parseDate = (date, language) => {
+    try {
+        if (date.getDate === undefined 
+                && (typeof(date) === 'number'
+                || typeof(date) === 'string')) {
+            date = new Date(date);
+        }
+        let day = date.getDate();
+        let month = date.getUTCMonth() + 1;
+        let year = date.getUTCFullYear();
+        let hour = date.getUTCHours();
+        let min = date.getUTCMinutes();
+        let sec = date.getUTCSeconds();
+        switch(language) {
+            case(LANGUAGE_SPANISH):
+                return "" + ((day < 10) ? "0" + day : day) + 
+                        "/" + ((month < 10) ? "0" + month : month) +
+                        "/" + year + " " +
+                        ((hour < 10) ? "0" + hour : hour) + ":" +
+                        ((min < 10) ? "0" + min : min) + ":" +
+                        ((sec < 10) ? "0" + sec : sec);
+            default:    // equals to english.
+                return "" + ((month < 10) ? "0" + month : month) + 
+                        "/" + ((day < 10) ? "0" + day : day) +
+                        "/" + year + " " +
+                        ((hour < 10) ? "0" + hour : hour) + ":" +
+                        ((min < 10) ? "0" + min : min) + ":" +
+                        ((sec < 10) ? "0" + sec : sec);
+        }
+    } catch(error) {
+        console.error(error);
+        return date;
+    }
+
 }

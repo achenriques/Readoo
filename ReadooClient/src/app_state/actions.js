@@ -1,7 +1,8 @@
-import { NUM_OF_BOOKS, NUM_OF_COMENTARIES, REST_DEFAULT } from '../constants/appConstants';
+import { NUM_OF_BOOKS } from '../constants/appConstants';
 import loginApi from '../api/loginApi';
 import bookApi from '../api/bookApi';
 import userApi from '../api/userApi';
+import chatApi from '../api/chatApi'
 
 //ACTION TYPES
 const actionTypes = {
@@ -36,6 +37,11 @@ const actionTypes = {
     DELETE_USER: 'DELETE_USER',
     WRITE_COMMENTARY: 'WRITE_COMMENTARY',
     SEND_COMMENTARY: 'SEND_COMMENTARY',
+    GO_CHAT_WITH: 'GO_CHAT_WITH',
+    RECIVED_GO_CHAT_WITH: 'RECIVED_GO_CHAT_WITH',
+    FETCH_CHAT_HISTORY: 'FETCH_CHAT_HISTORY',
+    FETCH_CHAT_MESSAGES: 'FETCH_CHAT_MESSAGES',
+    DELETE_CHAT: 'DELETE_CHAT',
     DELETE_BOOK: 'DELETE_BOOK',
     RESET_LOADS: 'RESET_LOADS',
     RESET_ERRORS: 'RESET_ERRORS',
@@ -269,6 +275,33 @@ const unsubscribeBook = (bookId, userId) => ({
     promise: bookApi.unsubscribeBook(bookId, userId)
 });
 
+const fetchChatHistory = (userId) => ({
+    type: actionTypes.FETCH_CHAT_HISTORY,
+    payload: {userId},
+    promise: chatApi.fetchChatHistory(userId)
+});
+
+const fetchChatMessages = (chatId, userId) => ({
+    type: actionTypes.FETCH_CHAT_MESSAGES,
+    payload: {chatId, userId},
+    promise: chatApi.fetchChatMessages(chatId, userId)
+});
+
+const deleteChat = (chatId, userId) => ({
+    type: actionTypes.DELETE_CHAT,
+    payload: {chatId, userId},
+    promise: chatApi.deleteChat(chatId, userId)
+});
+
+const goChatWith = (otherUserId) => ({
+    type: actionTypes.GO_CHAT_WITH,
+    payload: { otherUserId }
+});
+
+const recivedChatWith = () => ({
+    type: actionTypes.RECIVED_GO_CHAT_WITH
+});
+
 const reportErrorMessage = (errorMsg) => ({
     type: actionTypes.REPORT_ERROR_MESSAGE,
     payload: { errorMsg }
@@ -311,5 +344,10 @@ export {
     saveUserData,
     dissableUser,
     unsubscribeBook,
+    fetchChatHistory,
+    fetchChatMessages,
+    deleteChat,
+    goChatWith,
+    recivedChatWith,
     reportErrorMessage
 };

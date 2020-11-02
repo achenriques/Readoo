@@ -15,7 +15,7 @@ import GenreSelector from '../common/GenreSelector';
 import ContinueModal from '../common/ContinueModal';
 import avatarDefault from '../../resources/avatarDefault.svg';
 import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
-import { getProccessStatus, excedsLimit } from '../../utils/AppUtils';
+import { getProccessStatus, excedsLimit } from '../../utils/appUtils';
 
 const iconHelp = <Help/>;
 

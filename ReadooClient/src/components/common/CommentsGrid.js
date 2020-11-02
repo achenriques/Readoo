@@ -18,7 +18,7 @@ import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import LS from '../LanguageSelector';
 import avatarDefault from '../../resources/avatarDefault.svg';
-import { parseInputText } from '../../utils/AppUtils';
+import { parseInputText } from '../../utils/appUtils';
 import { DISPLAY_NONE, NUM_OF_COMENTARIES, REST_FAILURE, REST_SUCCESS, REST_DEFAULT } from '../../constants/appConstants';
 import ProfilePreviewModal from '../profile/ProfilePreviewModal';
 import '../../styles/Common.css';

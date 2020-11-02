@@ -1,7 +1,5 @@
 import axios from 'axios';
-import {} from '../constants/appConstants';
-import LanguageSelector from '../components/LanguageSelector';
-const baseURL = 'http://localhost:3030';
+import { SERVER_ENDPOINT as baseURL } from '../constants/appConstants';
 
 // Setted for evict cross-sitting error
 axios.defaults.withCredentials = true;

@@ -92,6 +92,11 @@ const initialState = {
     genres: {
         all: []
     },
+    chat: {
+        chatWith: null,
+        chatHistory: [],
+        chatMessages: constants.CHAT_MESSAGES_EMPTY
+    },
     controllerStatus: {
         loading: 0,
         loading_processes: [],
@@ -130,6 +135,12 @@ const tabs = (state = initialState.tabs, { type, payload, data }) => {
                 ...state,
                 currentTabID: constants.pages.PROFILE
             }
+            
+        case (actionTypes.GO_CHAT_WITH):
+            return {
+                ...state,
+                currentTabID: constants.pages.CHAT
+            } 
 
         case successType(actionTypes.CHECK_TOKEN):
             if (data.data && data.data.tabSelector != null) {
@@ -641,6 +652,65 @@ const genres = (state = initialState.genres, { type, payload, data }) => {
     }
 }
 
+const chat = (state = initialState.chat, { type, payload, data }) => {
+    switch (type) {
+        case (actionTypes.GO_CHAT_WITH):
+            if (payload.otherUserId) {
+                return {
+                    ...state,
+                    chatWith: payload.otherUserId
+                };
+            } else {
+                return state;
+            }
+
+        case (actionTypes.RECIVED_GO_CHAT_WITH):
+            return {
+                ...state,
+                chatWith: null
+            };
+
+        case successType(actionTypes.FETCH_CHAT_HISTORY):
+            console.log('FETCH_CHAT_HISTORY');
+            return {
+                ...state,
+                chatHistory: data.data
+            };
+
+        case failureType(actionTypes.FETCH_CHAT_HISTORY):
+            console.log('FETCH_CHAT_HISTORY');
+            return {
+                ...state,
+                chatHistory: null
+            };
+
+        case successType(actionTypes.FETCH_CHAT_MESSAGES):
+            console.log('FETCH_CHAT_MESSAGES');
+            return {
+                ...state,
+                chatMessages: data.data
+            };
+  
+        case successType(actionTypes.FETCH_CHAT_MESSAGES):
+                console.log('FETCH_CHAT_MESSAGES');
+                return {
+                    ...state,
+                    chatMessages: null
+                };
+
+        case successType(actionTypes.DELETE_CHAT):
+            console.log('DELETE_CHAT');
+            let newChatHistory = state.chatHistory.filter(c => c.chatId !== payload.chatId);
+            return {
+                ...state,
+                chatHistory: newChatHistory
+            }
+  
+        default:
+            return state;
+    }
+  }
+
 /**
  * Reducer to controller Rest operations and show err messages or warnings if necessary
  */
@@ -781,6 +851,7 @@ export default combineReducers({
     books,
     comentaries,
     genres,
+    chat,
     controllerStatus
 });
 
@@ -807,6 +878,9 @@ export const getTotalOfFavourites = (state) => state.books.favouritesTotal;
 export const getFavourites = (state) => state.books.favourites.currentPage;
 export const getCommentaries = (state) => state.comentaries.bookCommentaries;
 export const getSubCommentaries = (state) => state.comentaries.bookSubCommentaries;
+export const getChatHistory = (state) => state.chat.chatHistory;
+export const getChatMessages = (state) => state.chat.chatMessages;
+export const getChatWith = (state) => state.chat.chatWith;
 export const getLoadingStatus = (state) => state.controllerStatus.loading;
 export const getFailingStatus = (state) => state.controllerStatus.failure;
 export const getFailedProcesses = (state) => state.controllerStatus.failed_processes;

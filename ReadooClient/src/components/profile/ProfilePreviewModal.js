@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { goChatWith } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -8,8 +9,6 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import ProfileView from './ProfileView';
 import LS from '../LanguageSelector';
-import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
-
 
 class ProfilePreviewModal extends Component {
 
@@ -32,7 +31,7 @@ class ProfilePreviewModal extends Component {
     };
 
     handleChat = () => {
-        // this.props.previewUser
+        this.props.goChatWith(this.props.previewUser);
         this.handleClose();
     }
 
@@ -75,5 +74,6 @@ export default connect(
         loadingProcesses: appState.getLoadingProcesses(state)
     }),
     (dispatch) => ({
+        goChatWith: (userId) => dispatch(goChatWith(userId)),
     })
 )(ProfilePreviewModal);

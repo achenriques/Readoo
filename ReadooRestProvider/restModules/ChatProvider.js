@@ -1,22 +1,129 @@
+const socketIo = require('socket.io');
 const path = require('path');
-const constants = require('../util/constants');
 const functions = require('../util/functions');
 const middleware = require('./middlewares');
 const ChatDao = require('../daos/ChatDao');
 const resizeToIcon = require('../util/imageFormater').resizeToIcon;
 
-class CommentProvider {
+class ChatProvider {
     
-    constructor(app, db)
+    constructor(app, server, db)
     {
         this.chatDao = new ChatDao(db);
-        this.getAll(app);       //Get
-        this.getHistory(app);   //Get
-        this.getBunch(app);     //Get
-        this.insertOne(app);    //Post
-        this.deleteOne(app);    //Delete
+        this.getAll(app);       // Get
+        this.getHistory(app);   // Get
+        this.getBunch(app);     // Get
+        this.deleteOne(app);    // Delete
+
+        this.io = socketIo(server, {
+            path: '/chat'
+        });
+
+        this.io.on('connection', (socket) => {
+            console.log(socket);
+            console.log('a user connected');
+            socket.emit("socketId", socket.id);
+
+            // resend message to other client
+            socket.on("newMessage", (message) => {
+                this.arrivedMessage(message); 
+                socket.emit('message', message);
+            });
+
+            // disconect handler...
+            socket.on("disconnect", () => {
+                console.log("Client disconnected");
+            });
+        });
+        
+    }
+
+    emitError(error) {
+        if (!this.io.disconnect) {
+            if (error !== undefined) {
+                let reqError = functions.getRequestError(error);
+                this.io.emit("error", reqError.text);
+            } else {
+                this.io.emit("error", "");
+            }            
+        }
+    }
+
+    saveMessage(chatMessage) {
+        this.chatDao.saveOne(+chatMessage.chatId, +chatMessage.userIdFrom, chatMessage.messageText).then(function(result) {
+            if (result.affectedRows === 0) {
+                this.emitError();
+            }
+        }).catch(function(err) {
+            console.log(err);
+            this.emitError(err);
+        });
+    }
+
+    arrivedMessage(chatMessage) {
+        if (chatMessage && chatMessage.messageText !== undefined) {
+            let msgText = "" + chatMessage.messageText;
+            if (msgText.trim().length > 0) {
+                let chatId = chatMessage.chatId;
+                if (chatId !== undefined && chatId > 0) {
+                    // in chat history
+                    this.saveMessage(chatMessage);
+                } else {
+                    // not in chat history. Must insert
+                    const that = this;
+                    this.chatDao.insertOne(+chatMessage.userIdFrom, +chatMessage.userIdTo).then(function(result) {
+                        if (result.affectedRows > 0) {
+                            // set a new id before save message
+                            chatMessage.chatId = +result.insertId;
+                            that.saveMessage(chatMessage);
+                            that.io.emit("newChatId", result.insertId);
+                        }
+                    }).catch(function(err) {
+                        console.log(err);
+                        this.emit(err);
+                    });
+                }
+            }
+        }
     }
     
+    resizeImage (avatarFile, chatHistoryItem, channelDirection) {
+        if (avatarFile) {
+            return resizeToIcon(avatarFile).then(function (base64String) {
+                if (base64String) {
+                    chatHistoryItem[channelDirection] = base64String;
+                } else {
+                    chatHistoryItem[channelDirection] = null;
+                }       
+            }).catch(function (err) {
+                console.log(err);
+                chatHistoryItem[channelDirection] = null;
+            });
+        } else {
+            console.log('Avatar image not found: ' + avatar);
+            return Promise.resolve();
+        }
+    }
+
+    parseProfileImages (chatHistory) {
+        if (chatHistory) {
+            let promiseList = []
+            chatHistory.forEach(function(c, index, rSet) {
+                let avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + c.userAvatarUrlFrom);
+                promiseList.push(this.resizeImage(avatarFile, c, 'userAvatarUrlFrom'));
+                avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + c.userAvatarUrlTo);
+                promiseList.push(this.resizeImage(avatarFile, c, 'userAvatarUrlTo'));
+            }.bind(this));
+            return Promise.all(promiseList).then(function (promisesResult) {
+                return chatHistory;
+            }).catch(function (err) {
+                console.log(err);
+            });
+        } else {
+            return Promise.resolve(chatHistory);
+        }
+    }
+
     getAll(app) {
         const that = this;
         app.get('/chat', function (req, res) {
@@ -37,13 +144,15 @@ class CommentProvider {
 
     getHistory(app) {
         const that = this;
-        app.get('/chatHistory/', middleware.verifyToken, function (req, res) {
-            let userId = req.params.id;
+        app.get('/chatHistory', middleware.verifyToken, function (req, res) {
+            let userId = req.query.userId;
             console.log("Estoy getteando chat history" + userId);     
             if (+userId) {
-                that.chatDao.getChatHistory(+userId).then(
+                that.chatDao.getHistory(+userId).then(
                     function (result) {
-                        return res.header('Content-Type', 'application/json').send(JSON.stringify(result));
+                        that.parseProfileImages.bind(that)(result).then(function (resultOfParse) {
+                            return res.header('Content-Type', 'application/json').status(200).json(result);
+                        }); 
                     }
                 ).catch(
                     function (err) {
@@ -63,11 +172,12 @@ class CommentProvider {
 
     getBunch(app) {
         const that = this;
-        app.get('/chatMessages/:id', middleware.verifyToken, function (req, res) {
-            let chatId = req.params.id;
+        app.get('/chatMessages/', middleware.verifyToken, function (req, res) {
+            let chatId = req.query.chatId;
+            let userId = req.query.userId;
             console.log("Estoy getteando " + chatId);     
-            if (+chatId) {
-                that.chatDao.getChatById(+chatId).then(
+            if (+chatId, +userId) {
+                that.chatDao.getChatById(+chatId, +userId).then(
                     function (result) {
                         return res.header('Content-Type', 'application/json').send(JSON.stringify(result));
                     }
@@ -91,11 +201,26 @@ class CommentProvider {
         app.delete('/chat', function (req, res) {
             console.log("Estoy deleteando " + req.body.id);
             let chatId = req.body.chatId;
-            if (chatId) {
-                that.bookDao.deleteBook(+chatId).then(
+            let userId = req.body.userId;
+            if (chatId, userId) {
+                that.chatDao.getVisibility(+chatId).then(
                     function (result) {
-                        res.setHeader('Content-Type', 'application/json');
-                        return res.status(200).json(result);
+                        let newVisibility;
+                        if (result[0].chatVisible === 'B') {
+                            newVisibility = (+result[0].userIdFrom === userId) ? 'T' : 'F';
+                        } else {
+                            newVisibility = 'N';
+                        }
+                        if (newVisibility !== result[0].chatVisible) {
+                            that.chatDao.updateVisibility(+chatId, newVisibility).then(
+                                function (result) {
+                                    res.setHeader('Content-Type', 'application/json');
+                                    return res.status(200).json(result.message);
+                                });
+                        } else {
+                            res.setHeader('Content-Type', 'application/json');
+                            return res.status(201).json(result.message);    // Acepted but not changed
+                        }
                     }
                 ).catch(
                     function (err) {
@@ -110,9 +235,8 @@ class CommentProvider {
             }
         });
     };
-
     
 }
 
-module.exports = CommentProvider;
+module.exports = ChatProvider;
     

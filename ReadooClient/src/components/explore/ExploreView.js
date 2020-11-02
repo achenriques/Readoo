@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchBooks, nextBook, doLikeBook, doDislikeBook, reportErrorMessage, actionTypes } from '../../app_state/actions';
+import { fetchBooks, nextBook, doLikeBook, doDislikeBook, 
+    reportErrorMessage, actionTypes } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers';
 import RootRef from '@material-ui/core/RootRef';
 import Card from '@material-ui/core/Card';

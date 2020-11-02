@@ -14,7 +14,7 @@ import Grid from '@material-ui/core/Grid';
 import LS from '../LanguageSelector';
 import GenreSelector from '../common/GenreSelector';
 import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
-import { getProccessStatus, excedsLimit } from '../../utils/AppUtils';
+import { getProccessStatus, excedsLimit } from '../../utils/appUtils';
 
 const COMPLETE_FIELD = LS.getStringMsg('complete.field', 'Complete this field');
 

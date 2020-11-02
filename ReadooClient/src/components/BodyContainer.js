@@ -8,6 +8,7 @@ import LS from './LanguageSelector';
 import ExploreView from './explore/ExploreView';
 import UploadBookModal from './explore/UploadBookModal';
 import FavouritesView from './favourites/FavouritesView';
+import ChatView from './chat/ChatView';
 import ProfileView from './profile/ProfileView';
 import '../styles/BodyContainer.css';
 
@@ -52,9 +53,7 @@ class BodyContainer extends Component {
             case 2:
                 return (
                     <div className='bodyContainer'>
-                        <h1 align="center">
-                            Soy un body 3
-                        </h1>
+                        <ChatView/>
                     </div>
                 );
 
