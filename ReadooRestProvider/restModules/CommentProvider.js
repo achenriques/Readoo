@@ -29,6 +29,7 @@ class CommentProvider {
             ).catch(
                 function (err) {
                     // Sql Err
+                    console.error(err);
                     let reqError = functions.getRequestError(err);
                     return res.status(reqError.code)
                         .send(reqError.text);
@@ -41,7 +42,6 @@ class CommentProvider {
         const that = this;
         app.get('/commentary/:id', middleware.verifyToken, function (req, res) {
             let bookId = req.params.id;
-            console.log("Estoy getteando " + bookId);     
             if (bookId) {
                 that.commentDao.getCommentaryById(+bookId).then(
                     function (result) {
@@ -50,6 +50,7 @@ class CommentProvider {
                 ).catch(
                     function (err) {
                         // Sql Err
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);
@@ -75,7 +76,7 @@ class CommentProvider {
                                 c.userAvatarUrl = null;
                             }
                         }).catch(function (err) {
-                            console.log(err);
+                            console.error(err);
                             c.userAvatarUrl = null;
                         });
                     } else {
@@ -86,7 +87,7 @@ class CommentProvider {
             })).then(function (promisesResult) {
                 return commentArray;
             }).catch(function (err) {
-                console.log(err);
+                console.error(err);
             });
         } else {
             return Promise.resolve(commentArray);
@@ -99,7 +100,6 @@ class CommentProvider {
             let bookId = req.body.bookId;
             let lastDate = req.body.lastDate;
             let nCommentaries = req.body.nCommentaries;
-            console.log("Estoy cogiendo comentario " + bookId);     
             if (bookId) {
                 that.commentDao.getBunchOfCommentaries(+bookId, lastDate, constants.MAX_COMMENTARIES).then(
                     function (resultSet) {
@@ -141,6 +141,7 @@ class CommentProvider {
                             ).catch(
                                 function (err) {
                                     // Sql Err
+                                    console.error(err);
                                     let reqError = functions.getRequestError(err);
                                     return res.status(reqError.code)
                                         .send(reqError.text);
@@ -155,6 +156,7 @@ class CommentProvider {
                 ).catch(
                     function (err) {
                         // Sql Err
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);
@@ -173,7 +175,6 @@ class CommentProvider {
             let bookId = req.body.bookId;
             let fatherId = req.body.fatherCommentaryId;
             let lastDate = req.body.lastDate;
-            console.log("Estoy cogiendo comentario " + bookId);     
             if (bookId, fatherId) {
                 that.commentDao.getBunchOfSubCommentaries(+bookId, [+fatherId], constants.MAX_COMMENTARIES).then(
                     function (resultSet) {
@@ -203,6 +204,7 @@ class CommentProvider {
                 ).catch(
                     function (err) {
                         // Sql Err
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);
@@ -219,7 +221,6 @@ class CommentProvider {
         const that = this;
         app.post('/commentary/new', middleware.verifyToken, function (req, res) {
             let commentInfo = req.body;
-            console.log("Estoy insertando comentario " + commentInfo);     
             if (commentInfo && commentInfo.userId && commentInfo.bookId && commentInfo.commentText) {
                 that.commentDao.addCommentary(+commentInfo.userId, +commentInfo.bookId, 
                     commentInfo.commentText, (commentInfo.commentFatherId != null) ? +commentInfo.commentFatherId : null).then(
@@ -229,6 +230,7 @@ class CommentProvider {
                 ).catch(
                     function (err) {
                         // Sql Err
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);
@@ -244,7 +246,6 @@ class CommentProvider {
     dissableOne(app) {
         const that = this;
         app.post('/dissableCommentary', middleware.verifyToken, function (req, res) {
-            console.log("Estoy deshabilitando libro");
             let commentaryId = req.body.id;
             if (commentaryId) {
                 that.commentDao.dissableCommentary(+oldCommentaryId).then(
@@ -254,6 +255,7 @@ class CommentProvider {
                 ).catch(
                     function (err) {
                         // Sql Err
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);
@@ -269,7 +271,6 @@ class CommentProvider {
     deleteOne(app, db) {
         const that = this;
         app.delete('/commentary', middleware.verifyToken, function (req, res) {
-            console.log("Estoy deleteando " + req.body.id);
             let commentaryId = req.body.id;
             if (commentaryId) {
                 that.commentDao.deleteOne(+commentaryId).then(
@@ -279,6 +280,7 @@ class CommentProvider {
                 ).catch(
                     function (err) {
                         // Sql Err
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);

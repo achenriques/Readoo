@@ -23,7 +23,7 @@ class LastBookProvider {
                             .send(JSON.stringify(result));
                 }
             }).catch(function (err) {
-                console.log("Error at saving log register: " + err);
+                console.error(err);
                 return that.returnErrCode(err, res);
             });
         });
@@ -43,7 +43,7 @@ class LastBookProvider {
                                 .send(JSON.stringify(result));
                     }
                 }).catch(function (err) {
-                    console.log("Error at saving log register: " + err);
+                    console.error(err);
                     return that.returnErrCode(err, res);
                 });
             } else {
@@ -57,7 +57,6 @@ class LastBookProvider {
         const that = this;
         app.post('/lastBook', middleware.verifyToken, function (req, res) {
             let lastBook = req.body.lastBook;
-            console.log("Estoy insertando lastBook de usuario" + lastBook);     
             if (lastBook && lastBook.userId && lastBook.bookId && lastBook.genreId) {
                 that.lastBookDao.addOrUpdateBook(+lastBook.userId, +lastBook.bookId, +lastBook.genreId).then(function (result) {
                     if (result.affectedRows > 0) {
@@ -65,7 +64,7 @@ class LastBookProvider {
                     }
                     return res.status(200).send(true);
                 }).catch(function (err) {
-                    console.log("Error at saving log register: " + err);
+                    console.error(err);
                     return that.returnErrCode(err, res);
                 });
             } else {
@@ -79,7 +78,6 @@ class LastBookProvider {
         const that = this;
         app.delete('/lastBook', function (req, res) {
             let lastBookId = req.body.id;
-            console.log("Estoy deleteando " + lastBookId);
             if (lastBookId) {
                 that.bookDao.deleteLastBook(+lastBookId).then(function (result) {
                     if (result.affectedRows > 0) {
@@ -88,7 +86,7 @@ class LastBookProvider {
                     return res.status(200).setHeader('Content-Type', 'application/json')
                                 .send(true);
                 }).catch(function (err) {
-                    console.log("Error at saving log register: " + err);
+                    console.error(err);
                     return that.returnErrCode(err, res);
                 });
             } else {

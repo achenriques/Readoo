@@ -53,7 +53,7 @@ class LoginProvider {
                                             console.log("Registered user with ID: " + result.userId + " logged at " + new Date().toString());
                                         }
                                     ).catch(function (err) {
-                                        console.log("Error at saving log register: " + err);
+                                        console.warn("Error at saving log register: " + err);
                                     });
                                     // Convert image to icon
                                     if (result.userAvatarUrl) {
@@ -81,8 +81,17 @@ class LoginProvider {
                                                 userData: result
                                             });
                                         });
+                                    } else {
+                                        // return statement
+                                        return res.cookie('token', token, { httpOnly: true }).status(200).json({
+                                            success: true,
+                                            message: 'Authentication successful!',
+                                            userId: result.userId,
+                                            userData: result
+                                        });
                                     }
                                 }).catch(function(err) {
+                                    console.error(err);
                                     return returnErrCode(err, res);
                                 });
                             } else {
@@ -93,6 +102,7 @@ class LoginProvider {
                         }
                     }
                 ).catch(function(err) {
+                    console.error(err);
                     return returnErrCode(err, res);
                 });
             } else {
@@ -156,12 +166,13 @@ class LoginProvider {
                                 }
                                 return res.status(200).json(result);
                             }).catch(function (err) {
-                                console.log(err);
+                                console.error(err);
                                 return res.status(200).json(result);
                             });
                         }
                     }
                 ).catch(function(err) {
+                    console.error(err);
                     return returnErrCode(err, res);
                 });
             });
@@ -213,6 +224,7 @@ class LoginProvider {
                         return res.status(200).send(result.length === 0);
                     }
                 ).catch(function(err) {
+                    console.error(err);
                     return returnErrCode(err, res);
                 });
             } else {
@@ -232,6 +244,7 @@ class LoginProvider {
                         return res.status(200).send(result.length === 0);
                     }
                 ).catch(function(err) {
+                    console.error(err);
                     return returnErrCode(err, res);
                 });
             } else {
@@ -262,7 +275,7 @@ class LoginProvider {
                                 { expiresIn: TOKEN_TIME } // expires in 24 hours}
                             );
                             // Save date of login of all users.
-                            that.loginDao.registerLog(+result.userId).then(
+                            that.loginDao.registerLog(+result.insertId).then(
                                 function (resultLog) {
                                     console.log("Registered user with ID: " + result.userId + " logged at " + new Date().toString());
                                 }
@@ -373,6 +386,7 @@ class LoginProvider {
                             }
                         ).catch(function (err) {
                             console.log("Error at changing user language");
+                            console.error(err);
                         });
                         if (decoded.languageCode != +languageCode) {
                             let tokenWithSelector = jwt.sign(

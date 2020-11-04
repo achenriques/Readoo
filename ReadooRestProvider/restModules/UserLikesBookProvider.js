@@ -24,6 +24,7 @@ class UserLikesBookProvider {
             ).catch(
                 function (err) {
                     // Sql Err
+                    console.error(err);
                     let reqError = functions.getRequestError(err);
                     return res.status(reqError.code)
                         .send(reqError.text);
@@ -36,7 +37,6 @@ class UserLikesBookProvider {
         const that = this;
         app.get('/userLikesBook/:id', middleware.verifyToken, function (req, res) {
             let userId = req.params.id;
-            console.log("Estoy getteando " + userId);
             if (userId) {
                 that.userLikesBookDao.oneUserLike(+userId).then(
                     function (result) {
@@ -45,6 +45,7 @@ class UserLikesBookProvider {
                 ).catch(
                     function (err) {
                         // Sql Err
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);
@@ -62,7 +63,6 @@ class UserLikesBookProvider {
         app.get('/userLikesBook/:userId/:bookId', middleware.verifyToken, function (req, res) {
             let userId = req.params.userId;
             let bookId = req.params.bookId
-            console.log("Estoy getteando " + userId);
             if (userId && bookId) {
                 that.userLikesBookDao.oneUserBookLike(+userId, +bookId).then(
                     function (result) {
@@ -71,6 +71,7 @@ class UserLikesBookProvider {
                 ).catch(
                     function (err) {
                         // Sql Err
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);
@@ -87,7 +88,6 @@ class UserLikesBookProvider {
         const that = this;
         app.post('/userLikesBook', middleware.verifyToken, function (req, res) {
             let userLikesBook = req.body;
-            console.log("Estoy insertando gusto de usuario" + userLikesBook);
             if (userLikesBook && userLikesBook.userId && userLikesBook.bookId) {
                 that.userLikesBookDao.insertOrUpdateUserLike(+userLikesBook.userId, userLikesBook.bookId).then(
                     function (result) {
@@ -96,6 +96,7 @@ class UserLikesBookProvider {
                 ).catch(
                     function (err) {
                         // Sql Err
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);
@@ -112,7 +113,6 @@ class UserLikesBookProvider {
         const that = this;
         app.put('/userLikesBook', function (req, res) {
             let like = req.body.like;
-            console.log("Estoy modificando " + like);
             if (like && like.userId && like.bookId && like.like != null) {
                 that.this.userLikesBookDao.updateUserBookLike(+like.userId, +like.bookId, like.like).then(
                     function (result) {
@@ -121,6 +121,7 @@ class UserLikesBookProvider {
                 ).catch(
                     function (err) {
                         // Sql Err
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);
@@ -137,7 +138,6 @@ class UserLikesBookProvider {
         const that = this;
         app.delete('/userLikesBook', function (req, res) {
             let like = req.body;
-            console.log("Estoy deleteando " + like.userId + ", " + like.bookId);
             if (like && like.userId && like.bookId) {
                 that.userLikesBookDao.deleteUserLikes(+like.userId, +like.bookId).then(
                     function (result) {
@@ -146,6 +146,7 @@ class UserLikesBookProvider {
                 ).catch(
                     function (err) {
                         // Sql Err
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);

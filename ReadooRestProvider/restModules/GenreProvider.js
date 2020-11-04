@@ -35,7 +35,6 @@ class GenreProvider {
         const that = this;
         app.get('/genre/:id', function (req, res) {
             let genreId = req.params.id;
-            console.log("Estoy getteando " + genreId);
             if (genreId) {
                 that.genreDao.getOneGenre(+genreId).then(
                     function (result) {
@@ -49,6 +48,7 @@ class GenreProvider {
                     }
                 ).catch(
                     function (err) {
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)        
                             .send(reqError.text);
@@ -65,7 +65,6 @@ class GenreProvider {
         const that = this;
         app.post('/genre', function (req, res) {
             let genre = req.body.genre;
-            console.log("Estoy insertando categoria de usuario" + genre);
             if (genre) {
                 that.genreDao.addGenre(genre.trim()).then(
                     function (result) {
@@ -79,6 +78,7 @@ class GenreProvider {
                     }
                 ).catch(
                     function (err) {
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)        
                             .send(reqError.text);
@@ -94,7 +94,6 @@ class GenreProvider {
     deleteOne(app) {
         app.delete('/genre', function (req, res) {
             let genreId = req.body.genre;
-            console.log("Estoy deleteando " + genreId);
             if (genreId) {
                 this.genreDao.deleteOne(genreId).then(
                     function (result) {
@@ -108,6 +107,7 @@ class GenreProvider {
                     }
                 ).catch(
                     function (err) {
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)        
                             .send(reqError.text);

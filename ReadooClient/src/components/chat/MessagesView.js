@@ -91,8 +91,7 @@ class MessagesView extends Component {
     componentDidMount() {
         let chat = this.props.chat;
         if (chat && chat.chatId !== null) {
-            let userIdTo = (this.props.currentUserId === chat.userIdFrom) 
-                    ? this.props.currentUserId : chat.userIdTo;
+            let userIdTo = chat.userIdTo;
             if (chat.chatId > 0) {
                 this.setState({
                     ...this.state,
@@ -180,7 +179,7 @@ class MessagesView extends Component {
             let newMessage = {
                 chatId: this.state.currentChat.chatId,
                 userId: this.props.currentUserId,
-                messageText: this.state.messageText,
+                message: this.state.messageText,
                 messageDateTime: new Date()
             };
             messages.push(newMessage);            
@@ -294,7 +293,7 @@ class MessagesView extends Component {
                                                     />
                                                 </Grid>
                                                 <Grid item sm={10} xs={11}>
-                                                    <p className={(+msg.userId === this.props.currentUserId) ? "chatMessageBubble right" : "chatMessageBubble left"}>
+                                                    <p className={(+msg.userId === this.state.currentChat.userIdFrom) ? "chatMessageBubble right" : "chatMessageBubble left"}>
                                                         <span>{msg.message}</span>
                                                     </p>
                                                 </Grid>

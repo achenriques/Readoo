@@ -15,9 +15,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import LS from '../LanguageSelector';
 import ContinueModal from '../common/ContinueModal';
 import avatarDefault from '../../resources/avatarDefault.svg';
-import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
+import { REST_EMPTY, REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
 import '../../styles/Chat.css';
-import MessagesView from './MessagesView';
 
 class ChatView extends Component {
 
@@ -26,6 +25,7 @@ class ChatView extends Component {
         currentChat: null,
         selectedChatId: null,
         deleteChatId: null,
+        newChat: null,
         openContinueDeleteChat: false,
         loadingChatHistory: REST_DEFAULT,
         loadingChatMessages: REST_DEFAULT
@@ -55,8 +55,8 @@ class ChatView extends Component {
                 this.setState({
                     ...this.state,
                     loadingChatHistory: REST_FAILURE
-                });
-            } else if (this.props.chatHistory !== null && (this.state.loadingChatHistory === REST_DEFAULT
+                }, () => this.statusCallback(REST_FAILURE));
+            } else if (this.props.chatHistory !== null && this.state.newChat === null && (this.state.loadingChatHistory === REST_DEFAULT
                     || this.state.loadingChatHistory === REST_SUCCESS && this.props.chatHistory.length !== this.state.chatHistory.length)) {
                 let newChatHistory = (Array.isArray(this.props.chatHistory)) ? this.props.chatHistory.slice() : [];
                 let newChat = null;
@@ -75,7 +75,8 @@ class ChatView extends Component {
                             chatHistory: newChatHistory
                         }, () => {
                             this.props.recivedChatWith();
-                            this.hadleChatClick(undefined, chatWithConversation);
+                            this.hadleChatClick(chatWithConversation, REST_SUCCESS);
+
                         });
                     } else {
                         newChatId = -1;
@@ -85,7 +86,7 @@ class ChatView extends Component {
                             userNickFrom: this.props.currentUser.userNick,
                             userAvatarUrlFrom: this.props.currentUser.userAvatarUrl,
                             userIdTo: this.props.chatWith,
-                            userNickTo: this.props.currentUser.userNick,
+                            userNickTo: this.props.userPreview.userNick,
                             userAvatarUrlTo: this.props.userPreview.userAvatarUrl,
                             chatDateTime: new Date(),
                             chatVisible: 'B'
@@ -101,9 +102,21 @@ class ChatView extends Component {
                             chatHistory: newChatHistory
                         }, () => {
                             this.props.recivedChatWith();
-                            this.hadleChatClick(undefined, newChat);
+                            this.hadleChatClick(newChat, REST_SUCCESS);
                         });
                     }
+                } else {
+                    this.setState({
+                        ...this.state,
+                        loadingChatHistory: REST_SUCCESS,
+                        chatHistory: newChatHistory
+                    }, () => {
+                        if (newChatHistory.length > 0) {
+                            this.hadleChatClick(null, REST_SUCCESS);
+                        } else {
+                            this.hadleChatClick(null, REST_EMPTY);
+                        }
+                    });
                 }
             }
         }
@@ -136,17 +149,23 @@ class ChatView extends Component {
         });
     }
 
-    hadleChatClick(evt, chat) {
-        console.log("Chat con id: " + chat.chatId)
+    hadleChatClick(chat, status, evt) {
         this.setState({
             ...this.state,
-            selectedChatId: chat.chatId,
+            selectedChatId: (chat !== null) ? chat.chatId : null,
             currentChat: chat
         });
 
         // Calback onClickChat
         if (this.props.onClickSelectChat !== undefined && typeof this.props.onClickSelectChat === "function") {
-            this.props.onClickSelectChat(evt, chat);
+            this.props.onClickSelectChat(chat, status);
+        }
+    }
+
+    statusCallback(status) {
+        // Calback onClickChat
+        if (this.props.statusCallback !== undefined && typeof this.props.statusCallback === "function") {
+            this.props.statusCallback(status);
         }
     }
 
@@ -172,7 +191,7 @@ class ChatView extends Component {
                             <List className="">
                                 {this.state.chatHistory.map((chat) => (
                                 <ListItem key={chat.chatId} 
-                                    onClick={(evt) => this.hadleChatClick(evt, chat)}
+                                    onClick={(evt) => this.hadleChatClick(chat, REST_SUCCESS, evt)}
                                     className={(this.state.selectedChatId === chat.chatId) ? "chatHistorySelectedItem" : "chatHistoryItem"}
                                 >
                                     <ListItemAvatar>

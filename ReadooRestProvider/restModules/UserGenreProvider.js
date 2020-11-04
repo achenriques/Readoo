@@ -23,6 +23,7 @@ class UserGenreProvider {
             ).catch(
                 function (err) {
                     // Sql Err
+                    console.error(err);
                     let reqError = functions.getRequestError(err);
                     return res.status(reqError.code)
                         .send(reqError.text);
@@ -35,7 +36,6 @@ class UserGenreProvider {
         const that = this;
         app.get('/userGenre/:id', middleware.verifyToken, function (req, res) {
             let userId = req.params.id;
-            console.log("Estoy getteando " + userId);
             if (userId) {
                 that.userGenreDao.oneUsersGenres(+userId).then(
                     function (result) {
@@ -45,13 +45,14 @@ class UserGenreProvider {
                 ).catch(
                     function (err) {
                         // Sql Err
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);
                     }
                 );
             } else {
-                res.status(400)        // HTTP status 400: BadRequest
+                return res.status(400)        // HTTP status 400: BadRequest
                 .send('Missed Id');
             }
         });
@@ -61,19 +62,19 @@ class UserGenreProvider {
         const that = this;
         app.post('/userGenre', middleware.verifyToken, function (req, res) {
             let userGenre = req.body.userGenre;
-            console.log("Estoy insertando categoria de usuario" + userGenre);
             if (userGenre && userGenre.userId && userGenre.genreIds) {
                 let newUserGenreId = that.userGenreDao.updateGenres(+userGenre.userId, userGenre.genreIds);
                 if (Number.isInteger(newUserGenreId) && newUserGenreId > 0) {
                     res.setHeader('Content-Type', 'application/json');
-                    res.status(200).json(newUserGenreId);
+                    return res.status(200).json(newUserGenreId);
                 } else {
+                    console.error(err);
                     let reqError = functions.getRequestError(newUserGenreId);
-                    res.status(reqError.code)        
+                    return res.status(reqError.code)        
                         .send(reqError.text);
                 }
             } else {
-                res.status(400)        // HTTP status 400: BadRequest
+                return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Id');
             }
         });
@@ -83,16 +84,16 @@ class UserGenreProvider {
         const that = this;
         app.delete('/userGenre', middleware.verifyToken, function (req, res) {
             let userId = req.body.userId;
-            console.log("Estoy deleteando " + userId);
             if (userId) {
                 let oldUserGenreId = that.userGenreDao.deleteUserGenres(+userId);
                 if (Number.isInteger(oldUserGenreId) && oldUserGenreId > 0) {
                     res.setHeader('Content-Type', 'application/json');
-                    res.status(200).json(oldUserGenreId);
+                    return res.status(200).json(oldUserGenreId);
                 } else {
+                    console.error(err);
                     let reqError = functions.getRequestError(oldUserGenreId);
-                    res.status(reqError.code)
-                        .send(reqError.text);
+                    return res.status(reqError.code)
+                            .send(reqError.text);
                 }
             } else {
                 res.status(400)        // HTTP status 400: BadRequest

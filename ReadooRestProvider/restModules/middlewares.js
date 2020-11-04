@@ -44,7 +44,6 @@ module.exports = {
                 // if everything was good, save to request for use in other routes
                 next();
             }
-            
         });
     }
 }

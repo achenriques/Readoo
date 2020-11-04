@@ -4,14 +4,14 @@ module.exports = {
             " LEFT JOIN user_likes_book u ON b.bookId = u.bookId AND u.userId = ? " +
             " LEFT JOIN last_user_book l ON l.userId = ? AND b.genreId = l.genreId " +
             " INNER JOIN app_user us ON us.userId = b.userId " +
-            " WHERE b.bookVisible = 1 AND (l.bookId IS NULL OR b.bookId > l.bookId) " +
+            " WHERE b.bookVisible = 1 AND b.userId != ? AND (l.bookId IS NULL OR b.bookId > l.bookId) " +
             " ORDER BY b.bookDate ASC LIMIT ? ;",
     getBunchGenre: "SELECT b.*, COALESCE(u.likeBoolean, FALSE) AS user_likes_book, us.userAvatarUrl FROM book b " + 
             " LEFT JOIN user_likes_book u ON b.bookId = u.bookId AND u.userId = ? " + 
             " LEFT JOIN last_user_book l ON l.userId = ? AND b.genreId = l.genreId " +
             " INNER JOIN app_user us ON us.userId = b.userId " +
-            " WHERE b.genreID IN (?) AND b.bookVisible = 1 AND (l.bookId IS NULL OR b.bookId > l.bookId) " +
-            " ORDER BY b.bookDate ASC LIMIT ? ;",
+            " WHERE b.genreID IN (?) AND b.bookVisible = 1 AND b.userId != ? " +
+            " AND (l.bookId IS NULL OR b.bookId > l.bookId) ORDER BY b.bookDate ASC LIMIT ? ;",
     getMyBooks: "WITH fav AS ( SELECT ROW_NUMBER() OVER ( ORDER BY b.bookDate DESC ) AS row_num, b.*, u.userAvatarUrl " +
             " FROM book b INNER JOIN app_user u ON u.userId = ? AND u.userId = b.userId AND b.bookVisible = 1 ), " +
             " total AS ( SELECT COUNT(*) AS total FROM fav ) " +

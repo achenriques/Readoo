@@ -52,14 +52,13 @@ class UserProvider {
     getUserAvatar(app) {
         app.get('/user/avatar/:avatarUrl', function (req, res) {
             let avatarUrl = req.params.avatarUrl;
-            console.log("Estoy getteando Avatar" + avatarUrl);
             if (avatarUrl) {
                 let avatarFile = path.resolve('./ReadooRestProvider/Uploads/coverPages/' + avatarUrl.trim());
                 if (avatarFile) {
                     return res.status(200).sendfile(avatarFile);
                 }
                 else {
-                    console.log(error);
+                    console.error(error);
                     return res.status(404)        // HTTP status 404: Image not found
                         .send({ auth: false, info: 'image.not.found'});
                 }
@@ -94,7 +93,6 @@ class UserProvider {
         app.get('/user', middleware.verifyToken, function (req, res) {
             let userId = req.query.id;
             let isPreview = (req.query.isPreview == true) ? true : false;
-            console.log("Estoy getteando " + userId);
             if (userId) {
                 that.userDao.getOneUser(+userId, isPreview).then(function (result) {
                     // Parse genres
@@ -119,16 +117,20 @@ class UserProvider {
                             console.log(err);
                             return res.status(200).json(result);
                         });
+                    } else {
+                        return res.setHeader('Content-Type', 'application/json')
+                                .send(JSON.stringify(result));
                     }
                 }).catch(
                     function (err) {
                         // Sql Err
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);
                 });
             } else {
-                res.status(400)        // HTTP status 400: BadRequest
+                return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Id');
             }
         });
@@ -139,7 +141,6 @@ class UserProvider {
         app.put('/user', [middleware.verifyToken, userAvatarUpload.single('userAvatarUrl')], function (req, res) {
             let userToUpdate = req.body;
             let oldUserPass = (userToUpdate.oldUserPass != null) ? "" + userToUpdate.oldUserPass.trim() : null;
-            console.log("Estoy modificando " + userToUpdate.userId);     
             if (userToUpdate && userToUpdate.userId != null && (userToUpdate.userName !== undefined || userToUpdate.userSurname !== undefined 
                     || userToUpdate.userNick !== undefined || userToUpdate.userPass !== undefined || userToUpdate.userEmail !== undefined 
                     || userToUpdate.userAboutMe  !== undefined || userToUpdate.userAvatarUrl !== undefined
@@ -180,6 +181,7 @@ class UserProvider {
                                     }
                                 ).catch(
                                     function (err) {
+                                        console.error(err);
                                         let reqError = functions.getRequestError(err);
                                         return res.status(reqError.code)        
                                             .send(reqError.text);
@@ -194,6 +196,7 @@ class UserProvider {
                     }
                 ).catch(
                     function (err) {
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)        // HTTP status 204: NotContent
                             .send(reqError.text);
@@ -210,7 +213,6 @@ class UserProvider {
         const that = this;
         app.post('/user', middleware.verifyToken, function (req, res) {
             let userToInsert = req.body.user;
-            console.log("Estoy insertando " + userToInsert);     
             if (userToInsert && userToInsert.userName && userToInsert.userSurname && userToInsert.userNick && userToInsert.userPass && userToInsert.userEmail && 
                 userToInsert.userAboutMe && userToInsert.userAvatarUrl) {
                 that.userDao.insertOne(userToInsert.userName.trim(), userToInsert.userSurname.trim(), userToInsert.userNick.trim(), userToInsert.userPass, userToInsert.userEmail.trim(), 
@@ -221,13 +223,14 @@ class UserProvider {
                     }
                 ).catch(
                     function (err) {
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)        
                             .send(reqError.text);
                     }
                 );
             } else {
-                res.status(400)        // HTTP status 400: BadRequest
+                return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Id');
             }
         });
@@ -236,7 +239,6 @@ class UserProvider {
     dissableOne(app) {
         const that = this;
         app.post('/dissableUser', middleware.verifyToken, function (req, res) {
-            console.log("Estoy deshabilitando usuario");
             let userId = req.body.userId;
             if (userId) {
                 that.userDao.dissableOneUser(+userId).then(
@@ -246,13 +248,14 @@ class UserProvider {
                     }
                 ).catch(
                     function (err) {
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code) 
                             .send(reqError.text);
                     }
                 );
             } else {
-                res.status(400)
+                return res.status(400)
                     .send('Missed Id');
             }
         });
@@ -261,7 +264,6 @@ class UserProvider {
     deleteOne(app) {
         const that = this;
         app.delete('/user', function (req, res) {
-            console.log("Estoy deleteando " + req.body.id);
             let userId = req.body.id;
             if (userId) {
                 that.userDao.deleteOneUser(+userId).then(
@@ -277,7 +279,7 @@ class UserProvider {
                     }
                 )
             } else {
-                res.status(400)        // HTTP status 400: BadRequest
+                return res.status(400)        // HTTP status 400: BadRequest
                     .send('Missed Id');
             }
         });

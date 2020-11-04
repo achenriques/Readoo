@@ -96,6 +96,7 @@ export default [
         'book.was.deleted': 'Defeated!',
         'conversations': 'Conversations',
         'message': 'Write your message (Max: {0})',
+        'any.chat.yet': 'Nothing to see yet!. Enter and click in the avatar of your favourite books to start a chat.',
         // Genres
         'theater': 'Theater',
         'drama': 'Drama',
@@ -213,6 +214,7 @@ export default [
         'book.was.deleted': '¡Hasta luego Lucas!',
         'conversations': 'Conversaciones',
         'message': 'Escribe tu mensaje (Max: {0})',
+        'any.chat.yet': 'No hay nada que ver aún. Accede a los perfiles de tus libros favoritos y chatea con quien quieras.',
         // Genres
         'theater': 'Teatro',
         'drama': 'Drama',

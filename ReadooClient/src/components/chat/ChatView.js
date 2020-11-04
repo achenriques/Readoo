@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import * as appState from '../../app_state/reducers';
 import Grid from '@material-ui/core/Grid';
 import LS from '../LanguageSelector';
-import { REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
+import { REST_FAILURE, REST_DEFAULT, REST_SUCCESS, REST_EMPTY, DISPLAY_NONE } from '../../constants/appConstants';
 import '../../styles/Chat.css';
 import MessagesView from './MessagesView';
 import HistoryView from './HistoryView';
@@ -12,14 +12,9 @@ import { actionTypes } from '../../app_state/actions';
 class ChatView extends Component {
 
     initialState = {
-        chatHistory: [],
-        chatMessages: [],
-        newChat: null,
         currentChat: null,
         selectedChatId: null,
-        messageText: "",
-        openContinueDeleteChat: false,
-        loadingChatHistory: REST_SUCCESS
+        fetchStatus: REST_DEFAULT
     };
 
     constructor(props) {
@@ -29,44 +24,45 @@ class ChatView extends Component {
         };
     };
 
-    componentDidUpdate = () => {
-        
-    }
-
-    isLoadingProcess(action) {
-        return this.props.loadingProcesses.includes(action)
-    }
-
-    hadleChatClick(evt, chat) {
-        console.log("Chat con id: " + chat.chatId)
-        this.setState({
-            ...this.state,
-            selectedChatId: chat.chatId,
-            currentChat: chat
-        });
+    hadleChatClick(chat, status) {
+        let newState = { ...this.state };
+        if (chat !== undefined) {
+            newState.currentChat = chat;
+            newState.selectedChatId = (chat !== null) ? chat.chatId : null
+        }
+        if (status !== undefined) {
+            newState.fetchStatus = status;
+        }
+        this.setState(newState);
     }
 
     render = () => {
-        switch (this.state.loadingChatHistory) {
+        switch (this.state.fetchStatus) {
             case REST_FAILURE:
                 return (
                     <div className="loadingNewTab">
                         <h3><LS msgId='timeout.error' defaultMsg='An error has ocurred...'/></h3>
                     </div>
                 )
-            case REST_DEFAULT:
+                
+            case REST_EMPTY:
                 return (
                     <div className="loadingNewTab">
-                        <h3><LS msgId='loading' defaultMsg='Loading...'/></h3>
+                        <h3><LS msgId='any.chat.yet' defaultMsg='No chats yet...'/></h3>
                     </div>
                 )
-        
+
             default:
                 return (
                     <div className="chatRootDiv">
-                        <Grid container spacing={24}className="chatRootGrid">
+                        <div className="loadingNewTab" style={(this.state.fetchStatus === REST_DEFAULT) ? {} : DISPLAY_NONE}>
+                            <h3><LS msgId='loading' defaultMsg='Loading...'/></h3>
+                        </div>
+                        <Grid container spacing={24} className="chatRootGrid" style={(this.state.fetchStatus === REST_DEFAULT) ? DISPLAY_NONE : {}}>
                             <Grid item sm={3} className="chatConversationGrid">
-                                <h3><LS msgId='conversations' defaultMsg='Conversations'/></h3>
+                                <h3 className="conversationsText">
+                                    <LS msgId='conversations' defaultMsg='Conversations'/>
+                                </h3>
                                 <HistoryView onClickSelectChat={this.hadleChatClick.bind(this)}/>
                             </Grid>
                             <Grid item sm={9} className="chatMessagesGrid">

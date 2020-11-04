@@ -50,19 +50,19 @@ class ChatProvider {
     }
 
     saveMessage(chatMessage) {
-        this.chatDao.saveOne(+chatMessage.chatId, +chatMessage.userIdFrom, chatMessage.messageText).then(function(result) {
+        this.chatDao.saveOne(+chatMessage.chatId, +chatMessage.userIdFrom, chatMessage.message).then(function(result) {
             if (result.affectedRows === 0) {
                 this.emitError();
             }
         }).catch(function(err) {
-            console.log(err);
+            console.error(err);
             this.emitError(err);
         });
     }
 
     arrivedMessage(chatMessage) {
-        if (chatMessage && chatMessage.messageText !== undefined) {
-            let msgText = "" + chatMessage.messageText;
+        if (chatMessage && chatMessage.message !== undefined) {
+            let msgText = "" + chatMessage.message;
             if (msgText.trim().length > 0) {
                 let chatId = chatMessage.chatId;
                 if (chatId !== undefined && chatId > 0) {
@@ -70,18 +70,22 @@ class ChatProvider {
                     this.saveMessage(chatMessage);
                 } else {
                     // not in chat history. Must insert
-                    const that = this;
-                    this.chatDao.insertOne(+chatMessage.userIdFrom, +chatMessage.userIdTo).then(function(result) {
-                        if (result.affectedRows > 0) {
-                            // set a new id before save message
-                            chatMessage.chatId = +result.insertId;
-                            that.saveMessage(chatMessage);
-                            that.io.emit("newChatId", result.insertId);
-                        }
-                    }).catch(function(err) {
-                        console.log(err);
-                        this.emit(err);
-                    });
+                    if (+chatMessage.userIdFrom !== +chatMessage.userIdTo) {
+                        const that = this;
+                        this.chatDao.insertOne(+chatMessage.userIdFrom, +chatMessage.userIdTo).then(function(result) {
+                            if (result.affectedRows > 0) {
+                                // set a new id before save message
+                                chatMessage.chatId = +result.insertId;
+                                that.saveMessage(chatMessage);
+                                that.io.emit("newChatId", result.insertId);
+                            }
+                        }).catch(function(err) {
+                            console.error(err);
+                            this.emit(err);
+                        });
+                    } else {
+                        console.error("Chat not allowed! User is repeated.");
+                    }
                 }
             }
         }
@@ -96,11 +100,11 @@ class ChatProvider {
                     chatHistoryItem[channelDirection] = null;
                 }       
             }).catch(function (err) {
-                console.log(err);
+                console.error(err);
                 chatHistoryItem[channelDirection] = null;
             });
         } else {
-            console.log('Avatar image not found: ' + avatar);
+            console.warn('Avatar image not found: ' + avatar);
             return Promise.resolve();
         }
     }
@@ -117,7 +121,7 @@ class ChatProvider {
             return Promise.all(promiseList).then(function (promisesResult) {
                 return chatHistory;
             }).catch(function (err) {
-                console.log(err);
+                console.error(err);
             });
         } else {
             return Promise.resolve(chatHistory);
@@ -134,6 +138,7 @@ class ChatProvider {
             ).catch(
                 function (err) {
                     // Sql Err
+                    console.error(err);
                     let reqError = functions.getRequestError(err);
                     return res.status(reqError.code)
                         .send(reqError.text);
@@ -146,7 +151,6 @@ class ChatProvider {
         const that = this;
         app.get('/chatHistory', middleware.verifyToken, function (req, res) {
             let userId = req.query.userId;
-            console.log("Estoy getteando chat history" + userId);     
             if (+userId) {
                 that.chatDao.getHistory(+userId).then(
                     function (result) {
@@ -157,6 +161,7 @@ class ChatProvider {
                 ).catch(
                     function (err) {
                         // Sql Err
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);
@@ -175,7 +180,6 @@ class ChatProvider {
         app.get('/chatMessages/', middleware.verifyToken, function (req, res) {
             let chatId = req.query.chatId;
             let userId = req.query.userId;
-            console.log("Estoy getteando " + chatId);     
             if (+chatId, +userId) {
                 that.chatDao.getChatById(+chatId, +userId).then(
                     function (result) {
@@ -184,6 +188,7 @@ class ChatProvider {
                 ).catch(
                     function (err) {
                         // Sql Err
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);
@@ -199,7 +204,6 @@ class ChatProvider {
     deleteOne(app) {
         const that = this;
         app.delete('/chat', function (req, res) {
-            console.log("Estoy deleteando " + req.body.id);
             let chatId = req.body.chatId;
             let userId = req.body.userId;
             if (chatId, userId) {
@@ -224,6 +228,7 @@ class ChatProvider {
                     }
                 ).catch(
                     function (err) {
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);

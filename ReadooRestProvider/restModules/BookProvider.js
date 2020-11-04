@@ -52,20 +52,18 @@ class BookProvider {
     getBookCover(app) {
         app.get('/book/cover/:cover', function (req, res) {
             let coverName = req.params.cover;
-            console.log("Estoy getteando Portada" + nombrePortada);
             if (!coverName) {
-            let coverFile = path.resolve('./ReadooRestProvider/uploads/coverPages/' + coverName);
-            if (coverFile) {
-                res.sendfile(coverFile);
-            }
-            else {
-                console.log(error);
-                res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
-                    .send('No archive found!');
-            }
+                let coverFile = path.resolve('./ReadooRestProvider/uploads/coverPages/' + coverName);
+                if (coverFile) {
+                    res.sendfile(coverFile);
+                } else {
+                    console.warn('Cover not found. Cover name: ' + coverName);
+                    res.status(500)        // HTTP status 500: InternalErrorNotDbConnection
+                        .send('No archive found!');
+                }
             } else {
-            res.status(400)        // HTTP status 400: BadRequest
-                .send('Missed Id!');
+                res.status(400)        // HTTP status 400: BadRequest
+                    .send('Missed Id!');
             }
         });
     }
@@ -80,6 +78,7 @@ class BookProvider {
                 }
             ).catch(
                 function (err) { // Sql Err
+                    console.error(err);
                     let reqError = functions.getRequestError(books);
                     return res.status(reqError.code).send(reqError.text);
                 }
@@ -96,7 +95,7 @@ class BookProvider {
                     currentBook.bookCoverUrl = null;
                 }
             }).catch(function (err) {
-                console.log(err);
+                console.error(err);
                 currentBook.bookCoverUrl = null;
             });
         }
@@ -109,7 +108,7 @@ class BookProvider {
                     currentBook.userAvatarUrl = null;
                 }
             }).catch(function (err) {
-                console.log(err);
+                console.error(err);
                 currentBook.userAvatarUrl = null;
             });
         }
@@ -125,12 +124,12 @@ class BookProvider {
                     if (coverFile && fs.existsSync(coverFile)) {
                         arrayOfPromises.push(parseCover(coverFile, b));
                     } else {
-                        console.log('Book cover image not found: ' + b.bookCoverUrl);
+                        console.warn('Book cover image not found: ' + b.bookCoverUrl);
                         b.bookCoverUrl = null;
                         arrayOfPromises.push(Promise.resolve());
                     }
                 } else {
-                    console.log('Book cover was undefinde: ' + b.bookId);
+                    console.warn('Book cover was undefined: ' + b.bookId);
                     b.bookCoverUrl = null;
                     arrayOfPromises.push(Promise.resolve());
                 }
@@ -140,12 +139,12 @@ class BookProvider {
                     if (avatarFile && fs.existsSync(avatarFile)) {
                         arrayOfPromises.push(parseAvatar(avatarFile, b));
                     } else {
-                        console.log('Book cover image not found: ' + b.bookCoverUrl);
+                        console.warn('Book cover image not found: ' + b.bookCoverUrl);
                         b.userAvatarUrl = null;
                         arrayOfPromises.push(Promise.resolve());
                     }
                 } else {
-                    console.log('User avatar was undefined: ' + b.userId);
+                    console.warn('User avatar was undefined: ' + b.userId);
                     b.userAvatarUrl = null;
                     arrayOfPromises.push(Promise.resolve());
                 }
@@ -153,7 +152,7 @@ class BookProvider {
             })).then(function (promisesResult) {
                 return bookArray;
             }).catch(function (err) {
-                console.log(err);
+                console.error(err);
             });
         } else {
             return Promise.resolve(bookArray);
@@ -164,7 +163,6 @@ class BookProvider {
         const that = this;
         app.post('/book', middleware.verifyToken, function (req, res) {
             let lastOne = req.body.last;
-            console.log("Deberia cojer n libros " + lastOne);
             if (lastOne && lastOne.userId && lastOne.numberOfBooks) {
                 let userId = lastOne.userId;
                 let genres = lastOne.genres;
@@ -183,6 +181,7 @@ class BookProvider {
                     }
                 ).catch(
                     function (err) {
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code) 
                             .send(reqError.text);
@@ -199,7 +198,6 @@ class BookProvider {
         const that = this;
         app.post('/bookFavourites', middleware.verifyToken, function (req, res) {
             let favourite = req.body.favourite;
-            console.log("Deberia cojer favoritos " + favourite.booksPerPage);
             if (favourite && favourite.userId, favourite.page != null && favourite.booksPerPage != null) {
                 let userId = favourite.userId;
                 let betweenA = (favourite.page * favourite.booksPerPage) + 1;
@@ -218,6 +216,7 @@ class BookProvider {
                     }
                 ).catch(
                     function (err) {
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code) 
                             .send(reqError.text);
@@ -233,7 +232,6 @@ class BookProvider {
     insertOne(app) {
         const that = this;
         app.post('/book/new', [middleware.verifyToken, bookCoverUpload.single('bookCoverUrl')], function (req, res) { // TODO: have a look to multiple middleware
-            console.log("Estoy insertando libro");
             let bookInfo = req.body;
             if (bookInfo && bookInfo.bookTitle != null && bookInfo.bookAuthor != null && bookInfo.bookDescription && bookInfo.bookReview != null
                     && bookInfo.bookCoverUrl != null && bookInfo.userId != null && bookInfo.genreId != null ) {
@@ -245,6 +243,7 @@ class BookProvider {
                     }
                 ).catch(
                     function (err) {
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)        
                             .send(reqError.text);
@@ -260,7 +259,6 @@ class BookProvider {
     dissableOne(app) {
         const that = this;
         app.post('/dissableBook', middleware.verifyToken, function (req, res) {
-            console.log("Estoy deshabilitando libro");
             let bookId = req.body.bookId;
             let userId = req.body.userId;
             if (bookId, userId) {
@@ -271,6 +269,7 @@ class BookProvider {
                     }
                 ).catch(
                     function (err) {
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code) 
                             .send(reqError.text);
@@ -286,7 +285,6 @@ class BookProvider {
     deleteOne(app) {
         const that = this;
         app.delete('/book', function (req, res) {
-            console.log("Estoy deleteando " + req.body.id);
             let bookId = req.body.bookId;
             let userId = req.body.userId;
             if (bookId, userId) {
@@ -297,6 +295,7 @@ class BookProvider {
                     }
                 ).catch(
                     function (err) {
+                        console.error(err);
                         let reqError = functions.getRequestError(err);
                         return res.status(reqError.code)
                             .send(reqError.text);

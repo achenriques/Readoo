@@ -154,3 +154,8 @@ span.chatDateSpan {
     cursor: pointer;
     background: lightgreen;
 }
+
+.conversationsText {
+    width: 100%;
+    text-align: center;
+}
