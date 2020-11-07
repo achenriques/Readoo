@@ -15,7 +15,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import LS from '../LanguageSelector';
 import ContinueModal from '../common/ContinueModal';
 import avatarDefault from '../../resources/avatarDefault.svg';
-import { REST_EMPTY, REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
+import { NEW_CHAT_ID, REST_EMPTY, REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
 import '../../styles/Chat.css';
 
 class ChatView extends Component {
@@ -79,7 +79,7 @@ class ChatView extends Component {
 
                         });
                     } else {
-                        newChatId = -1;
+                        newChatId = NEW_CHAT_ID;
                         newChat = {
                             chatId: newChatId,
                             userIdFrom: this.props.currentUser.userId,

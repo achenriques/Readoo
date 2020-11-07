@@ -56,12 +56,14 @@ class ProfilePreviewModal extends Component {
                     >
                         <LS msgId='close' defaultMsg='Close'/>
                     </Button>
-                    <Button variant="contained" color="primary"
-                        onClick={this.handleChat.bind(this)}
-                        className="primaryButton"
-                    >
-                        <LS msgId='chat' defaultMsg='Go chat!'/>
-                    </Button>
+                    {(this.props.allowChat) ? (
+                        <Button variant="contained" color="primary"
+                            onClick={this.handleChat.bind(this)}
+                            className="primaryButton"
+                        >
+                            <LS msgId='chat' defaultMsg='Go chat!'/>
+                        </Button>
+                    ) : null }
                 </DialogActions>
             </Dialog>
         );

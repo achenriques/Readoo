@@ -13,7 +13,7 @@ import TextField from '@material-ui/core/TextField';
 import Send from 'material-ui/svg-icons/content/send';
 import LS from '../LanguageSelector';
 import avatarDefault from '../../resources/avatarDefault.svg';
-import { CHAT_MESSAGES_EMPTY, SERVER_ENDPOINT, 
+import { NEW_CHAT_ID, CHAT_MESSAGES_EMPTY, SERVER_ENDPOINT, 
     REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
 import '../../styles/Chat.css';
 
@@ -146,13 +146,17 @@ class MessagesView extends Component {
                 }, () => this.socketListeners(this.props.chat));
             } else if (this.props.chat !== undefined 
                         && this.state.currentChat !== null && this.props.chat.chatId !== this.state.currentChat.chatId) {
-                this.setState({
-                    ...this.state,
-                    chatMessages: [],
-                    currentChat: this.props.chat,
-                    messageText: "",
-                    loadingChatMessages: REST_DEFAULT
-                }, () => this.props.fetchChatMessages(this.props.chat.chatId, this.props.currentUserId));
+                if (!this.state.isNewChat || this.state.currentChat.chatId > NEW_CHAT_ID) {
+                    // if not is an assignation of a new id to a new chat...
+                    // fetch next messages...
+                    this.setState({
+                        ...this.state,
+                        chatMessages: [],
+                        currentChat: this.props.chat,
+                        messageText: "",
+                        loadingChatMessages: REST_DEFAULT
+                    }, () => this.props.fetchChatMessages(this.props.chat.chatId, this.props.currentUserId));
+                }
             }
         }        
     }

@@ -118,8 +118,8 @@ class UserProvider {
                             return res.status(200).json(result);
                         });
                     } else {
-                        return res.setHeader('Content-Type', 'application/json')
-                                .send(JSON.stringify(result));
+                        res.setHeader('Content-Type', 'application/json');
+                        return res.send(JSON.stringify(result));
                     }
                 }).catch(
                     function (err) {

@@ -1,11 +1,11 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userConfig = require('../util/serverOptions');
-const returnErrCode = require('../').returnErrCode;
+const functions = require('../util/functions');
 const LoginDao = require('../daos/LoginDao');
 const path = require('path');
 const UserGenreDao = require('../daos/UserGenreDao');
-const encoder64 = require('../util/functions').base64_encode;
+const { encoder64,  returnErrCode } = require('../util/functions').base64_encode;
 const resizeToIcon = require('../util/imageFormater').resizeToIcon;
 const LANGUAGE_ENGLISH = require('../util/constants').LANGUAGE_ENGLISH;
 const TOKEN_TIME = require('../util/constants').TOKEN_TIME;
@@ -17,6 +17,7 @@ class LoginProvider {
     constructor(app, db) {
         this.loginDao = new LoginDao(db);
         this.userGenreDao = new UserGenreDao(db);
+        this.returnErrCode = functions.returnErrCode;
         this.login(app);                // Post
         this.isMe(app);                 // Get
         this.logOut(app);               // Get
@@ -92,7 +93,7 @@ class LoginProvider {
                                     }
                                 }).catch(function(err) {
                                     console.error(err);
-                                    return returnErrCode(err, res);
+                                    return that.returnErrCode(err, res);
                                 });
                             } else {
                                 return res.status(401).send({ auth: false, info: 'wrong.pass'});
@@ -103,7 +104,7 @@ class LoginProvider {
                     }
                 ).catch(function(err) {
                     console.error(err);
-                    return returnErrCode(err, res);
+                    return that.returnErrCode(err, res);
                 });
             } else {
                 return res.status(400)        // HTTP status 400: BadRequest
@@ -169,11 +170,14 @@ class LoginProvider {
                                 console.error(err);
                                 return res.status(200).json(result);
                             });
+                        } else {
+                            res.setHeader('Content-Type', 'application/json');
+                            return res.status(200).json(result);
                         }
                     }
                 ).catch(function(err) {
                     console.error(err);
-                    return returnErrCode(err, res);
+                    return that.returnErrCode(err, res);
                 });
             });
         });
@@ -225,7 +229,7 @@ class LoginProvider {
                     }
                 ).catch(function(err) {
                     console.error(err);
-                    return returnErrCode(err, res);
+                    return that.returnErrCode(err, res);
                 });
             } else {
                 return res.status(400)        // HTTP status 400: BadRequest
@@ -245,7 +249,7 @@ class LoginProvider {
                     }
                 ).catch(function(err) {
                     console.error(err);
-                    return returnErrCode(err, res);
+                    return that.returnErrCode(err, res);
                 });
             } else {
                 return res.status(400)        // HTTP status 400: BadRequest
@@ -293,7 +297,7 @@ class LoginProvider {
                         }
                     }
                 ).catch(function(err) {
-                    return returnErrCode(err, res);
+                    return that.returnErrCode(err, res);
                 });
             } else {
                 return res.status(400)        // HTTP status 400: BadRequest

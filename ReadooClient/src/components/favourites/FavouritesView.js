@@ -485,10 +485,15 @@ class FavouritesView extends Component {
                                     <Divider/>
                                     {this.tableActionButtons()}
                                 </Grid>
-                                <Grid item sm={4} xs={12}>
+                                <Grid item sm={4} xs={12} className="favouritesGridRightFather">
                                     { (this.state.selectedBook != null)? (
-                                        <div className="favouritesGridRight">
-                                            <div className="favouritesRightUp">
+                                        <Grid container 
+                                            direction="column" 
+                                            alignItems="flex-start" 
+                                            justify="flex-start" 
+                                            className="favouritesGridRight"
+                                        >
+                                            <Grid item sm="auto" className="favouritesRightUp">
                                                 <IconButton className="inlineBlock floatRight" onClick={(evt) => {this.handleCloseClick(evt)}}>
                                                     <Close/>
                                                 </IconButton>
@@ -512,11 +517,11 @@ class FavouritesView extends Component {
                                                 <h3 style={{marginBottom: '15px'}}>
                                                     <LS msgId='commentaries' defaultMsg='Let´s see people´s opinion:'/>
                                                 </h3>
-                                            </div>
-                                            <div className="favouritesRightDown">
+                                            </Grid>
+                                            <Grid item sm="auto" className="favouritesRightDown">
                                                 <CommentsGrid bookId={this.state.selectedBook} commentFatherId={null} isFavorite={true}/>
-                                            </div>
-                                        </div>
+                                            </Grid>
+                                        </Grid>       
                                         ) : (
                                         <div>
                                             <Typography gutterBottom variant='headline'>
@@ -524,14 +529,14 @@ class FavouritesView extends Component {
                                             </Typography>
                                         </div>
                                         )
-                                    }
-                                </Grid>                  
-                            </Grid>
-                            <ProfilePreviewModal previewUser={this.state.previewUser} isOpen={this.state.previewUser !== null} closeCallback={this.hadleProfilePreviewClose.bind(this)} />
+                                    }    
+                                </Grid>
+                            </Grid> 
+                            <ProfilePreviewModal allowChat={false} previewUser={this.state.previewUser} isOpen={this.state.previewUser !== null} closeCallback={this.hadleProfilePreviewClose.bind(this)} />
                             <ContinueModal open={this.state.openContinueDeleteBook} text={LS.getStringMsg('continue.delete.book')} closeCallback={this.acceptDeleteBook.bind(this)} />
                             <InfoModal open={this.state.openInfoModal} text={LS.getStringMsg('success.delete.book')} closeCallback={this.closeInfoModal.bind(this)} />
                         </div>
-                    )
+                    );
                 }
 
             default: 

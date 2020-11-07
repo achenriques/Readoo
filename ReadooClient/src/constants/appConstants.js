@@ -16,6 +16,8 @@ export const pages = {
 
 export const SHORTCUT_HEIGHT_PX = 60;
 
+export const NEW_CHAT_ID = -1;  // ID assigned to new chat conversartions
+
 export const MIN_BOOK_ID = 1;
 export const NUM_OF_BOOKS = 10;
 export const NUM_OF_BOOKS_PER_REQUEST = NUM_OF_BOOKS / 2;

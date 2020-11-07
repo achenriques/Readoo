@@ -208,8 +208,13 @@ class CommentsGrid extends Component {
                     date: new Date(),
                     commentFatherId: commentFatherId,
                 };
+
                 // Write commetn in the app
-                this.props.writeComment(newComment);
+                if (newComment,commentFatherId === null 
+                            || (this.state.expandComment !== null 
+                                && this.state.expandComment === commentFatherId)) {
+                    this.props.writeComment(newComment);
+                }
                 // Send commentary to the server
                 this.props.sendCommentary(newComment);
                 // Clear text field
@@ -427,7 +432,7 @@ class CommentsGrid extends Component {
                                 {(this.isLoading() || this.isLoadingSubs()) ? <CircularProgress className="loadingIcon" size='20' /> : <ExpandMoreIcon />}
                             </Button >
                             </p>
-                            <ProfilePreviewModal previewUser={this.state.previewUser} isOpen={this.state.previewUser !== null} closeCallback={this.hadleProfilePreviewClose.bind(this)} />
+                            <ProfilePreviewModal allowChat={false} previewUser={this.state.previewUser} isOpen={this.state.previewUser !== null} closeCallback={this.hadleProfilePreviewClose.bind(this)} />
                         </div>
                     );
                 }
