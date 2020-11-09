@@ -99,7 +99,9 @@ class GenreSelector extends Component {
                                 required
                                 error={this.props.error}
                             >
-                                <LS msgId='my.genres' defaultMsg='My favourite genres'/>
+                                {(this.props.myGenres) 
+                                        ? <LS msgId='my.genres' defaultMsg='My favourite genres'/> 
+                                        : <LS msgId='book.genres' defaultMsg='What is the book genre?'/>}
                             </InputLabel>
                             <Select
                                 multiple={this.props.multiple !== undefined}

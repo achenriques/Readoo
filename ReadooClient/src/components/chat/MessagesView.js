@@ -10,7 +10,7 @@ import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
-import Send from 'material-ui/svg-icons/content/send';
+import Send from '@material-ui/icons/Send';
 import LS from '../LanguageSelector';
 import avatarDefault from '../../resources/avatarDefault.svg';
 import { NEW_CHAT_ID, CHAT_MESSAGES_EMPTY, SERVER_ENDPOINT, 

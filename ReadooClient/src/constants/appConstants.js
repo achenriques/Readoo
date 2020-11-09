@@ -16,6 +16,8 @@ export const pages = {
 
 export const SHORTCUT_HEIGHT_PX = 60;
 
+export const DEFAULT_BOOK_ID = -1;  // Default book id. Stored on client side
+export const FAILURE_BOOK_ID = -2;  // Default book id in case of fetch failure. Stored on client side
 export const NEW_CHAT_ID = -1;  // ID assigned to new chat conversartions
 
 export const MIN_BOOK_ID = 1;

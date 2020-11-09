@@ -12,24 +12,27 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Collapse from '@material-ui/core/Collapse';
-import ArrowLeft from 'material-ui/svg-icons/navigation/chevron-left';
-import ArrowRight from 'material-ui/svg-icons/navigation/chevron-right';
+import ArrowLeft from '@material-ui/icons/ChevronLeft';
+import ArrowRight from '@material-ui/icons/ChevronRight';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import Favorite from 'material-ui/svg-icons/action/favorite';
-import ExpandMoreIcon from 'material-ui/svg-icons/navigation/expand-more';
-import ExpandLessIcon from 'material-ui/svg-icons/navigation/expand-less';
+import Favorite from '@material-ui/icons/Favorite';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpandLessIcon from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
 import CommentsGrid from '../common/CommentsGrid';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import LS from '../LanguageSelector';
-import { NUM_OF_BOOKS_PER_REQUEST, MIN_BOOK_ID, DISPLAY_NONE, LANGUAGE_SPANISH } from '../../constants/appConstants';
+import { DEFAULT_BOOK_ID, FAILURE_BOOK_ID, NUM_OF_BOOKS_PER_REQUEST, 
+    MIN_BOOK_ID, DISPLAY_NONE, LANGUAGE_SPANISH } from '../../constants/appConstants';
 import noBookDefaultEs from '../../resources/loadingBookEs.svg';
 import noBookDefaultEn from '../../resources/loadingBookEn.svg';
 import bookDefault from '../../resources/bookDefault.gif';
+import isEmptyEN from '../../resources/emptyBookstore_en.png';
+import isEmptyES from '../../resources/emptyBookstore_es.png';
+import noInternetEN from '../../resources/noInternet_en.png';
+import noInternetES from '../../resources/noInternet_es.png';
 import material_styles from './material_styles';
 import '../../styles/Explorer.css';
-
-const FIRST_TIME_BOOK_ID = -1;
 
 class ExploreView extends Component {
 
@@ -48,6 +51,7 @@ class ExploreView extends Component {
         },
         likeBook: false,
         bookCoverErr: false,
+        currentLanguage: null,
         showHeart: 0,  // 0 no mostrar, 1 red, 2 black
         expanded: false,
         showScrollButton: false
@@ -55,28 +59,51 @@ class ExploreView extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { ...this.initilState };
+        this.state = { 
+            ...this.initilState, 
+            currentLanguage: props.appLanguage 
+        };
         this.cardRootRef = React.createRef();
     };
 
     loadCurrentBookFromProps (props) {
-        console.log(props.shownBooks[props.bookIndex]);
-        if (props.shownBooks.length > 0 || props.bookIndex > -1) {
+        if (props.shownBooks.length > 0 || props.bookIndex > DEFAULT_BOOK_ID) {
+            let bookId = props.shownBooks[props.bookIndex].bookId
             let bookCoverUrl;
+            let bookCoverErr = "";
             if (props.shownBooks.length === 1) {
-                bookCoverUrl = props.shownBooks[props.bookIndex].bookCoverUrl;
+                if (bookId === DEFAULT_BOOK_ID) {
+                    bookCoverUrl = (this.props.appLanguage === LANGUAGE_SPANISH)
+                            ? isEmptyES : isEmptyEN;
+                } else if (bookId === FAILURE_BOOK_ID) {
+                    bookCoverUrl = (this.props.appLanguage === LANGUAGE_SPANISH)
+                            ? noInternetES : noInternetEN;
+                } else {
+                    bookCoverUrl = props.shownBooks[props.bookIndex].bookCoverUrl;
+                }
             } else if (props.shownBooks[props.bookIndex].bookCoverUrl) {
                 bookCoverUrl = props.shownBooks[props.bookIndex].bookCoverUrl;
             } else {
                 bookCoverUrl =  bookDefault;
+                bookCoverErr = LS.getStringMsg('couldnt.get.image', 'Image didn´t load properly');
             }
             
+            let bookTitle;
+            let bookAuthor;
+            if (bookId === DEFAULT_BOOK_ID) {
+                bookTitle = LS.getStringMsg(props.shownBooks[props.bookIndex].bookTitle);
+                bookAuthor = LS.getStringMsg(props.shownBooks[props.bookIndex].bookAuthor);
+            } else {
+                bookTitle = props.shownBooks[props.bookIndex].bookTitle;
+                bookAuthor = props.shownBooks[props.bookIndex].bookAuthor;
+            }
+
             this.setState({
                 ...this.state,
                 currentBook: {
-                    bookId: props.shownBooks[props.bookIndex].bookId,
-                    bookTitle: props.shownBooks[props.bookIndex].bookTitle,
-                    bookAuthor: props.shownBooks[props.bookIndex].bookAuthor,
+                    bookId: bookId,
+                    bookTitle: bookTitle,
+                    bookAuthor: bookAuthor,
                     bookCoverUrl: bookCoverUrl,
                     bookDescription: props.shownBooks[props.bookIndex].bookDescription,
                     bookReview: props.shownBooks[props.bookIndex].bookReview,
@@ -84,16 +111,16 @@ class ExploreView extends Component {
                     bookLikes: +props.shownBooks[props.bookIndex].bookLikes,
                     userLikesBook: +props.shownBooks[props.bookIndex].userLikesBook
                 },
-                bookCoverErr: (!props.shownBooks[props.bookIndex].bookCoverUrl) 
-                        ? LS.getStringMsg('couldnt.get.image', 'Image didn´t load properly') : '',
-                likeBook: props.shownBooks[props.bookIndex].userLikesBook == true
+                bookCoverErr: bookCoverErr,
+                likeBook: props.shownBooks[props.bookIndex].userLikesBook == true,
+                currentLanguage: this.props.appLanguage
             });
         }
     }
 
     componentDidMount() {
         if (this.props.currentUserId && this.props.currentUserGenres) {
-            this.props.fetchBooks(this.props.currentUserId, FIRST_TIME_BOOK_ID, this.props.currentUserGenres, true);
+            this.props.fetchBooks(this.props.currentUserId, DEFAULT_BOOK_ID, this.props.currentUserGenres, true);
         } else {
             // throw err
             this.props.reportErrorMessage(LS.getStringMsg('please.reload', 'An error has occurred!'));
@@ -104,6 +131,7 @@ class ExploreView extends Component {
                 ...this.state,
                 currentBook: {
                     ...this.state.currentBook,
+                    currentLanguage: currentLanguage,
                     bookCoverUrl: LANGUAGE_SPANISH === currentLanguage ? noBookDefaultEs : noBookDefaultEn
                 }
             })
@@ -115,8 +143,9 @@ class ExploreView extends Component {
         if (this.props.shownBooks.length 
                 && !this.state.isPreviousBook
                 && this.props.shownBooks[this.props.bookIndex] !== undefined
-                && this.state.currentBook.bookId !== this.props.shownBooks[this.props.bookIndex].bookId) {
-            this.loadCurrentBookFromProps (this.props);
+                && (this.state.currentBook.bookId !== this.props.shownBooks[this.props.bookIndex].bookId 
+                        || this.state.currentLanguage !== this.props.appLanguage)) {
+            this.loadCurrentBookFromProps(this.props);
         }
     }
 

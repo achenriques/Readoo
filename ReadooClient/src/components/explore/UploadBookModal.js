@@ -299,11 +299,13 @@ class UploadBookModal extends Component {
                                         genresSelected={this.state.addBookGenre}
                                         error={this.state.error.addBookGenre !== ""}
                                         onChange={this.onChangeGenre.bind(this)}
+                                        myGenres={false}
                                     /><br />                                
                                     <TextField
                                         name="addBookDescription"
                                         id="addBookDescription"
                                         label={<LS msgId='book.description' defaultMsg='Book description' params={(this.state.addBookDescription != null) ? [140 - this.state.addBookDescription.length] : [140]}/>}
+                                        placeholder={LS.getStringMsg('book.description.placeholder', 'Do not tell spoilers!')}
                                         rowsMax="4"
                                         fullWidth
                                         inputProps={{

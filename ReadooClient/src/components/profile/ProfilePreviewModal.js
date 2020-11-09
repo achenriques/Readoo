@@ -23,16 +23,20 @@ class ProfilePreviewModal extends Component {
         this.state = { ...this.initialState };
     };
 
-    handleClose = () => {
+    handleClose() {
         // Calback onClose
         if (this.props.closeCallback !== undefined && typeof this.props.closeCallback === "function") {
             this.props.closeCallback();
         }
     };
 
-    handleChat = () => {
+    handleChat() {
         this.props.goChatWith(this.props.previewUser);
         this.handleClose();
+    }
+
+    allowChat() {
+        return this.props.allowChat && +this.props.currentUserId !== +this.props.previewUser;
     }
 
     render() {
@@ -56,7 +60,7 @@ class ProfilePreviewModal extends Component {
                     >
                         <LS msgId='close' defaultMsg='Close'/>
                     </Button>
-                    {(this.props.allowChat) ? (
+                    {(this.allowChat()) ? (
                         <Button variant="contained" color="primary"
                             onClick={this.handleChat.bind(this)}
                             className="primaryButton"

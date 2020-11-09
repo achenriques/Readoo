@@ -9,7 +9,7 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import IconButton from '@material-ui/core/IconButton';
 import Popper from '@material-ui/core/Popper';
-import Help from 'material-ui/svg-icons/action/help';
+import Help from '@material-ui/icons/Help';
 import LS from '../LanguageSelector';
 import GenreSelector from '../common/GenreSelector';
 import ContinueModal from '../common/ContinueModal';
@@ -585,7 +585,8 @@ class ProfileView extends Component {
                                             readOnly={this.state.isPreview}
                                             multiple
                                             genresSelected={this.state.userGenres} 
-                                            onChange={this.onChangeGenre.bind(this)} 
+                                            onChange={this.onChangeGenre.bind(this)}
+                                            myGenres={true}
                                         />
                                     </Paper>
                                 </RootRef>

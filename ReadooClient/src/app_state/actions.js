@@ -96,10 +96,12 @@ const resetProccess = (proccessName) => ({
     }
 });
 
-const changeLanguage = (languageCode) => {
+const changeLanguage = (languageCode, userIsLogin) => {
 
      // we do not need to wait a respose
-     loginApi.setLanguageSelected(languageCode);
+     if (userIsLogin) {
+        loginApi.setLanguageSelected(languageCode);
+     }
 
     return {
         type: actionTypes.CHANGE_LANGUAGE,

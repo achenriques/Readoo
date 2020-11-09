@@ -12,13 +12,14 @@ import Grid from '@material-ui/core/Grid';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
-import FirstPageIcon from 'material-ui/svg-icons/navigation/first-page';
-import KeyboardArrowLeft from 'material-ui/svg-icons/navigation/chevron-left';
-import KeyboardArrowRight from 'material-ui/svg-icons/navigation/chevron-right';
-import LastPageIcon from 'material-ui/svg-icons/navigation/last-page';
-import Favorite from 'material-ui/svg-icons/action/favorite';
-import { Avatar, Divider } from '@material-ui/core';
-import Close from 'material-ui/svg-icons/content/clear';
+import FirstPageIcon from '@material-ui/icons/FirstPage';
+import KeyboardArrowLeft from '@material-ui/icons/ChevronLeft';
+import KeyboardArrowRight from '@material-ui/icons/ChevronRight';
+import LastPageIcon from '@material-ui/icons/LastPage';
+import Favorite from '@material-ui/icons/Favorite';
+import Close from '@material-ui/icons/Clear';
+import Avatar from '@material-ui/core/Avatar';
+import Divider from '@material-ui/core/Divider';
 import LS from '../LanguageSelector';
 import CommentsGrid from '../common/CommentsGrid';
 import ProfilePreviewModal from '../profile/ProfilePreviewModal';
@@ -532,7 +533,7 @@ class FavouritesView extends Component {
                                     }    
                                 </Grid>
                             </Grid> 
-                            <ProfilePreviewModal allowChat={false} previewUser={this.state.previewUser} isOpen={this.state.previewUser !== null} closeCallback={this.hadleProfilePreviewClose.bind(this)} />
+                            <ProfilePreviewModal allowChat={true} previewUser={this.state.previewUser} isOpen={this.state.previewUser !== null} closeCallback={this.hadleProfilePreviewClose.bind(this)} />
                             <ContinueModal open={this.state.openContinueDeleteBook} text={LS.getStringMsg('continue.delete.book')} closeCallback={this.acceptDeleteBook.bind(this)} />
                             <InfoModal open={this.state.openInfoModal} text={LS.getStringMsg('success.delete.book')} closeCallback={this.closeInfoModal.bind(this)} />
                         </div>

@@ -1,7 +1,5 @@
 import { combineReducers } from 'redux';
 import * as constants from '../constants/appConstants';
-import isEmpty from '../resources/isEmpty.png';
-import noInternet from '../resources/noInternet.png';
 import { actionTypes } from './actions';
 import { getStringMsg } from '../components/LanguageSelector';
 
@@ -52,20 +50,20 @@ const initialState = {
     },
     books: {
         bookDefault: {
-            bookId: -1,
-            bookTitle : 'Has explorados todos los books de tus deseos.',
-            bookAuthor: 'Prueba a cambiar tus filtos en tu perfil de usuario.',
-            bookCoverUrl: isEmpty,
+            bookId: constants.DEFAULT_BOOK_ID,
+            bookTitle : 'no.books.explore',
+            bookAuthor: 'change.perfil.data',
+            bookCoverUrl: null,
             descripcion: '',
             review: '',
             bookLikes: 0,
             userLikesBook: false
         },
-        libroFailure: {
-            bookId: -1,
-            bookTitle : 'Jope! Se ha producido un error de red...',
-            bookAuthor: 'Prueba a refrescar la aplicación o espera a que el problema se resuelva.',
-            bookCoverUrl: noInternet,
+        bookFailure: {
+            bookId: constants.FAILURE_BOOK_ID,
+            bookTitle : 'network.error',
+            bookAuthor: 'error.refresh.app',
+            bookCoverUrl: null,
             descripcion: '',
             review: '',
             bookLikes: 0,
@@ -390,7 +388,7 @@ const books = (state = initialState.books, { type, payload, data }) => {
             console.log(failureType(actionTypes.FETCH_BOOKS));
             return {
                 ...state,
-                shownBooks: [ state.libroFailure ],
+                shownBooks: [ state.bookFailure ],
                 success_fetch: false,
             };
 
