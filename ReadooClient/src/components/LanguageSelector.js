@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as appState from '../app_state/reducers';
+import * as appState from '../app_state/reducers/index';
 import { changeLanguage } from '../app_state/actions';
 import stringResources from '../resources/stringResources';
 import { LANGUAGE_ENGLISH } from '../constants/appConstants';

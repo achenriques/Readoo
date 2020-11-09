@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as appState from '../app_state/reducers';
+import * as appState from '../app_state/reducers/index';
 import LS from './LanguageSelector';
 import { pages, LANGUAGE_ENGLISH, LANGUAGE_SPANISH } from '../constants/appConstants';
 import '../styles/Footer.css';

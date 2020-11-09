@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as appState from '../../app_state/reducers';
+import * as appState from '../../app_state/reducers/index';
 import { 
     favouritePageRequest, fetchFavourites, 
     doLikeBook, doDislikeBook, unsubscribeBook,
@@ -242,7 +242,6 @@ class FavouritesView extends Component {
     handleAvatarClick(evt, userId) {
         evt.stopPropagation();
         if (userId) {
-            console.log("I made click on avatar: " + userId);
             this.setState({
                 ...this.state,
                 previewUser: userId
@@ -325,7 +324,7 @@ class FavouritesView extends Component {
     }
 
     // returns the style of favourite hearts
-    heartType = (bookId) => {
+    heartType(bookId) {
         let heartStyle = {};
         if (this.state.dislikeBooks.includes(bookId)) {
             heartStyle = { fill: 'black', fontSize:'15px' };
@@ -345,7 +344,7 @@ class FavouritesView extends Component {
         const { total, page, booksPerPage } = this.state;
 
         return (
-            <div className="favouriteFoot">
+            <div className={(this.state.total > 0) ? "favouriteFoot" : "favouriteFootEmpty"}>
                 <div className="favouriteSelector">
                     <FavouritesSelector
                         disabled={this.isLoading(actionTypes.FETCH_FAVOURITES)}
@@ -365,39 +364,40 @@ class FavouritesView extends Component {
                                 <LS msgId='delete.book' defaultMsg='Delete my book!'/>
                             </Button>
                         </div>) : (<div/>)}
-                <div className="favouritePages">
-                    <span>
-                        <LS msgId='page.one.of' defaultMsg={"Page: " + this.state.page + 1} params={[this.state.page + 1, Math.ceil(this.state.total/this.state.booksPerPage)]}/>
-                    </span>
-                    <IconButton
-                        onClick= {(evt) => {this.handleChangePage(evt, constants.FIRST_PAGE)}}
-                        disabled={page === 0}
-                        aria-label={LS.getStringMsg('first.page', 'To First Page')}
-                    >
-                        <FirstPageIcon />
-                    </IconButton>
-                    <IconButton
-                        onClick={(evt) => {this.handleChangePage(evt, constants.BEFORE_PAGE)}}
-                        disabled={page === 0}
-                        aria-label={LS.getStringMsg('before.page', 'To Page Before')}
-                    >
-                        <KeyboardArrowLeft />
-                    </IconButton>
-                    <IconButton
-                        onClick={(evt) => {this.handleChangePage(evt, constants.NEXT_PAGE)}}
-                        disabled={page >= Math.ceil(total / booksPerPage) - 1}
-                        aria-label={LS.getStringMsg('next.page', 'To Page Next')}
-                    >
-                        <KeyboardArrowRight />
-                    </IconButton>
-                    <IconButton
-                        onClick={(evt) => {this.handleChangePage(evt, constants.LAST_PAGE)}}
-                        disabled={page >= Math.ceil(total / booksPerPage) - 1}
-                        aria-label={LS.getStringMsg('last.page', 'To Last Before')}
-                    >
-                        <LastPageIcon />
-                    </IconButton>
-                </div>
+                {(this.state.total > 0)
+                    ? ( <div className="favouritePages">
+                            <span>
+                                <LS msgId='page.one.of' defaultMsg={"Page: " + this.state.page + 1} params={[this.state.page + 1, Math.ceil(this.state.total/this.state.booksPerPage)]}/>
+                            </span>
+                            <IconButton
+                                onClick= {(evt) => {this.handleChangePage(evt, constants.FIRST_PAGE)}}
+                                disabled={page === 0}
+                                aria-label={LS.getStringMsg('first.page', 'To First Page')}
+                            >
+                                <FirstPageIcon />
+                            </IconButton>
+                            <IconButton
+                                onClick={(evt) => {this.handleChangePage(evt, constants.BEFORE_PAGE)}}
+                                disabled={page === 0}
+                                aria-label={LS.getStringMsg('before.page', 'To Page Before')}
+                            >
+                                <KeyboardArrowLeft />
+                            </IconButton>
+                            <IconButton
+                                onClick={(evt) => {this.handleChangePage(evt, constants.NEXT_PAGE)}}
+                                disabled={page >= Math.ceil(total / booksPerPage) - 1}
+                                aria-label={LS.getStringMsg('next.page', 'To Page Next')}
+                            >
+                                <KeyboardArrowRight />
+                            </IconButton>
+                            <IconButton
+                                onClick={(evt) => {this.handleChangePage(evt, constants.LAST_PAGE)}}
+                                disabled={page >= Math.ceil(total / booksPerPage) - 1}
+                                aria-label={LS.getStringMsg('last.page', 'To Last Before')}
+                            >
+                                <LastPageIcon />
+                            </IconButton>
+                        </div>) : (<div/>)}
             </div>
         );
     }
@@ -542,8 +542,11 @@ class FavouritesView extends Component {
 
             default: 
                 return (
-                    <div className="loadingNewTab">
-                        <h3><LS msgId='no.books.yet' defaultMsg='Are you a hater or you just do not like anything?'/></h3>
+                    <div>
+                        <div className="loadingNewTab">
+                            <h3><LS msgId='no.books.yet' defaultMsg='Are you a hater or you just do not like anything?'/></h3>
+                        </div>
+                        {this.tableActionButtons()}
                     </div>
                 );
         }

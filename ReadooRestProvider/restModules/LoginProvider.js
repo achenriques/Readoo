@@ -73,7 +73,7 @@ class LoginProvider {
                                                 userData: result
                                             });
                                         }).catch(function (err) {
-                                            console.log(err);
+                                            console.error(err);
                                             // return statement
                                             return res.cookie('token', token, { httpOnly: true }).status(200).json({
                                                 success: true,
@@ -261,7 +261,6 @@ class LoginProvider {
     newUser(app) {
         const that = this;
         app.post('/login/new', function (req, res) {
-            console.log("Estoy insertando " + req.body.userNickEmail);     
             if (req.body.userNickEmail && req.body.pass && req.body.email) {
                 let userEmail = req.body.email.trim();
                 let userLanguage = req.body.language;
@@ -284,7 +283,7 @@ class LoginProvider {
                                     console.log("Registered user with ID: " + result.userId + " logged at " + new Date().toString());
                                 }
                             ).catch(function (err) {
-                                console.log("Error at saving log register: " + err);
+                                console.warn("WARN: Error at saving log register: " + err);
                             });
                             // return ...
                             return res.cookie('token', token, { httpOnly: true }).status(200).json({
@@ -293,7 +292,7 @@ class LoginProvider {
                                 userId: result.insertId
                             });
                         } else {
-                            console.log("Not user saved. Something did not work!");
+                            console.warn("Not user saved. Something did not work!");
                         }
                     }
                 ).catch(function(err) {
@@ -309,7 +308,6 @@ class LoginProvider {
     selectTab(app) {
         const that = this;
         app.post('/login/tabSelector', function (req, res) {
-            console.log("Estoy con tabSelector " + req.body.tabSelector);  
             let tabSelector = req.body.tabSelector;   
             if (tabSelector != null) {
                 // Save on the token the current tab ID
@@ -356,7 +354,6 @@ class LoginProvider {
     selectLanguage(app) {
         const that = this;
         app.post('/login/languageSelector', function (req, res) {
-            console.log("Estoy con languageSelector " + req.body.languageSelector);  
             let languageCode = req.body.languageCode;   
             if (languageCode != null) {
                 // Save on the token the current tab ID
@@ -385,11 +382,9 @@ class LoginProvider {
                     } else {
                         // If language selector is not null or undefined this selector will be saved on the cookie
                         that.loginDao.changeUserLanguage(+decoded.userId, +languageCode).then(
-                            function (resultLog) {
-                                console.log("Changed language");
-                            }
+                            function (resultLog) {}
                         ).catch(function (err) {
-                            console.log("Error at changing user language");
+                            console.error("Error at changing user language");
                             console.error(err);
                         });
                         if (decoded.languageCode != +languageCode) {

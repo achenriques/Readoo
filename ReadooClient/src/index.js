@@ -6,7 +6,7 @@ import JssProvider from 'react-jss/lib/JssProvider';
 import { create } from 'jss';
 import { createGenerateClassName, jssPreset } from '@material-ui/core/styles';
 import { Provider } from 'react-redux';
-import appReducer from './app_state/reducers';
+import appReducer from './app_state/reducers/index';
 import { createStore, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import promiseMiddleware from 'redux-promise-action-middleware'

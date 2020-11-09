@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { goChatWith } from '../../app_state/actions';
-import * as appState from '../../app_state/reducers';
+import * as appState from '../../app_state/reducers/index';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';

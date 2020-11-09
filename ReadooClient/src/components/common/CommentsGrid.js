@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchCommentaries, fetchSubCommentaries, writeComment, sendComment, actionTypes } from '../../app_state/actions';
-import * as appState from '../../app_state/reducers';
+import * as appState from '../../app_state/reducers/index';
 import Grid from '@material-ui/core/Grid';
 import { GridList, GridListTile, GridListTileBar } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
@@ -209,9 +209,9 @@ class CommentsGrid extends Component {
                 };
 
                 // Write commetn in the app
-                if (newComment,commentFatherId === null 
-                            || (this.state.expandComment !== null 
-                                && this.state.expandComment === commentFatherId)) {
+                if (newComment.commentFatherId === null 
+                            || this.state.expandComment === null 
+                            || this.state.expandComment === commentFatherId) {
                     this.props.writeComment(newComment);
                 }
                 // Send commentary to the server
@@ -233,7 +233,6 @@ class CommentsGrid extends Component {
     }
 
     handleCollapseSubs(evt, commentaryId) {
-        console.log("I made click on show subcommentaries of: " + commentaryId);
         if (commentaryId !== null) {
             if (this.state.expandComment === commentaryId) {
                 // Close the expand
@@ -267,7 +266,6 @@ class CommentsGrid extends Component {
     handleAvatarClick(evt, userId) {
         evt.stopPropagation();
         if (userId) {
-            console.log("I made click on avatar: " + userId);
             this.setState({
                 ...this.state,
                 previewUser: +userId

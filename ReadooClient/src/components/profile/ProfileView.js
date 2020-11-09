@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { actionTypes, fetchUserData, checkEmailIsUnique, setEmailIsUniqueFalse, saveUserData, dissableUser, resetProccess, doLogOut } from '../../app_state/actions';
-import * as appState from '../../app_state/reducers';
+import { actionTypes, fetchUserData, checkEmailIsUnique, setEmailIsUniqueFalse, 
+    saveUserData, dissableUser, resetProccess, doLogOut } from '../../app_state/actions';
+import * as appState from '../../app_state/reducers/index';
 import RootRef from '@material-ui/core/RootRef';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';

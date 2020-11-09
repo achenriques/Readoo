@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as appState from '../../app_state/reducers';
+import * as appState from '../../app_state/reducers/index';
 import Grid from '@material-ui/core/Grid';
 import LS from '../LanguageSelector';
 import { REST_FAILURE, REST_DEFAULT, REST_SUCCESS, REST_EMPTY, DISPLAY_NONE } from '../../constants/appConstants';

@@ -1,6 +1,10 @@
 import { REST_FAILURE, REST_DEFAULT, REST_SUCCESS, 
     FILE_BYTE_LIMIT, LANGUAGE_ENGLISH, LANGUAGE_SPANISH } from '../constants/appConstants';
 
+export const failureType = (actionType) => `${actionType}_FAILURE`;
+export const loadingType = (actionType) => `${actionType}_LOADING`;
+export const successType = (actionType) => `${actionType}_SUCCESS`;
+
 /*
  *  Remove a proccess from the proccesses list and at the end returns where the proccess was if it was found in other cases returns null.
  * If the actionsReference is avoided the process will not be removed yet

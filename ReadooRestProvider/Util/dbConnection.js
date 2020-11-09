@@ -17,7 +17,7 @@ class Connection
       database: 'readoo_db',
       connectionLimit: 50
     });
-    console.log("Building DB connection pool");
+    console.info("Building DB connection pool");
   }
 
   getConn(connect)

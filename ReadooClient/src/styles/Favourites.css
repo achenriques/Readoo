@@ -132,6 +132,11 @@
     text-align: center;
 }
 
+.favouriteFootEmpty {
+    position: absolute;
+    bottom: 3%;
+}
+
 .favouriteSelector {
     position: inline-block;
     float: left;

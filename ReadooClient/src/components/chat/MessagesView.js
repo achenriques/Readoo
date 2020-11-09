@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchChatMessages, reportErrorMessage, actionTypes } from '../../app_state/actions';
-import * as appState from '../../app_state/reducers';
+import * as appState from '../../app_state/reducers/index';
 import io from 'socket.io-client';
 import { parseDate, compareArrays } from '../../utils/appUtils';
 import RootRef from '@material-ui/core/RootRef';

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchChatHistory, recivedChatWith, deleteChat, actionTypes, fetchChatMessages } from '../../app_state/actions';
-import * as appState from '../../app_state/reducers';
+import * as appState from '../../app_state/reducers/index';
 import { parseDate } from '../../utils/appUtils';
 import Paper from '@material-ui/core/Paper';
 import List from '@material-ui/core/List';

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchBooks, nextBook, doLikeBook, doDislikeBook, 
     reportErrorMessage, actionTypes } from '../../app_state/actions';
-import * as appState from '../../app_state/reducers';
+import * as appState from '../../app_state/reducers/index';
 import RootRef from '@material-ui/core/RootRef';
 import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';

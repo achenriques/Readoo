@@ -21,11 +21,11 @@ class DaoManager {
                     if (err) {
                         if (err.code == 'ER_DUP_ENTRY') {
                             console.log('Duplicated Entry!'); 
-                            console.log(err);
+                            console.error(err);
                             reject(constants.QUERY_ERROR_DUPLICATE_ENTRY);
                         } else {
                             console.log('Query Error!');
-                            console.log(err);
+                            console.error(err);
                             reject(constants.QUERY_ERROR);
                         }
                     } else {
@@ -37,11 +37,11 @@ class DaoManager {
                     }
                 });
             }, function (error) {
-                console.log(error);
+                console.error(error);
                 reject(constants.DB_CONNECTION_FAIL);
             }).catch (
                 function (que) {
-                    console.log(error);
+                    console.error(error);
                     reject(constants.DB_CONNECTION_FAIL);
                 }
             );
@@ -64,7 +64,7 @@ class DaoManager {
                                 //Failure
                             });
                             console.log('Create Transaction Error!');
-                            console.log(err);
+                            console.error(err);
                             reject(constants.QUERY_ERROR);
                         } else {
                             for (let f of  executeStatmentFunctionsParametersLists) {
@@ -88,12 +88,12 @@ class DaoManager {
                         }
                     });
                 }, function (error) {
-                    console.log(error);
+                    console.error(error);
                     reject(constants.DB_CONNECTION_FAIL);
                 }
             ).catch (
                 function (err) {
-                    console.log(err);
+                    console.error(err);
                     reject(constants.DB_CONNECTION_FAIL);
                 }
             );

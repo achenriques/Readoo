@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchUserData, doLogin, doRegister, checkNickIsUnique, setNickIsUniqueFalse,
         checkEmailIsUnique, setEmailIsUniqueFalse} from '../../app_state/actions';
-import * as appState from '../../app_state/reducers';
+import * as appState from '../../app_state/reducers/index';
 import LS from '../LanguageSelector';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';

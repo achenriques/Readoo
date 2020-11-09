@@ -19,7 +19,7 @@ const resizeImage = function (imagePath, width, height, keepRatio) {
                         .quality(90)
                         .getBase64(jimp.MIME_PNG, function (err, src) {
                             if (err) {
-                                console.log(err);
+                                console.warn(err);
                                 reject(err);
                             }
                             resolve(src);
@@ -32,7 +32,7 @@ const resizeImage = function (imagePath, width, height, keepRatio) {
                         .quality(90)
                         .getBase64(jimp.MIME_PNG, function (err, src) {
                             if (err) {
-                                console.log(err);
+                                console.warn(err);
                                 reject(err);
                             }
                             resolve(src);

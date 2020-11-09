@@ -20,8 +20,7 @@ class ChatProvider {
         });
 
         this.io.on('connection', (socket) => {
-            console.log(socket);
-            console.log('a user connected');
+            console.log('a user connected to socket with id: ' + socket.id);
             socket.emit("socketId", socket.id);
 
             // resend message to other client

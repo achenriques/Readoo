@@ -1,7 +1,7 @@
 // Read .env file
 const dotenv = require('dotenv').config();
 if (dotenv.error) {
-     console.log("Something goes wrong at reading .env file: " + dotenv.error);
+     console.error("Something goes wrong at reading .env file: " + dotenv.error);
 }
 // Express
 const http = require("http");
@@ -74,5 +74,5 @@ new UserReportsBookProvider(app, db);
 
 // All services are now listening in the port 3030
 server.listen(3030, function () {
-  console.log('App is listening on port 3030!');
+  console.info('App is listening on port 3030!');
 });

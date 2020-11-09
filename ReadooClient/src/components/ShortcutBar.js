@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import * as appState from '../app_state/reducers';
+import * as appState from '../app_state/reducers/index';
 import { changeTab, changeLanguage, doLogOut } from '../app_state/actions';
 import { connect } from 'react-redux';
 import BottomNavigation from '@material-ui/core/BottomNavigation';
@@ -49,7 +49,7 @@ class ShortcutBar extends Component {
                         <img src={logo} className='readooIcon'/>
                         <h4>READOO</h4>
                     </Grid>
-                    <Grid item sm={1} xs={1} >
+                    <Grid item sm={1} xs={1} className="flexB">
                         {(this.props.loading > 0) ? <CircularProgress className="loadingIcon" size='20' /> : <div/>}
                     </Grid>
                     <Grid item sm={8} xs={6} >
@@ -98,7 +98,7 @@ class ShortcutBar extends Component {
                             />
                         </BottomNavigation>
                     </Grid>
-                    <Grid item sm={1} xs={2} >
+                    <Grid item sm={1} xs={2} className="flexBasicsAuto">
                         {(this.props.userIsLogged) ? (
                             <BottomNavigationAction 
                                 label={<LS msgId='log.out' defaultMsg='Log Out'/>}

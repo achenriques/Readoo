@@ -253,8 +253,6 @@ div#appDiv {
     transform: translate(-50%, -50%);
 }
 
-/*
-.divCommentaryAnswerSubCommentary {
-
+.flexBasicsAuto {
+    flex-basis: auto;
 }
-*/

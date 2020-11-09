@@ -114,7 +114,7 @@ class UserProvider {
                             res.setHeader('Content-Type', 'application/json');
                             return res.send(JSON.stringify(result));
                         }).catch(function (err) {
-                            console.log(err);
+                            console.error(err);
                             return res.status(200).json(result);
                         });
                     } else {
