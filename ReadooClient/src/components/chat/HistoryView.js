@@ -127,6 +127,16 @@ class ChatView extends Component {
     }
 
     acceptDeleteChat(deleteChatId) {
+        if (deleteChatId === NEW_CHAT_ID) {
+            let newChatHistory = this.state.chatHistory.filter(c => +c.chatId !== NEW_CHAT_ID);
+            this.setState({
+                ...this.state,
+                newChat: null,
+                selectedChatId: null,
+                currentChat: null,
+                chatHistory: newChatHistory
+            });
+        }
         this.props.deleteChat(deleteChatId, this.props.currentUserId);
     }
 

@@ -41,6 +41,7 @@ const actionTypes = {
     RECIVED_GO_CHAT_WITH: 'RECIVED_GO_CHAT_WITH',
     FETCH_CHAT_HISTORY: 'FETCH_CHAT_HISTORY',
     FETCH_CHAT_MESSAGES: 'FETCH_CHAT_MESSAGES',
+    CLOSE_CONVERSATION: 'CLOSE_CONVERSATION',
     DELETE_CHAT: 'DELETE_CHAT',
     DELETE_BOOK: 'DELETE_BOOK',
     RESET_LOADS: 'RESET_LOADS',
@@ -303,6 +304,10 @@ const recivedChatWith = () => ({
     type: actionTypes.RECIVED_GO_CHAT_WITH
 });
 
+const closeConversation = () => ({
+    type: actionTypes.CLOSE_CONVERSATION
+})
+
 const reportErrorMessage = (errorMsg) => ({
     type: actionTypes.REPORT_ERROR_MESSAGE,
     payload: { errorMsg }
@@ -350,5 +355,6 @@ export {
     deleteChat,
     goChatWith,
     recivedChatWith,
+    closeConversation,
     reportErrorMessage
 };

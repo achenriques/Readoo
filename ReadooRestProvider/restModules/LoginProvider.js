@@ -280,7 +280,7 @@ class LoginProvider {
                             // Save date of login of all users.
                             that.loginDao.registerLog(+result.insertId).then(
                                 function (resultLog) {
-                                    console.log("Registered user with ID: " + result.userId + " logged at " + new Date().toString());
+                                    console.log("Registered user with ID: " + result.insertId + " logged at " + new Date().toString());
                                 }
                             ).catch(function (err) {
                                 console.warn("WARN: Error at saving log register: " + err);

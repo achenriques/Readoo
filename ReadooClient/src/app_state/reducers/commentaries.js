@@ -56,7 +56,7 @@ export default (state = initialState.commentaries, { type, payload, data }) => {
                 let copyOfSubCommentaries = state.bookSubCommentaries.slice();
                 copyOfSubCommentaries.unshift(payload.newComment);
                 let theFather = copyOfCommentaries.find((c => c.commentId === payload.newComment.commentFatherId));
-                theFather.nSubCommentaries = theFather.nSubCommentaries + 1;
+                theFather.nSubCommentaries = +theFather.nSubCommentaries + 1;
                 return {
                     ...state,
                     bookSubCommentaries: copyOfSubCommentaries,

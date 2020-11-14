@@ -1,6 +1,7 @@
 import { initialState } from './index';
 import { actionTypes } from '../actions';
-import {successType } from '../../utils/appUtils';
+import { successType } from '../../utils/appUtils';
+import * as constants from '../../constants/appConstants';
 
 // This is a reducer that managers all reducers from the top level
 export default (state = initialState, { type, payload, data, err }) => {

@@ -1,5 +1,6 @@
 import { initialState } from './index';
 import { actionTypes } from '../actions';
+import * as constants from '../../constants/appConstants';
 import { failureType, successType } from '../../utils/appUtils';
 
 /**
@@ -46,6 +47,12 @@ export default (state = initialState.chat, { type, payload, data }) => {
                     ...state,
                     chatMessages: null
                 };
+
+        case actionTypes.CLOSE_CONVERSATION:
+            return {
+                ...state,
+                chatMessages: constants.CHAT_MESSAGES_EMPTY
+            }
 
         case successType(actionTypes.DELETE_CHAT):
             let newChatHistory = state.chatHistory.filter(c => c.chatId !== payload.chatId);

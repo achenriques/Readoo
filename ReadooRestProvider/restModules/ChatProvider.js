@@ -21,16 +21,19 @@ class ChatProvider {
 
         this.io.on('connection', (socket) => {
             console.log('a user connected to socket with id: ' + socket.id);
+            const socketRoomId = socket.handshake.query.chatId;
+            socket.join(socketRoomId);
             socket.emit("socketId", socket.id);
 
             // resend message to other client
             socket.on("newMessage", (message) => {
                 this.arrivedMessage(message); 
-                socket.emit('message', message);
+                socket.in(socketRoomId).emit('message', message);
             });
 
             // disconect handler...
             socket.on("disconnect", () => {
+                socket.leave(socketRoomId);
                 console.log("Client disconnected");
             });
         });
@@ -103,7 +106,7 @@ class ChatProvider {
                 chatHistoryItem[channelDirection] = null;
             });
         } else {
-            console.warn('Avatar image not found: ' + avatar);
+            console.warn('Avatar image not found, chatId is: ' + chatHistoryItem.chatId);
             return Promise.resolve();
         }
     }
@@ -112,9 +115,9 @@ class ChatProvider {
         if (chatHistory) {
             let promiseList = []
             chatHistory.forEach(function(c, index, rSet) {
-                let avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + c.userAvatarUrlFrom);
+                let avatarFile = (c.userAvatarUrlFrom) ? path.resolve('./ReadooRestProvider/uploads/userAvatars/' + c.userAvatarUrlFrom) : undefined;
                 promiseList.push(this.resizeImage(avatarFile, c, 'userAvatarUrlFrom'));
-                avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + c.userAvatarUrlTo);
+                avatarFile =  (c.userAvatarUrlTo) ? path.resolve('./ReadooRestProvider/uploads/userAvatars/' + c.userAvatarUrlTo) : undefined;
                 promiseList.push(this.resizeImage(avatarFile, c, 'userAvatarUrlTo'));
             }.bind(this));
             return Promise.all(promiseList).then(function (promisesResult) {
@@ -209,12 +212,14 @@ class ChatProvider {
                 that.chatDao.getVisibility(+chatId).then(
                     function (result) {
                         let newVisibility;
-                        if (result[0].chatVisible === 'B') {
-                            newVisibility = (+result[0].userIdFrom === userId) ? 'T' : 'F';
-                        } else {
-                            newVisibility = 'N';
-                        }
-                        if (newVisibility !== result[0].chatVisible) {
+                        if (result.length) {
+                            if (result[0].chatVisible === 'B') {
+                                newVisibility = (+result[0].userIdFrom === userId) ? 'T' : 'F';
+                            } else {
+                                newVisibility = 'N';
+                            }
+                        }                        
+                        if (newVisibility && newVisibility !== result[0].chatVisible) {
                             that.chatDao.updateVisibility(+chatId, newVisibility).then(
                                 function (result) {
                                     res.setHeader('Content-Type', 'application/json');

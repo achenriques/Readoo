@@ -41,6 +41,7 @@
     overflow-x: hidden;
     overflow-y: auto;
     flex: 1;
+    background-color: #eeeeee;
 }
 
 .grBookId {

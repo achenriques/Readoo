@@ -1,20 +1,22 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchChatMessages, reportErrorMessage, actionTypes } from '../../app_state/actions';
+import { fetchChatMessages, reportErrorMessage, closeConversation, actionTypes } from '../../app_state/actions';
 import * as appState from '../../app_state/reducers/index';
 import io from 'socket.io-client';
 import { parseDate, compareArrays } from '../../utils/appUtils';
 import RootRef from '@material-ui/core/RootRef';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import Send from '@material-ui/icons/Send';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import LS from '../LanguageSelector';
 import avatarDefault from '../../resources/avatarDefault.svg';
 import { NEW_CHAT_ID, CHAT_MESSAGES_EMPTY, SERVER_ENDPOINT, 
-    REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
+    REST_FAILURE, REST_DEFAULT, REST_SUCCESS, DISPLAY_NONE } from '../../constants/appConstants';
 import '../../styles/Chat.css';
 
 class MessagesView extends Component {
@@ -26,6 +28,8 @@ class MessagesView extends Component {
         messageText: "",
         isNewChat: false,
         socketId: null,
+        showScrollButton: false,
+        changeScrollColor: false,
         loadingChatMessages: REST_DEFAULT
     };
 
@@ -45,7 +49,7 @@ class MessagesView extends Component {
         }
         this.socket = io.connect(SERVER_ENDPOINT, {
             path: '/chat',
-            query: { from: chat.userIdFrom, to: chat.userIdTo },
+            query: { chatId: "" + chat.chatId + "_" + chat.userIdFrom + "_" + chat.userIdTo },
             reconnectionDelayMax: 10000
         });
         this.socket.on("socketId", id => {
@@ -70,11 +74,13 @@ class MessagesView extends Component {
         // socket is listening for new messages
         this.socket.on("message", message => {
             if (message && message.chatId === this.state.currentChat.chatId && message.userIdFrom !== this.props.currentUserId) {
-                let newChatMessages = this.props.chatMessages.slice();
+                let newChatMessages = this.state.chatMessages.slice();
                 newChatMessages.push(message);
+                let changeScrollColor = !this.state.changeScrollColor && this.state.showScrollButton;
                 this.setState({
                     ...this.state,
-                    chatMessages: newChatMessages
+                    chatMessages: newChatMessages,
+                    changeScrollColor: changeScrollColor
                 });
             }
         });
@@ -116,6 +122,7 @@ class MessagesView extends Component {
     }
 
     componentWillUnmount() {
+        this.props.closeConversation();
         // close socket connection
         if (this.socket !== undefined) {
             this.socket.close();
@@ -142,11 +149,16 @@ class MessagesView extends Component {
                     ...this.state,
                     chatMessages: newChatMessages,
                     currentChat: this.props.chat,
-                    loadingChatMessages: REST_SUCCESS
-                }, () => this.socketListeners(this.props.chat));
+                    loadingChatMessages: REST_SUCCESS,
+                    showScrollButton: false,
+                    changeScrollColor: false
+                }, () => {
+                    this.socketListeners(this.props.chat);
+                    this.gridChatRef.current.scrollTo(0, this.gridChatRef.current.scrollHeight);
+                });
             } else if (this.props.chat !== undefined 
                         && this.state.currentChat !== null && this.props.chat.chatId !== this.state.currentChat.chatId) {
-                if (!this.state.isNewChat || this.state.currentChat.chatId > NEW_CHAT_ID) {
+                if (!this.state.isNewChat && this.state.currentChat.chatId > NEW_CHAT_ID) {
                     // if not is an assignation of a new id to a new chat...
                     // fetch next messages...
                     this.setState({
@@ -154,7 +166,9 @@ class MessagesView extends Component {
                         chatMessages: [],
                         currentChat: this.props.chat,
                         messageText: "",
-                        loadingChatMessages: REST_DEFAULT
+                        loadingChatMessages: REST_DEFAULT,
+                        showScrollButton: false,
+                        changeScrollColor: false
                     }, () => this.props.fetchChatMessages(this.props.chat.chatId, this.props.currentUserId));
                 }
             }
@@ -178,7 +192,6 @@ class MessagesView extends Component {
     sendMessage(evt) {
         let newMessage = this.state.messageText.trim();
         if (newMessage.length) {
-            this.gridChatRef.current.scrollTo(0, this.gridChatRef.current.scrollHeight);
             let messages = this.state.chatMessages.slice();
             let newMessage = {
                 chatId: this.state.currentChat.chatId,
@@ -190,8 +203,10 @@ class MessagesView extends Component {
             this.setState({
                 ...this.state,
                 chatMessages: messages,
-                messageText: ""
-            });
+                messageText: "",
+                showScrollButton: false,
+                changeScrollColor: false
+            }, () => { this.gridChatRef.current.scrollTo(0, this.gridChatRef.current.scrollHeight) });
             // send message to other user...
             this.socket.emit("newMessage", {
                 ...newMessage,
@@ -207,6 +222,31 @@ class MessagesView extends Component {
             evt.stopPropagation();
             evt.preventDefault();
             this.sendMessage(evt);
+        }
+    }
+
+    handleScroll(evt) {
+        evt.preventDefault();
+        this.setState({
+            ...this.state,
+            showScrollButton: false,
+            changeScrollColor: false
+        }, () => this.gridChatRef.current.scrollTo(0, this.gridChatRef.current.scrollHeight));
+    }
+
+    displayScrollButton() {
+        if (this.gridChatRef.current !== null) {
+            if (this.gridChatRef.current.scrollHeight - this.gridChatRef.current.scrollTop > 1000) {
+                this.setState({
+                    ...this.state,
+                    showScrollButton: true
+                })
+            } else {
+                this.setState({
+                    ...this.state,
+                    showScrollButton: false
+                })
+            }
         }
     }
 
@@ -265,7 +305,7 @@ class MessagesView extends Component {
                                 </Grid>
                             </Grid>
                             <RootRef rootRef={this.gridChatRef}>
-                                <Grid item sm={11} className="chatMessagesColumnInsideGrid">
+                                <Grid item sm={11} className="chatMessagesColumnInsideGrid" onScroll={this.displayScrollButton.bind(this)}>
                                     <Grid container
                                         direction="column"
                                         justify="flex-end"
@@ -278,14 +318,14 @@ class MessagesView extends Component {
                                             <Grid container 
                                                 key={index}
                                                 spacing={8} 
-                                                direction={(+msg.userId === this.state.currentChat.userIdFrom) ? "row-reverse": "row"}
+                                                direction={(+msg.userId === this.props.currentUserId) ? "row-reverse": "row"}
                                                 alignItems="flex-end"
                                                 wrap="nowrap"
                                                 className="chatMessageGrid"
                                             >
                                                 <Grid item sm={1}
                                                     zeroMinWidth
-                                                    className={(+msg.userId === this.state.currentChat.userIdFrom) ? "chatMessageAvatar right" : "chatMessageAvatar left" }
+                                                    className={(+msg.userId === this.props.currentUserId) ? "chatMessageAvatar right" : "chatMessageAvatar left" }
                                                 >
                                                     <span className="chatTimeSpan">{parseDate(msg.messageDateTime).split(' ')[1]}</span>
                                                     <br/>
@@ -297,7 +337,7 @@ class MessagesView extends Component {
                                                     />
                                                 </Grid>
                                                 <Grid item sm={10} xs={11}>
-                                                    <p className={(+msg.userId === this.state.currentChat.userIdFrom) ? "chatMessageBubble right" : "chatMessageBubble left"}>
+                                                    <p className={(+msg.userId === this.props.currentUserId) ? "chatMessageBubble right" : "chatMessageBubble left"}>
                                                         <span>{msg.message}</span>
                                                     </p>
                                                 </Grid>
@@ -309,6 +349,15 @@ class MessagesView extends Component {
                                 </Grid>
                             </RootRef>
                         </Grid>
+                        <Button variant="fab" 
+                            color="default" 
+                            aria-label="up" 
+                            onClick={this.handleScroll.bind(this)} 
+                            className= {(!this.state.changeScrollColor) ? "styleButtonDown": "styleButtonDown new"}
+                            style={(this.state.showScrollButton) ? {} : DISPLAY_NONE}
+                        >
+                            <KeyboardArrowDownIcon/>
+                        </Button>
                     </Paper>
                 )
         }
@@ -327,6 +376,7 @@ export default connect(
     }),
     (dispatch) => ({
         fetchChatMessages: (chatId, userId) => dispatch(fetchChatMessages(chatId, userId)),
+        closeConversation: () => dispatch(closeConversation()),
         reportErrorMessage: (errorMsg) => dispatch(reportErrorMessage(errorMsg))
     })
 )(MessagesView);

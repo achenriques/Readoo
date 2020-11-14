@@ -15,6 +15,7 @@ import LS from '../LanguageSelector';
 import GenreSelector from '../common/GenreSelector';
 import { DISPLAY_NONE, REST_FAILURE, REST_DEFAULT, REST_SUCCESS } from '../../constants/appConstants';
 import { getProccessStatus, excedsLimit } from '../../utils/appUtils';
+import bookDefault from '../../resources/bookDefault.svg';
 
 const COMPLETE_FIELD = LS.getStringMsg('complete.field', 'Complete this field');
 
@@ -331,8 +332,11 @@ class UploadBookModal extends Component {
                                     />
                                 </Grid>
                                 <Grid item sm={6} className="uploadBookRightGrid">
-                                    <Paper elevation={4} square style={coverPreview}>
-                                        <img src={this.state.addBookCover} crossOrigin='http://localhost:3030' alt={LS.getStringMsg('book.need.image', 'Need an image!')} className="coverImagePreview" />
+                                    <Paper elevation={4} square style={coverPreview} className="coverImagePaper">
+                                        <img src={(this.state.addBookCover) ? this.state.addBookCover : bookDefault } 
+                                            crossOrigin='http://localhost:3030' 
+                                            alt={LS.getStringMsg('book.need.image', 'Need an image!')} 
+                                            className={(this.state.addBookCover) ? "coverImagePreview" : "coverImagePreview default"} />
                                     </Paper>
                                     <br />
                                     <div className="divUploadAvatarButton">

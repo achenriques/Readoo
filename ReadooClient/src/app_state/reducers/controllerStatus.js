@@ -1,6 +1,7 @@
 import { initialState } from './index';
 import { actionTypes } from '../actions';
 import * as constants from '../../constants/appConstants';
+import LS from '../../components/LanguageSelector';
 
 /**
  * Reducer to controller Rest operations and show err messages or warnings if necessary
@@ -73,18 +74,18 @@ export default (state = initialState.controllerStatus, { type, payload, data, er
                         switch (err.response.status) {
                             case constants.ERROR_401:
                                 if (info) {
-                                    nextFailure.push(getStringMsg(info, 'Error at log portal.'));
+                                    nextFailure.push(LS.getStringMsg(info, 'Error at log portal.'));
                                 } else {
-                                    nextFailure.push(getStringMsg('no.user.logged', 'No user logged yet, Please Log or Register!'));
+                                    nextFailure.push(LS.getStringMsg('no.user.logged', 'No user logged yet, Please Log or Register!'));
                                 }
                                 break;
                             case constants.ERROR_403:
-                                nextFailure.push(getStringMsg((info) ? info : 'no.token.provided', 'The sesson has expired. Please refresh the page and log in to continue!'));
+                                nextFailure.push(LS.getStringMsg((info) ? info : 'no.token.provided', 'The sesson has expired. Please refresh the page and log in to continue!'));
                                 break;
                             default:
                                 nextFailure = (Array.isArray(state.failure)) ? state.failure.slice(0) : []; // Clone array to not modify original
                                 if (info) {
-                                    nextFailure.push(getStringMsg(info, "" + err));
+                                    nextFailure.push(LS.getStringMsg(info, "" + err));
                                 } else {
                                     nextFailure.push(err);
                                 }

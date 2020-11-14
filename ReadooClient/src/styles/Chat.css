@@ -159,3 +159,16 @@ span.chatDateSpan {
     width: 100%;
     text-align: center;
 }
+
+.styleButtonDown {
+    position: fixed;
+    bottom: 150px;
+    right: 50px;
+}
+
+.scrollButton.new {
+    position: fixed;
+    bottom: 150px;
+    right: 50px;
+    background-color: greenyellow;
+}

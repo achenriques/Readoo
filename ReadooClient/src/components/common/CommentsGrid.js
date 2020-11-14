@@ -203,7 +203,8 @@ class CommentsGrid extends Component {
                     userId: this.props.currentUser.userId,
                     userNick: this.props.currentUser.userNick,
                     userAvatarUrl: this.props.currentUser.userAvatarUrl, 
-                    bookId: bookId, 
+                    bookId: bookId,
+                    nSubCommentaries: 0,
                     date: new Date(),
                     commentFatherId: commentFatherId,
                 };
