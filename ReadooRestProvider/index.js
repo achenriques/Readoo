@@ -39,7 +39,7 @@ app.use(cors({
 const server = http.createServer(app);
 
 // Create a dbConnection
-const Connection = require('./Util/dbConnection');
+const Connection = require('./util/dbConnection');
 const db = new Connection();
 
 app.use(express.static(path.join(__dirname, '../ReadooClient/build')));
