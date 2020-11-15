@@ -14,15 +14,19 @@ const bodyParser = require('body-parser');
 // Url encoder for photos and other data
 app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
 app.use(bodyParser.json());
+// Path
+const path = require('path');
 
 /* var basicAuth = require('express-basic-auth')
 var serverCredentials = require('./Util/serverOptions');
 app.use(basicAuth(serverCredentials)); */
 
+const whitelist = require('./util/corsWhitelist');
+
 // Using cors
 app.use(cors({
      origin: (origin, cb) => {
-          if (origin == 'http://localhost:3000' || origin == "http://127.0.0.1:3000") {
+          if (!origin || whitelist.indexOf(origin) !== -1) {
                return cb(null, true);
           }
           return cb(new Error("Cors error"), false);
@@ -37,6 +41,12 @@ const server = http.createServer(app);
 // Create a dbConnection
 const Connection = require('./Util/dbConnection');
 const db = new Connection();
+
+app.use(express.static(path.join(__dirname, '../ReadooClient/build')));
+
+app.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, '../ReadooClient/build', '../ReadooClient/build/index.html'));
+});
 
 // Crating rest services
 const LoginProvider = require('./restModules/LoginProvider');
@@ -73,6 +83,6 @@ const UserReportsBookProvider = require('./restModules/UserReportsBookProvider')
 new UserReportsBookProvider(app, db);
 
 // All services are now listening in the port 3030
-server.listen(3030, function () {
-  console.info('App is listening on port 3030!');
+server.listen(process.env.PORT || 3030, function () {
+  console.info('App is listening on port: ' + process.env.PORT || 3030 + "!");
 });

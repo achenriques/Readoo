@@ -1,6 +1,7 @@
 {
   "name": "readoo",
   "version": "1.0.0",
+  "description": "A React-Redux application with Material-UI components to create the front of Readoo APP",
   "private": true,
   "dependencies": {
     "@material-ui/core": "1.5.1",

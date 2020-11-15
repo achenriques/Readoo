@@ -1,0 +1,14 @@
+{
+  "name": "readoo",
+  "version": "1.0.0",
+  "description": "A social app to share people´s books and their opinions.",
+  "main": "index.js",
+  "scripts": {
+    "start": "cd ./ReadooClient && npm run-script build && cd .. && node ./ReadooRestProvider/index.js ",
+    "start_server": "start node ./ReadooRestProvider/index.js",
+    "start_front": "cd ./ReadooClient && start npm start",
+    "build" : "cd ./ReadooClient && npm build"
+  },
+  "author": "",
+  "license": "ISC"
+}
