@@ -4,10 +4,12 @@
   "description": "A social app to share people´s books and their opinions.",
   "main": "index.js",
   "scripts": {
-    "start": "cd ./ReadooClient && npm run-script build && cd .. && node ./ReadooRestProvider/index.js ",
+    "start": "cd ./ReadooRestProvider && node index.js ",
     "start_server": "start node ./ReadooRestProvider/index.js",
     "start_front": "cd ./ReadooClient && start npm start",
-    "build" : "cd ./ReadooClient && npm build"
+    "build_front" : "cd ./ReadooClient && npm build",
+    "dev": "concurrently --kill-others-on-fail \"npm run start_server\" \"npm run start_front\"",
+    "heroku-postbuild": "cd ./ReadooClient && npm install && npm run-script build && cd ../ReadooRestProvider && npm install"
   },
   "author": "A.Carballo",
   "license": "ISC"
