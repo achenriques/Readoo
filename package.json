@@ -9,6 +9,6 @@
     "start_front": "cd ./ReadooClient && start npm start",
     "build" : "cd ./ReadooClient && npm build"
   },
-  "author": "",
+  "author": "A.Carballo",
   "license": "ISC"
 }
