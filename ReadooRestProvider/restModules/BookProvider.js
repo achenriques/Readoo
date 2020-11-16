@@ -74,12 +74,12 @@ class BookProvider {
             that.bookDao.getAllBook().then(
                 function (result) {
                     res.setHeader('Content-Type', 'application/json');
-                    return res.send(JSON.stringify(books));
+                    return res.send(JSON.stringify(result));
                 }
             ).catch(
                 function (err) { // Sql Err
                     console.error(err);
-                    let reqError = functions.getRequestError(books);
+                    let reqError = functions.getRequestError(result);
                     return res.status(reqError.code).send(reqError.text);
                 }
             );

@@ -1,6 +1,8 @@
 import axios from 'axios';
-import {} from '../constants/appConstants';
-const baseURL = 'http://localhost:3030';
+import { isLocalhost } from '../registerServiceWorker';
+import { LOCAL_ENDPOINT } from '../constants/appConstants';
+
+const baseURL = (isLocalhost ? LOCAL_ENDPOINT : "");
 
 // Setted for evict cross-sitting error
 axios.defaults.withCredentials = true;

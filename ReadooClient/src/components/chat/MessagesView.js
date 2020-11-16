@@ -15,7 +15,8 @@ import Send from '@material-ui/icons/Send';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import LS from '../LanguageSelector';
 import avatarDefault from '../../resources/avatarDefault.svg';
-import { NEW_CHAT_ID, CHAT_MESSAGES_EMPTY, SERVER_ENDPOINT, 
+import { isLocalhost } from '../../registerServiceWorker';
+import { NEW_CHAT_ID, CHAT_MESSAGES_EMPTY, LOCAL_ENDPOINT, 
     REST_FAILURE, REST_DEFAULT, REST_SUCCESS, DISPLAY_NONE } from '../../constants/appConstants';
 import '../../styles/Chat.css';
 
@@ -36,6 +37,8 @@ class MessagesView extends Component {
     constructor(props) {
 
         super(props);
+        // Calculate API url
+        this.apiEndpoint = (isLocalhost ? LOCAL_ENDPOINT : "");
         this.gridChatRef = React.createRef();
         this.state = { 
             ...this.initialState
@@ -47,7 +50,7 @@ class MessagesView extends Component {
         if (this.socket !== undefined && !this.socket.disconnected) {
             this.socket.close();
         }
-        this.socket = io.connect(SERVER_ENDPOINT, {
+        this.socket = io.connect(this.apiEndpoint, {
             path: '/chat',
             query: { chatId: "" + chat.chatId + "_" + chat.userIdFrom + "_" + chat.userIdTo },
             reconnectionDelayMax: 10000

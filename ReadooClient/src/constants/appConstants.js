@@ -1,4 +1,4 @@
-export const SERVER_ENDPOINT = 'http://localhost:3030';
+export const LOCAL_ENDPOINT = 'http://localhost:3030';
 
 export const REST_FAILURE = -1;
 export const REST_DEFAULT = 0;

@@ -1,7 +1,8 @@
 // Read .env file
 const dotenv = require('dotenv').config();
-if (dotenv.error) {
-     console.error("Something goes wrong at reading .env file: " + dotenv.error);
+if (dotenv.error && !process.env.PORT) {
+     console.warn("Something goes wrong at reading .env file: " + dotenv.error);
+     console.warn("Ensure to have environment vars setted up before continue!");
 }
 // Express
 const http = require("http");
