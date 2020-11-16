@@ -10,6 +10,8 @@ const { resizeToProfile } = require('../util/imageFormater');
 
 const userStorage = multer.diskStorage({
     destination: function (req, file, cb) {
+        console.log(" - - - AQUI SE FILTRA EL CWD...");
+        console.log(process.cwd());
         cb(null, uploadAvatarDir);
     },
     filename: function (req, file, cb) {
