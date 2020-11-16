@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 
 // Env vars
+const bdName = process.env.DB_NAME;
 const bdhost = process.env.DB_HOST;
 const bdUser = process.env.DB_USER;
 const bdPass = process.env.DB_PASS;
@@ -11,10 +12,10 @@ class Connection
   {
     this.connect = mysql.createPool({
       //properties
-      host:'localhost',
+      host: bdhost,
       user: bdUser,
       password: bdPass,
-      database: 'readoo_db',
+      database: bdName,
       connectionLimit: 50
     });
     console.info("Building DB connection pool");
