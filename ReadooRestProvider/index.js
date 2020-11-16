@@ -30,6 +30,7 @@ app.use(cors({
           if (!origin || whitelist.indexOf(origin) !== -1) {
                return cb(null, true);
           }
+          console.log("Cors origin error: " + origin);
           return cb(new Error("Cors error"), false);
      },
      credentials: true,
