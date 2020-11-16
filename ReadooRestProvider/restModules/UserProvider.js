@@ -2,15 +2,15 @@ const bcrypt = require('bcryptjs');
 const middleware = require('./middlewares');
 const multer = require('multer');
 const path = require('path');
-const encoder64 = require('../util/functions').base64_encode;
 const functions = require('../util/functions');
+const { uploadAvatarDir } = require('../util/serverOptions');
 const UserDao = require('../daos/UserDao');
 const UserGenreDao = require('../daos/UserGenreDao');
 const { resizeToProfile } = require('../util/imageFormater');
 
 const userStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './ReadooRestProvider/uploads/userAvatars');
+        cb(null, uploadAvatarDir);
     },
     filename: function (req, file, cb) {
         let fileType = file.mimetype.split('/');
@@ -53,7 +53,7 @@ class UserProvider {
         app.get('/user/avatar/:avatarUrl', function (req, res) {
             let avatarUrl = req.params.avatarUrl;
             if (avatarUrl) {
-                let avatarFile = path.resolve('./ReadooRestProvider/Uploads/coverPages/' + avatarUrl.trim());
+                let avatarFile = path.resolve(uploadAvatarDir + "/" + avatarUrl.trim());
                 if (avatarFile) {
                     return res.status(200).sendfile(avatarFile);
                 }
@@ -104,7 +104,7 @@ class UserProvider {
                     }
                     // Parse avatar
                     if (result.userAvatarUrl) {
-                        let avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + result.userAvatarUrl.trim());
+                        let avatarFile = path.resolve(uploadAvatarDir + "/" + result.userAvatarUrl.trim());
                         resizeToProfile(avatarFile).then(function (base64String) {
                             if (base64String) {
                                 result.userAvatarUrl = base64String;

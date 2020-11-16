@@ -1,6 +1,7 @@
 const path = require('path');
 const constants = require('../util/constants');
 const functions = require('../util/functions');
+const { uploadAvatarDir } = require('../util/serverOptions');
 const middleware = require('./middlewares');
 const CommentDao = require('../daos/CommentDao');
 const resizeToIcon = require('../util/imageFormater').resizeToIcon;
@@ -67,7 +68,7 @@ class CommentProvider {
         if (commentArray) {
             return Promise.all(commentArray.map(function(c, index, rSet) {
                 if (c.userAvatarUrl != null && c.userAvatarUrl.length !== 0) {
-                    let avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + c.userAvatarUrl);
+                    let avatarFile = path.resolve(uploadAvatarDir + '/' + c.userAvatarUrl);
                     if (avatarFile) {
                         return resizeToIcon(avatarFile).then(function (base64String) {
                             if (base64String) {

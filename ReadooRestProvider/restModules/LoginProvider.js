@@ -1,11 +1,10 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const userConfig = require('../util/serverOptions');
+const { uploadAvatarDir } = require('../util/serverOptions');
 const functions = require('../util/functions');
 const LoginDao = require('../daos/LoginDao');
 const path = require('path');
 const UserGenreDao = require('../daos/UserGenreDao');
-const { encoder64,  returnErrCode } = require('../util/functions').base64_encode;
 const resizeToIcon = require('../util/imageFormater').resizeToIcon;
 const LANGUAGE_ENGLISH = require('../util/constants').LANGUAGE_ENGLISH;
 const TOKEN_TIME = require('../util/constants').TOKEN_TIME;
@@ -58,7 +57,7 @@ class LoginProvider {
                                     });
                                     // Convert image to icon
                                     if (result.userAvatarUrl) {
-                                        let avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + result.userAvatarUrl.trim());
+                                        let avatarFile = path.resolve(uploadAvatarDir + "/" + result.userAvatarUrl.trim());
                                         resizeToIcon(avatarFile).then(function (base64String) {
                                             if (base64String) {
                                                 result.userAvatarUrl = base64String;
@@ -151,7 +150,7 @@ class LoginProvider {
                         }
                         // Parse avatar
                         if (result.userAvatarUrl) {
-                            let avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + result.userAvatarUrl.trim());
+                            let avatarFile = path.resolve(uploadAvatarDir + "/" + result.userAvatarUrl.trim());
                             resizeToIcon(avatarFile).then(function (base64String) {
                                 if (base64String) {
                                     result.userAvatarUrl = base64String;

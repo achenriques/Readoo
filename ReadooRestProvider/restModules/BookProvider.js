@@ -2,6 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const functions = require('../util/functions');
+const { uploadAvatarDir, uploadCoverDir } = require('../util/serverOptions');
 const middleware = require('./middlewares');
 const BookDao = require('../daos/BookDao');
 const LastBookDao = require('../daos/LastBookDao');
@@ -11,7 +12,7 @@ const MIN_DB_ID = 0;
 
 const bookStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './ReadooRestProvider/uploads/coverPages')
+        cb(null, uploadCoverDir)
     },
     filename: function (req, file, cb) {
         let fileType = file.mimetype.split('/');
@@ -53,7 +54,7 @@ class BookProvider {
         app.get('/book/cover/:cover', function (req, res) {
             let coverName = req.params.cover;
             if (!coverName) {
-                let coverFile = path.resolve('./ReadooRestProvider/uploads/coverPages/' + coverName);
+                let coverFile = path.resolve(uploadCoverDir + '/' + coverName);
                 if (coverFile) {
                     res.sendfile(coverFile);
                 } else {
@@ -120,7 +121,7 @@ class BookProvider {
                 delete b.total;
                 // Parse book covers
                 if (b.bookCoverUrl != null && b.bookCoverUrl.length !== 0) {
-                    let coverFile = path.resolve('./ReadooRestProvider/uploads/coverPages/' + b.bookCoverUrl);
+                    let coverFile = path.resolve(uploadCoverDir + '/' + b.bookCoverUrl);
                     if (coverFile && fs.existsSync(coverFile)) {
                         arrayOfPromises.push(parseCover(coverFile, b));
                     } else {
@@ -135,7 +136,7 @@ class BookProvider {
                 }
                 // Parse user icons
                 if (b.userAvatarUrl != null && b.userAvatarUrl.length !== 0) {
-                    let avatarFile = path.resolve('./ReadooRestProvider/uploads/userAvatars/' + b.userAvatarUrl);
+                    let avatarFile = path.resolve(uploadAvatarDir + '/' + b.userAvatarUrl);
                     if (avatarFile && fs.existsSync(avatarFile)) {
                         arrayOfPromises.push(parseAvatar(avatarFile, b));
                     } else {

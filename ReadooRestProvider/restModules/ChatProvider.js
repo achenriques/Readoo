@@ -1,6 +1,7 @@
 const socketIo = require('socket.io');
 const path = require('path');
 const functions = require('../util/functions');
+const { uploadAvatarDir } = require('../util/serverOptions');
 const middleware = require('./middlewares');
 const ChatDao = require('../daos/ChatDao');
 const resizeToIcon = require('../util/imageFormater').resizeToIcon;
@@ -115,9 +116,9 @@ class ChatProvider {
         if (chatHistory) {
             let promiseList = []
             chatHistory.forEach(function(c, index, rSet) {
-                let avatarFile = (c.userAvatarUrlFrom) ? path.resolve('./ReadooRestProvider/uploads/userAvatars/' + c.userAvatarUrlFrom) : undefined;
+                let avatarFile = (c.userAvatarUrlFrom) ? path.resolve(uploadAvatarDir + '/' + c.userAvatarUrlFrom) : undefined;
                 promiseList.push(this.resizeImage(avatarFile, c, 'userAvatarUrlFrom'));
-                avatarFile =  (c.userAvatarUrlTo) ? path.resolve('./ReadooRestProvider/uploads/userAvatars/' + c.userAvatarUrlTo) : undefined;
+                avatarFile =  (c.userAvatarUrlTo) ? path.resolve(uploadAvatarDir + '/' + c.userAvatarUrlTo) : undefined;
                 promiseList.push(this.resizeImage(avatarFile, c, 'userAvatarUrlTo'));
             }.bind(this));
             return Promise.all(promiseList).then(function (promisesResult) {
