@@ -12,6 +12,7 @@ import thunk from 'redux-thunk'
 import promiseMiddleware from 'redux-promise-action-middleware'
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
+import { isLocalhost } from './registerServiceWorker';
 
 let store = createStore(appReducer, applyMiddleware(thunk, promiseMiddleware));
 
@@ -31,4 +32,4 @@ ReactDOM.render(
     </MuiThemeProvider>,
     document.getElementById('root')
 );
-registerServiceWorker();
+(isLocalhost) && registerServiceWorker();

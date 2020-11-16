@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import 'bootstrap';
 import { checkToken, resetErrLog } from './app_state/actions';
 import * as appState from './app_state/reducers/index';
 import Snackbar from '@material-ui/core/Snackbar';
