@@ -62,8 +62,10 @@ typings/
 *.mwb.*
 
 # image folders
-ReadooRestProvider/uploads/coverPages/*.*
-ReadooRestProvider/uploads/userAvatars/*.*
+ReadooRestProvider/uploads/coverPages/*
+ReadooRestProvider/uploads/userAvatars/*
+!ReadooRestProvider/uploads/coverPages/README.md 
+!ReadooRestProvider/uploads/userAvatars/README.md
 
 # others
 to_continue.txt
