@@ -21,23 +21,18 @@ class Connection
     console.info("Building DB connection pool");
   }
 
-  getConn(connect)
-  {
-    return new Promise(function (response, reject)
-    {
-      connect.getConnection(function(error, tempCon)
-      {
-        if(error)
-        {
-          console.log(error);
-          reject(error);
-        } else
-        {
-          response(tempCon);
-        }
-      });
-    });
-  }
+  getConn(connect) {
+        return new Promise(function (response, reject) {
+            connect.getConnection(function(error, tempCon) {
+                if(error) {
+                    console.log(error);
+                    reject(error);
+                } else {
+                    response(tempCon);
+                }
+            });
+        });
+    }
 }
 
 module.exports = Connection;
