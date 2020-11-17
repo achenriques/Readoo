@@ -18,7 +18,7 @@ module.exports = {
             "  FROM book b INNER JOIN app_user u ON u.userId = ? AND u.userId = b.userId AND b.bookVisible = 1 " +
             " GROUP BY row_num, b.bookId, bookTitle, b.bookAuthor, b.bookDescription, b.bookReview, b.bookLikes, " + 
             "  b.bookDate, b.bookCoverUrl, b.userId, b.genreId, u.userAvatarUrl " +
-            " ) AS fav, (SELECT @row_number:= 0) AS it WHERE fav.row_num BETWEEN ? AND ? OR (? = TRUE AND fav.row_num BETWEEN @row_number AND @row_number - ?) ;",
+            " ) AS fav, (SELECT @row_number:= 1) AS it WHERE fav.row_num BETWEEN ? AND ? OR (? = TRUE AND fav.row_num BETWEEN @row_number AND @row_number - ?) ;",
     getFavourites: " SELECT @row_number as total, bookId, bookTitle, bookAuthor, bookDescription, bookReview, bookLikes, bookDate, bookCoverUrl, userId, genreId, userAvatarUrl " +
             " FROM ( SELECT (@row_number:=@row_number + 1) AS row_num, b.bookId, bookTitle, b.bookAuthor, " +
             "  b.bookDescription, b.bookReview, b.bookLikes, b.bookDate, b.bookCoverUrl, b.userId, b.genreId, u.userAvatarUrl  " +
@@ -26,7 +26,7 @@ module.exports = {
             "  INNER JOIN app_user u ON u.userId = b.userId " +
             " GROUP BY row_num, b.bookId, bookTitle, b.bookAuthor, b.bookDescription, b.bookReview, b.bookLikes, " + 
             "  b.bookDate, b.bookCoverUrl, b.userId, b.genreId, u.userAvatarUrl " +
-            " ) AS fav, (SELECT @row_number:= 0) AS it WHERE fav.row_num BETWEEN ? AND ? OR (? = TRUE AND fav.row_num BETWEEN @row_number AND @row_number - ?) ;",
+            " ) AS fav, (SELECT @row_number:= 1) AS it WHERE fav.row_num BETWEEN ? AND ? OR (? = TRUE AND fav.row_num BETWEEN @row_number AND @row_number - ?) ;",
     insertBook: "INSERT INTO book (bookId, bookTitle, bookAuthor, bookDescription, bookReview, " +
             " bookLikes, bookDate, bookCoverUrl, userId, genreId, bookVisible) " + 
             " VALUES (0, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP(), ?, ?, ?, 1) ;",
