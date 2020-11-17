@@ -1,12 +1,12 @@
 module.exports = {
     allBooks: "SELECT * FROM book",
-    getBunch: "SELECT b.*, COALESCE(u.likeBoolean, FALSE) AS user_likes_book, us.userAvatarUrl FROM book b " + 
+    getBunch: "SELECT b.*, COALESCE(u.likeBoolean, FALSE) AS userLikesBook, us.userAvatarUrl FROM book b " + 
             " LEFT JOIN user_likes_book u ON b.bookId = u.bookId AND u.userId = ? " +
             " LEFT JOIN last_user_book l ON l.userId = ? AND b.genreId = l.genreId " +
             " INNER JOIN app_user us ON us.userId = b.userId " +
             " WHERE b.bookVisible = 1 AND b.userId != ? AND (l.bookId IS NULL OR b.bookId > l.bookId) " +
             " ORDER BY b.bookDate ASC LIMIT ? ;",
-    getBunchGenre: "SELECT b.*, COALESCE(u.likeBoolean, FALSE) AS user_likes_book, us.userAvatarUrl FROM book b " + 
+    getBunchGenre: "SELECT b.*, COALESCE(u.likeBoolean, FALSE) AS userLikesBook, us.userAvatarUrl FROM book b " + 
             " LEFT JOIN user_likes_book u ON b.bookId = u.bookId AND u.userId = ? " + 
             " LEFT JOIN last_user_book l ON l.userId = ? AND b.genreId = l.genreId " +
             " INNER JOIN app_user us ON us.userId = b.userId " +
