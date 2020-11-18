@@ -82,6 +82,7 @@ class CommentProvider {
                         });
                     } else {
                         console.log('Avatar image not found: ' + c.userAvatarUrl);
+                        c.userAvatarUrl = null;
                         return Promise.resolve();
                     }
                 }
@@ -198,6 +199,7 @@ class CommentProvider {
                         that.parseProfileImages(toRet).then(function (resultOfParse) {
                             return res.header('Content-Type', 'application/json').status(200).json(toRet);
                         }).catch (function (err) {
+                            console.error(err);
                             res.status(400)        // HTTP status 400: BadRequest
                             .send('Error while parsing commentaries');
                         });

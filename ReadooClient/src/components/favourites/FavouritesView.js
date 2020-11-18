@@ -33,7 +33,7 @@ import InfoModal from '../common/InfoModal';
 
 class FavouritesView extends Component {
 
-    initilState = {
+    initialState = {
         loadingState: constants.REST_DEFAULT,
         expanded: false,
         page: 0,
@@ -55,7 +55,7 @@ class FavouritesView extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { ...this.initilState };
+        this.state = { ...this.initialState };
     };
 
     // Ciclo de vida de react

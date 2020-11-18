@@ -108,6 +108,7 @@ class ChatProvider {
             });
         } else {
             console.warn('Avatar image not found, chatId is: ' + chatHistoryItem.chatId);
+            chatHistoryItem[channelDirection] = null;
             return Promise.resolve();
         }
     }

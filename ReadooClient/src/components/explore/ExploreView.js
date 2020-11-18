@@ -8,6 +8,7 @@ import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
+import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
@@ -36,7 +37,7 @@ import '../../styles/Explorer.css';
 
 class ExploreView extends Component {
 
-    initilState = {
+    initialState = {
         isPreviousBook: false,
         previousBook : null,
         currentBook: {
@@ -60,7 +61,7 @@ class ExploreView extends Component {
     constructor(props) {
         super(props);
         this.state = { 
-            ...this.initilState, 
+            ...this.initialState, 
             currentLanguage: props.appLanguage 
         };
         this.cardRootRef = React.createRef();
@@ -129,9 +130,9 @@ class ExploreView extends Component {
         if (currentLanguage !== null) {
             this.setState({
                 ...this.state,
+                currentLanguage: currentLanguage,
                 currentBook: {
                     ...this.state.currentBook,
-                    currentLanguage: currentLanguage,
                     bookCoverUrl: LANGUAGE_SPANISH === currentLanguage ? noBookDefaultEs : noBookDefaultEn
                 }
             })
@@ -297,69 +298,75 @@ class ExploreView extends Component {
             <div id='exploreDiv'>
                 <RootRef rootRef={this.cardRootRef}>
                     <Card classes={{ root: 'styleCardRoot' }} onScroll={this.displayScrollButton.bind(this)}>
-                        <CardMedia style={material_styles.styleCard} src="empty"
-                            //overlay={<CardTitle title="Overlay title" subtitle="Overlay subtitle" />}
-                        >
-                        <div className='imageExplore'>
-                            <IconButton onClick={this.handleBack.bind(this)} style={material_styles.styleLeftArrow} disabled={(this.state.previousBook)? false: true}>
-                                <ArrowLeft style={(this.state.previousBook)? material_styles.styleArrows : DISPLAY_NONE} />
-                            </IconButton>
-                            <IconButton 
-                                    onClick={this.handleForward.bind(this)} 
-                                    style={material_styles.styleRightArrow} 
-                                    disabled={!this.state.isPreviousBook && this.props.shownBooks.length === 1 && this.state.currentBook.bookId < MIN_BOOK_ID}>
-                                <ArrowRight style={(this.state.isPreviousBook || (this.props.shownBooks.length >= 1 && this.state.currentBook.bookId >= MIN_BOOK_ID)) 
-                                        ? material_styles.styleArrows : DISPLAY_NONE} />
-                            </IconButton >
-                            <div style= {(this.state.bookCoverErr.length)? { color: 'red', paddingTop: '1em' } : DISPLAY_NONE}>
-                                { this.state.bookCoverErr }
-                            </div>
-                            <img src={this.state.currentBook.bookCoverUrl} alt="" className="imageExplore" onDoubleClick={this.handleDbClickImage.bind(this)}/>
-                            <Favorite style={ this.heartType(this.state.showHeart) } />
-                        </div>
-                        </CardMedia>
-                        <CardContent style={material_styles.width50}>
-                            <Divider/>
-                            <Typography gutterBottom variant='headline'>
-                                {this.state.currentBook.bookTitle}
-                            </Typography>
-                            <div className="writtenBy"><LS msgId='what.book.by' defaultMsg='By:'/></div><Typography gutterBottom variant='title' style={material_styles.inlineBlock}>
-                                {this.state.currentBook.bookAuthor}
-                            </Typography>
-                            <h3 style={(this.state.currentBook.bookDescription) ? { paddingLeft: '15px', marginBottom: '5px' }: { display: 'none' }}><LS msgId='what.book.about' defaultMsg='Explanation about the book'/></h3>
-                            {this.state.currentBook.bookDescription}
-                            <br/>
-                            <h4 style={(this.state.currentBook.bookReview) ? { paddingLeft: '15px', marginBottom: '5px' }: { display: 'none' }}><LS msgId='what.book.opinion' defaultMsg='Opinion by the book owner'/></h4>
-                            {this.state.currentBook.bookReview}
-                        </CardContent>
-                        <CardActions>
-                            {(this.state.currentBook.bookId)
-                                ? (<div><LS msgId='what.book.likes' defaultMsg='Likes' params={ [this.state.currentBook.bookLikes] } />
-                                    <Button size='small' disableRipple disableFocusRipple variant='flat' onClick={this.handleDbClickImage.bind(this)} style={material_styles.backgroundTransparent}>
-                                        <Favorite style={{...material_styles.styleFavorite, fill: (this.state.likeBook)? 'red': ''}} />
-                                    </Button>
-                                    <Button 
-                                        disableRipple 
-                                        disabled={(this.isLoadingCommentaries())}
-                                        size="small" 
-                                        variant='flat' 
-                                        onClick={this.handleCollapse.bind(this)} 
-                                        style={material_styles.styleExpandComentaries}
-                                    >
-                                        {(this.state.expanded)? <LS msgId='hide.commentaries' defaultMsg='Hide comments'/> : <LS msgId='show.commentaries' defaultMsg='Show comments'/>}
-                                        {(this.state.expanded)? (this.isLoadingCommentaries()) ? <CircularProgress className="loadingIconCommentaries" size='20' /> : <ExpandLessIcon /> : <ExpandMoreIcon />}
-                                    </Button >
-                                </div>)
-                                : (<div></div>)
-                            }
-                        </CardActions>
-                        <Collapse in={this.state.expanded} timeout="auto" direction="right"  
-                                classes={{ wrapperInner: 'exploreCollapse' }}
-                                mountOnEnter unmountOnExit>
-                            <div className="commentBackground">
-                                <CommentsGrid bookId={this.state.currentBook.bookId} commentFatherId={null}/>
-                            </div>                        
-                        </Collapse>
+                        <Grid container>
+                            <Grid item sm={12} xs={6}>
+                                <CardMedia style={material_styles.styleCard} src="empty"
+                                    //overlay={<CardTitle title="Overlay title" subtitle="Overlay subtitle" />}
+                                >
+                                <div className='imageExplore'>
+                                    <IconButton onClick={this.handleBack.bind(this)} style={material_styles.styleLeftArrow} disabled={(this.state.previousBook)? false: true}>
+                                        <ArrowLeft style={(this.state.previousBook)? material_styles.styleArrows : DISPLAY_NONE} />
+                                    </IconButton>
+                                    <IconButton 
+                                            onClick={this.handleForward.bind(this)} 
+                                            style={material_styles.styleRightArrow} 
+                                            disabled={!this.state.isPreviousBook && this.props.shownBooks.length === 1 && this.state.currentBook.bookId < MIN_BOOK_ID}>
+                                        <ArrowRight style={(this.state.isPreviousBook || (this.props.shownBooks.length >= 1 && this.state.currentBook.bookId >= MIN_BOOK_ID)) 
+                                                ? material_styles.styleArrows : DISPLAY_NONE} />
+                                    </IconButton >
+                                    <div style= {(this.state.bookCoverErr.length)? { color: 'red', paddingTop: '1em' } : DISPLAY_NONE}>
+                                        { this.state.bookCoverErr }
+                                    </div>
+                                    <img src={this.state.currentBook.bookCoverUrl} alt="" className="imageExplore" onDoubleClick={this.handleDbClickImage.bind(this)}/>
+                                    <Favorite style={ this.heartType(this.state.showHeart) } />
+                                </div>
+                                </CardMedia>
+                                <CardContent style={material_styles.width50}>
+                                    <Divider/>
+                                    <Typography gutterBottom variant='headline'>
+                                        {this.state.currentBook.bookTitle}
+                                    </Typography>
+                                    <div className="writtenBy"><LS msgId='what.book.by' defaultMsg='By:'/></div><Typography gutterBottom variant='title' style={material_styles.inlineBlock}>
+                                        {this.state.currentBook.bookAuthor}
+                                    </Typography>
+                                    <h3 style={(this.state.currentBook.bookDescription) ? { paddingLeft: '15px', marginBottom: '5px' }: { display: 'none' }}><LS msgId='what.book.about' defaultMsg='Explanation about the book'/></h3>
+                                    {this.state.currentBook.bookDescription}
+                                    <br/>
+                                    <h4 style={(this.state.currentBook.bookReview) ? { paddingLeft: '15px', marginBottom: '5px' }: { display: 'none' }}><LS msgId='what.book.opinion' defaultMsg='Opinion by the book owner'/></h4>
+                                    {this.state.currentBook.bookReview}
+                                </CardContent>
+                                <CardActions>
+                                    {(this.state.currentBook.bookId)
+                                        ? (<div><LS msgId='what.book.likes' defaultMsg='Likes' params={ [this.state.currentBook.bookLikes] } />
+                                            <Button size='small' disableRipple disableFocusRipple variant='flat' onClick={this.handleDbClickImage.bind(this)} style={material_styles.backgroundTransparent}>
+                                                <Favorite style={{...material_styles.styleFavorite, fill: (this.state.likeBook)? 'red': ''}} />
+                                            </Button>
+                                            <Button 
+                                                disableRipple 
+                                                disabled={(this.isLoadingCommentaries())}
+                                                size="small" 
+                                                variant='flat' 
+                                                onClick={this.handleCollapse.bind(this)} 
+                                                style={material_styles.styleExpandComentaries}
+                                            >
+                                                {(this.state.expanded)? <LS msgId='hide.commentaries' defaultMsg='Hide comments'/> : <LS msgId='show.commentaries' defaultMsg='Show comments'/>}
+                                                {(this.state.expanded)? (this.isLoadingCommentaries()) ? <CircularProgress className="loadingIconCommentaries" size='20' /> : <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                            </Button >
+                                        </div>)
+                                        : (<div></div>)
+                                    }
+                                </CardActions>
+                            </Grid>
+                            <Grid sm={12} xs={(this.state.expanded) ? 6 : 12}>
+                                <Collapse in={this.state.expanded} timeout="auto" direction="right"  
+                                        classes={{ wrapperInner: 'exploreCollapse' }}
+                                        mountOnEnter unmountOnExit>
+                                    <div className="commentBackground">
+                                        <CommentsGrid bookId={this.state.currentBook.bookId} commentFatherId={null}/>
+                                    </div>                        
+                                </Collapse>
+                            </Grid>
+                        </Grid>
                     </Card>
                 </RootRef>
                 <Button variant="fab" color="default" aria-label="up" onClick={this.handleScroll.bind(this)} className='styleButtonUp'

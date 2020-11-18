@@ -72,6 +72,7 @@ class LoginProvider {
                                                 userData: result
                                             });
                                         }).catch(function (err) {
+                                            result.userAvatarUrl = null;
                                             console.error(err);
                                             // return statement
                                             return res.cookie('token', token, { httpOnly: true }).status(200).json({
