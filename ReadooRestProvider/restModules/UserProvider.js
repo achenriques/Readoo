@@ -116,6 +116,7 @@ class UserProvider {
                             res.setHeader('Content-Type', 'application/json');
                             return res.send(JSON.stringify(result));
                         }).catch(function (err) {
+                            result.userAvatarUrl = null;
                             console.error(err);
                             return res.status(200).json(result);
                         });
