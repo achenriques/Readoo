@@ -29,17 +29,44 @@ const base64_encode = function (file) {
 const getRequestError = function (code) {
     switch (code) {
         case -1:
-        return { code: 204, text: 'Failed at consult!' };
+            return { code: 204, text: 'Failed at consult!' };
 
         case -2:
-        return { code: 500, text: 'Not DB connection!' };
+            return { code: 500, text: 'Not DB connection!' };
 
         case -3:
-        return {code: 206, text: 'Duplicated Entry' };
+            return {code: 206, text: 'Duplicated Entry' };
         
         default:
-        return { code: 400, text: 'Error detected!' };
+            return { code: 400, text: 'Error detected!' };
     }
 }
 
-module.exports = {returnErrCode, base64_encode, getRequestError};
+// get the token from a request
+const getTokenFromRequest = function (req) {
+    if (!req) {
+        return null;
+    }
+    let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
+    if (token === undefined && req.headers.cookie !== undefined) {
+        let stringFromCookie = req.headers.cookie;
+        let cookieTokenValues = new RegExp('token' + "=([^;]+)").exec(stringFromCookie);
+        if (cookieTokenValues.length) {
+            token = cookieTokenValues[1];
+        }
+    }
+
+    if (!token) {
+        return null;
+    }
+
+    // No util info
+    if (token.startsWith('Bearer ')) {
+        // Remove Bearer from string
+        token = token.slice(7, token.length);
+    }
+
+    return token;
+}
+
+module.exports = { returnErrCode, base64_encode, getRequestError, getTokenFromRequest };

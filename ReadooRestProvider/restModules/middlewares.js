@@ -1,27 +1,15 @@
 const jwt = require('jsonwebtoken');
-const userConfig = require('../util/serverOptions');
+const functions = require('../util/functions');
 const constants = require('../util/constants');
 
 const USER_CREDENTIAL = process.env.READOO_USER_CREDENTIAL;
 
 module.exports = {
     verifyToken : function (req, res, next) {
-        let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
-        if (token === undefined && req.headers.cookie !== undefined) {
-            let stringFromCookie = req.headers.cookie;
-            let cookieTokenValues = new RegExp('token' + "=([^;]+)").exec(stringFromCookie);
-            if (cookieTokenValues.length) {
-                token = cookieTokenValues[1];
-            }
-        }
+        let token = functions.getTokenFromRequest(req);
 
         if (!token) {
             return res.status(403).send({ auth: false, info: 'no.token.provided', message: 'No token provided.' });
-        }
-        // No util info
-        if (token.startsWith('Bearer ')) {
-            // Remove Bearer from string
-            token = token.slice(7, token.length);
         }
       
         jwt.verify(token, USER_CREDENTIAL, function(err, decoded) {

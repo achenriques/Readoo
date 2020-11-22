@@ -276,7 +276,24 @@ CREATE TABLE IF NOT EXISTS `readoo_db`.`chat_message` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+-- Necessary insertions --
+INSERT INTO `readoo_db`.`genre` (`genre`) VALUES ('lyric');
+INSERT INTO `readoo_db`.`genre` (`genre`) VALUES ('drama');
+INSERT INTO `readoo_db`.`genre` (`genre`) VALUES ('didactic');
+INSERT INTO `readoo_db`.`genre` (`genre`) VALUES ('history');
+INSERT INTO `readoo_db`.`genre` (`genre`) VALUES ('oratory');
+INSERT INTO `readoo_db`.`genre` (`genre`) VALUES ('biography');
+INSERT INTO `readoo_db`.`genre` (`genre`) VALUES ('autobiography');
+INSERT INTO `readoo_db`.`genre` (`genre`) VALUES ('poetry');
+INSERT INTO `readoo_db`.`genre` (`genre`) VALUES ('novel');
+INSERT INTO `readoo_db`.`genre` (`genre`) VALUES ('fable');
+INSERT INTO `readoo_db`.`genre` (`genre`) VALUES ('legend');
+INSERT INTO `readoo_db`.`genre` (`genre`) VALUES ('tale');
+INSERT INTO `readoo_db`.`genre` (`genre`) VALUES ('childish');
+INSERT INTO `readoo_db`.`genre` (`genre`) VALUES ('theater');
+INSERT INTO `readoo_db`.`genre` (`genre`) VALUES ('romantic');
+INSERT INTO `readoo_db`.`genre` (`genre`) VALUES ('erotic');

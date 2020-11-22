@@ -117,25 +117,11 @@ class LoginProvider {
     isMe(app) {
         const that = this;
         app.get('/login/isme', function (req, res) {
-            let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
-            if (token === undefined && req.headers.cookie !== undefined) {
-                let stringFromCookie = req.headers.cookie;
-                let cookieTokenValues = new RegExp('token' + "=([^;]+)").exec(stringFromCookie);
-                if (cookieTokenValues.length) {
-                    token = cookieTokenValues[1];
-                }
-            }
-
+            let token = functions.getTokenFromRequest(req);
             if (!token) {
                 return res.status(401).send({ auth: false, message: 'No token provided!' });
-            } else {
-                // No util info
-                if (token.startsWith('Bearer ')) {
-                    // Remove Bearer from string
-                    token = token.slice(7, token.length);
-                }
             }
-            
+
             jwt.verify(token, USER_CREDENTIAL, function(err, decoded) {
                 if (err) {
                     return res.status(500).send({ auth: false, message: 'Failed to authenticate token!' });
@@ -186,15 +172,7 @@ class LoginProvider {
     logOut(app) {
         const that = this;
         app.get('/login/logout', function (req, res) {
-            let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
-            if (token === undefined && req.headers.cookie !== undefined) {
-                let stringFromCookie = req.headers.cookie;
-                let cookieTokenValues = new RegExp('token' + "=([^;]+)").exec(stringFromCookie);
-                if (cookieTokenValues.length) {
-                    token = cookieTokenValues[1];
-                }
-            }
-
+            let token = functions.getTokenFromRequest(req);
             if (!token) {
                 return res.status(401).send({ auth: false, message: 'No token provided!' });
             }
@@ -311,22 +289,9 @@ class LoginProvider {
             let tabSelector = req.body.tabSelector;   
             if (tabSelector != null) {
                 // Save on the token the current tab ID
-                let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
-                if (token === undefined && req.headers.cookie !== undefined) {
-                    let stringFromCookie = req.headers.cookie;
-                    let cookieTokenValues = new RegExp('token' + "=([^;]+)").exec(stringFromCookie);
-                    if (cookieTokenValues.length) {
-                        token = cookieTokenValues[1];
-                    }
-                }
-        
+                let token = functions.getTokenFromRequest(req);
                 if (!token) {
                     return res.status(403).send({ auth: false, info: 'no.token.provided', message: 'No token provided.' });
-                }
-                // No util info
-                if (token.startsWith('Bearer ')) {
-                    // Remove Bearer from string
-                    token = token.slice(7, token.length);
                 }
               
                 jwt.verify(token, USER_CREDENTIAL, function(err, decoded) {
@@ -357,22 +322,9 @@ class LoginProvider {
             let languageCode = req.body.languageCode;   
             if (languageCode != null) {
                 // Save on the token the current tab ID
-                let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
-                if (token === undefined && req.headers.cookie !== undefined) {
-                    let stringFromCookie = req.headers.cookie;
-                    let cookieTokenValues = new RegExp('token' + "=([^;]+)").exec(stringFromCookie);
-                    if (cookieTokenValues.length) {
-                        token = cookieTokenValues[1];
-                    }
-                }
-        
+                let token = functions.getTokenFromRequest(req);
                 if (!token) {
                     return res.status(403).send({ auth: false, info: 'no.token.provided', message: 'No token provided.' });
-                }
-                // No util info
-                if (token.startsWith('Bearer ')) {
-                    // Remove Bearer from string
-                    token = token.slice(7, token.length);
                 }
               
                 jwt.verify(token, USER_CREDENTIAL, function(err, decoded) {

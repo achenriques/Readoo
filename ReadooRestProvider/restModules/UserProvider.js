@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const middleware = require('./middlewares');
 const multer = require('multer');
@@ -10,7 +11,7 @@ const { resizeToProfile } = require('../util/imageFormater');
 
 const userStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        console.log(" - - - AQUI SE FILTRA EL CWD...");
+        console.log(" - - - Here the complete url for the image...");
         console.log(process.cwd());
         cb(null, uploadAvatarDir);
     },
@@ -166,10 +167,50 @@ class UserProvider {
                                             // Acepted but no changes commited
                                             returnStatus = 202;
                                         }
+
+                                        let returnCallback = function () {
+                                            that.userDao.getOneUser(+userToUpdate.userId, false).then(function (resultUser) {
+                                                // Parse genres
+                                                if (resultUser.userGenres != null) {
+                                                    // The genres of the user are cast to an array of numbers with the genre ids
+                                                    resultUser.userGenres = resultUser.userGenres.split(",").map(function (x) {return +x});
+                                                } else {
+                                                    resultUser.userGenres = [];
+                                                }
+                                                // Parse avatar
+                                                if (resultUser.userAvatarUrl) {
+                                                    let avatarFile = path.resolve(uploadAvatarDir + "/" + resultUser.userAvatarUrl.trim());
+                                                    resizeToProfile(avatarFile).then(function (base64String) {
+                                                        if (base64String) {
+                                                            resultUser.userAvatarUrl = base64String;
+                                                        } else {
+                                                            resultUser.userAvatarUrl = null;
+                                                        }
+                                                        res.setHeader('Content-Type', 'application/json');
+                                                        return res.send(JSON.stringify(resultUser));
+                                                    }).catch(function (err) {
+                                                        resultUser.userAvatarUrl = null;
+                                                        console.error(err);
+                                                        return res.status(200).json(resultUser);
+                                                    });
+                                                } else {
+                                                    res.setHeader('Content-Type', 'application/json');
+                                                    return res.send(JSON.stringify(resultUser));
+                                                }
+                                            }).catch(
+                                                function (err) {
+                                                    // Sql Err
+                                                    console.error(err);
+                                                    let reqError = functions.getRequestError(err);
+                                                    return res.status(reqError.code)
+                                                        .send(reqError.text);
+                                            });
+                                        }
+
                                         if (userToUpdate.userGenres !== undefined) {
                                             that.userGenreDao.updateGenres(+userToUpdate.userId, JSON.parse(userToUpdate.userGenres)).then(
                                                 function (result2) {
-                                                    return res.header('Content-Type', 'application/json').status(returnStatus).json(result);
+                                                    returnCallback();
                                                 }
                                             ).catch(
                                                 function (err) {
@@ -179,7 +220,7 @@ class UserProvider {
                                                 }
                                             )
                                         } else {
-                                            return res.header('Content-Type', 'application/json').status(returnStatus).json(result);
+                                            returnCallback();
                                         }
                                     }
                                 ).catch(

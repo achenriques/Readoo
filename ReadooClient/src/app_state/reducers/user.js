@@ -45,7 +45,9 @@ export default (state = initialState.user, { type, payload, data }) => {
                 return userData;
 
             case successType(actionTypes.SAVE_USER_DATA):
-                if (payload.newUserData) {
+                return userData;
+                
+                /* if (payload.newUserData) {
                     let nextUser = Object.assign({}, state);
                     Object.keys(payload.newUserData).forEach(
                         (key) => (payload.newUserData[key] == null || key === "userPass" || key === "oldUserPass") && delete payload.newUserData[key]
@@ -53,7 +55,7 @@ export default (state = initialState.user, { type, payload, data }) => {
                     nextUser = Object.assign(nextUser, payload.newUserData);
                     return nextUser;
                 }
-                return state;
+                return state; */
 
             default:
                 return state;

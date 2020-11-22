@@ -357,7 +357,7 @@ class ExploreView extends Component {
                                     }
                                 </CardActions>
                             </Grid>
-                            <Grid sm={12} xs={(this.state.expanded) ? 6 : 12}>
+                            <Grid item sm={12} xs={(this.state.expanded) ? 6 : 12}>
                                 <Collapse in={this.state.expanded} timeout="auto" direction="right"  
                                         classes={{ wrapperInner: 'exploreCollapse' }}
                                         mountOnEnter unmountOnExit>
