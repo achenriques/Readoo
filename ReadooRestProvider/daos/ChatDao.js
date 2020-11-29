@@ -22,9 +22,14 @@ class ChatDao extends DaoManager {
         return this.executeStatment(statement, [chatId]);
     }
 
+    getOneChatId(userIdFrom, userIdTo) {
+        let statement = queries.getOneChatId;
+        return this.executeStatment(statement, [userIdFrom, userIdTo, userIdTo, userIdFrom]);
+    }
+
     insertOne(userIdFrom, userIdTo) {
         let statement = queries.insertInHistory;
-        return this.executeStatment(statement, [userIdFrom, userIdTo]);
+        return this.executeStatment(statement, [userIdFrom, userIdTo, userIdFrom, userIdTo, userIdTo, userIdFrom]);
     }
 
     saveOne(chatId, userId, messageText) {
@@ -40,6 +45,11 @@ class ChatDao extends DaoManager {
     updateVisibility(chatId, chatVisibility) {
         let statement = queries.updateVisibility;
         return this.executeStatment(statement, [chatVisibility, chatId]);
+    }
+
+    updateVisibility2(userIdFrom, userIdTo) {
+        let statement = queries.updateVisibility2;
+        return this.executeStatment(statement, [userIdFrom, userIdTo, userIdTo, userIdFrom]);
     }
             
 }

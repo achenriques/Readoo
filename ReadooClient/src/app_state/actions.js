@@ -30,7 +30,7 @@ const actionTypes = {
     FETCH_SUB_COMMENTARIES: 'FETCH_SUB_COMMENTARIES',
     FETCH_FAVOURITES: 'FETCH_FAVOURITES',
     FAVOURITE_PAGE_REQUEST: 'FAVOURITE_PAGE_REQUEST',
-    SET_FAVOURITE_LOADING: 'SET_FAVOURITE_LOADING',
+    SET_FAVOURITE_LOAD_PAGE: 'SET_FAVOURITE_LOAD_PAGE',
     FETCH_USER_DATA: 'FETCH_USER_DATA',
     FETCH_USER_PREVIEW_DATA: 'FETCH_USER_PREVIEW_DATA',
     FETCH_USER_AVATAR: 'FETCH_USER_AVATAR',
@@ -154,7 +154,7 @@ const beforeBook = () => ({
 
 const doLikeBook = (bookId, userId) => ({
     type: actionTypes.I_LIKE_BOOK,
-    payload: { like: true},
+    payload: { bookId, like: true},
     promise: userApi.doLikeBook(bookId, userId)
 });
 
@@ -267,7 +267,7 @@ const favouritePageRequest = (buttonCode, fetchData, loadingPage) => ({
 });
 
 const setLoadingPage = (nPage) => ({
-    type: actionTypes.SET_FAVOURITE_LOADING,
+    type: actionTypes.SET_FAVOURITE_LOAD_PAGE,
     payload: { nPage }
 });
 

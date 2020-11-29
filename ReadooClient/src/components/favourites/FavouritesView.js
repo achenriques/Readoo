@@ -59,6 +59,7 @@ class FavouritesView extends Component {
 
     // Ciclo de vida de react
     componentDidMount() {
+        this.props.setLoadingPage(0);
         this.props.fetchFavourites(this.props.currentUserId, this.state.page, this.state.booksPerPage, 
                 this.state.selectorValue === constants.MY_BOOKS, null);
     }
@@ -125,6 +126,7 @@ class FavouritesView extends Component {
                         
                 case constants.LAST_PAGE:
                     page = Math.floor(this.state.total / constants.BOOKS_PER_PAGE);
+                    page = (this.state.total % constants.BOOKS_PER_PAGE === 0) ? page - 1 : page;
                     pageToFetch = (page > 0) ? (page - 1) : page;
                     break; 
     

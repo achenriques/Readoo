@@ -27,7 +27,7 @@ class BookDao extends DaoManager {
 
     getBunchOfFavourites(userId, betweenA, betweenB, myUploads, isPage0, booksPerPage) {
         let statement = (myUploads) ? queries.getMyBooks : queries.getFavourites;
-        return this.executeStatment(statement, [userId, betweenA, betweenB, isPage0, booksPerPage - 1]);
+        return this.executeStatment(statement, [userId, booksPerPage, betweenA, betweenB, isPage0, booksPerPage - 1]);
     }
 
     addBook(bookTitle, bookAuthor, bookDescription, bookReview, bookCoverUrl, userId, genreId) {

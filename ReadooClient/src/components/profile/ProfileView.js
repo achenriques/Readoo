@@ -569,16 +569,20 @@ class ProfileView extends Component {
                                             :   <div/>}
                                         <br/>
                                         <TextField
-                                            label={<LS msgId='about.you' params={(this.state.userAboutMe != null) ? [140 - this.state.userAboutMe.length] : [140]}/>}
+                                            label={(!this.state.isPreview) 
+                                                    ? <LS msgId='about.you' params={(this.state.userAboutMe != null) ? [140 - this.state.userAboutMe.length] : [140]}/>
+                                                    : <LS msgId='about.a.readoer'/> }
                                             id="userAboutMe"
                                             name="userAboutMe"
                                             multiline
                                             rowsMax="4"
+                                            disabled={this.state.isPreview}
                                             fullWidth
                                             inputProps={{
                                                 maxLength: 140,
                                             }}
                                             value={this.state.userAboutMe}
+                                            style={(this.state.isPreview && !this.state.userAboutMe.length) ? DISPLAY_NONE : {}}
                                             onChange={this.oChangeInput.bind(this)}
                                         />
                                         <br/>

@@ -8,6 +8,23 @@ import * as constants from '../../constants/appConstants';
  */
 export default (state = initialState.books, { type, payload, data }) => {
     switch (type) {
+        case successType(actionTypes.I_LIKE_BOOK):
+            if (payload.bookId && payload.like !== undefined && state.shownBooks && state.shownBooks.length) {
+                let nextBooks = state.shownBooks.map(b => {
+                    if (+b.bookId === +payload.bookId) {
+                        b.bookLikes = (true == payload.like) ? (b.bookLikes + 1) : (b.bookLikes - 1);
+                        b.userLikesBook = (true == payload.like);
+                    }
+                    return b;
+                });
+                return {
+                    ...state,
+                    shownBooks: nextBooks
+                };
+            } else {
+                return state;
+            }
+            
         case loadingType(actionTypes.NEXT_BOOK):
             let toRet = {};
             if (state.currentBook +1 < state.shownBooks.length) {
@@ -66,7 +83,7 @@ export default (state = initialState.books, { type, payload, data }) => {
                 success_fetch: false,
             };
 
-        case actionTypes.SET_FAVOURITE_LOADING:
+        case actionTypes.SET_FAVOURITE_LOAD_PAGE:
             if (payload.nPage !== undefined) {
                 return {
                     ...state,
@@ -119,8 +136,8 @@ export default (state = initialState.books, { type, payload, data }) => {
                             favouritesTotal: data.data.total,
                             favourites: {
                                 ...state.favourites,
-                                beforePage: state.favourites.currentPage.slice(),
-                                currentPage: state.favourites.nextPage.slice(),
+                                // beforePage: state.favourites.currentPage.slice(),
+                                // currentPage: state.favourites.nextPage.slice(),
                                 nextPage: data.data.data,
                                 loadingPage: null
                             }
@@ -133,8 +150,8 @@ export default (state = initialState.books, { type, payload, data }) => {
                             favourites: {
                                 ...state.favourites,
                                 beforePage: data.data.data,
-                                currentPage: state.beforePage.slice(),
-                                nextPage: state.currentPage.slice(),
+                                // currentPage: state.favourites.beforePage.slice(),
+                                // nextPage: state.favourites.currentPage.slice(),
                                 loadingPage: null
                             }
                         };
@@ -146,7 +163,7 @@ export default (state = initialState.books, { type, payload, data }) => {
                             favourites: {
                                 ...state.favourites,
                                 beforePage: data.data.data,
-                                currentPage: state.favourites.lastPage.slice(),
+                                // currentPage: state.favourites.lastPage.slice(),
                                 loadingPage: null
                             }
                         };
@@ -158,7 +175,7 @@ export default (state = initialState.books, { type, payload, data }) => {
                             favourites: {
                                 ...state.favourites,
                                 nextPage: data.data.data,
-                                currentPage: state.favourites.firstPage.slice(),
+                                // currentPage: state.favourites.firstPage.slice(),
                                 loadingPage: null
                             }
                         };
@@ -195,6 +212,7 @@ export default (state = initialState.books, { type, payload, data }) => {
                         ...state,
                         favourites: {
                             ...state.favourites,
+                            beforePage: state.favourites.currentPage.slice(),
                             currentPage: state.favourites.nextPage.slice(),
                             loadingPage: loadingPage
                         }
@@ -205,6 +223,7 @@ export default (state = initialState.books, { type, payload, data }) => {
                         ...state,
                         favourites: {
                             ...state.favourites,
+                            nextPage: state.favourites.currentPage.slice(),
                             currentPage: state.favourites.beforePage.slice(),
                             loadingPage: loadingPage
                         }

@@ -81,10 +81,28 @@ class ChatProvider {
                                 chatMessage.chatId = +result.insertId;
                                 that.saveMessage(chatMessage);
                                 that.io.emit("newChatId", result.insertId);
+                            } else {
+                                that.chatDao.getOneChatId(+chatMessage.userIdFrom, +chatMessage.userIdTo).then(function(resultId) {
+                                    if (resultId.length) {
+                                        let existingChatId = +resultId[0].chatId;
+                                        chatMessage.chatId = existingChatId;
+                                        that.saveMessage(chatMessage);
+                                        that.io.emit("newChatId", existingChatId);
+                                        that.chatDao.updateVisibility(existingChatId, 'B').catch(function (err) {
+                                            console.error(err);
+                                            that.io.emit(err);
+                                        });
+                                    } else {
+                                        that.io.emit("error", "imposible.to.found.chat");
+                                    }
+                                }).catch(function(err) {
+                                    console.error(err);
+                                    that.io.emit(err);
+                                });
                             }
                         }).catch(function(err) {
                             console.error(err);
-                            this.emit(err);
+                            that.io.emit(err);
                         });
                     } else {
                         console.error("Chat not allowed! User is repeated.");
