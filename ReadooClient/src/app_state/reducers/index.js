@@ -80,7 +80,8 @@ export const initialState = {
             beforePage: [],
             currentPage: [],
             nextPage: [],
-            lastPage: []
+            lastPage: [],
+            loadingPage: 0
         },
         favouritesTotal: 0,
         success_fetch: true,
@@ -145,6 +146,7 @@ export const getBookIndex = (state) => state.books.currentBook;
 export const getBooks = (state) => state.books.shownBooks;
 export const getTotalOfFavourites = (state) => state.books.favouritesTotal;
 export const getFavourites = (state) => state.books.favourites.currentPage;
+export const getFavouritesLoadingPage = (state) => state.books.favourites.loadingPage;
 export const getCommentaries = (state) => state.commentaries.bookCommentaries;
 export const getSubCommentaries = (state) => state.commentaries.bookSubCommentaries;
 export const getChatHistory = (state) => state.chat.chatHistory;

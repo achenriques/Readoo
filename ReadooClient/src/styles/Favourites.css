@@ -8,7 +8,7 @@
 
 .favouritesGrid {
     position: relative;
-    height: 100%;
+    height: 99%;
 }
 
 .gridList {
@@ -131,8 +131,11 @@
 }
 
 .favouriteFoot {
+    position: absolute;
+    bottom: 0%;
     display: block;
     text-align: center;
+    width: 66.66%;
 }
 
 .favouriteFootEmpty {

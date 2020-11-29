@@ -202,7 +202,7 @@ class BookProvider {
             if (favourite && favourite.userId, favourite.page != null && favourite.booksPerPage != null) {
                 let userId = favourite.userId;
                 let betweenA = (favourite.page * favourite.booksPerPage) + 1;
-                let betweenB = (favourite.page === 0) ? 2 * favourite.booksPerPage : ((favourite.page + 1) * favourite.booksPerPage) + 1;
+                let betweenB = (favourite.page === 0) ? 2 * favourite.booksPerPage : ((favourite.page + 1) * favourite.booksPerPage);
                 let myUploads = favourite.myUploads == true;
                 
                 that.bookDao.getBunchOfFavourites(+userId, betweenA, betweenB, myUploads, +favourite.page === 0, +favourite.booksPerPage).then(

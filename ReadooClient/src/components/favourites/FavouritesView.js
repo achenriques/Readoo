@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as appState from '../../app_state/reducers/index';
 import { 
-    favouritePageRequest, fetchFavourites, 
+    favouritePageRequest, fetchFavourites, setLoadingPage,
     doLikeBook, doDislikeBook, unsubscribeBook,
     resetProccess, actionTypes } from '../../app_state/actions';
 import Typography from '@material-ui/core/Typography';
@@ -37,8 +37,7 @@ class FavouritesView extends Component {
         loadingState: constants.REST_DEFAULT,
         expanded: false,
         page: 0,
-        total: 0,
-        loadingPage: 0,
+        total: null,
         currentBooksPerPage: 0,
         rowsPerPage: constants.ROWS_PER_PAGE,
         booksPerPage: constants.BOOKS_PER_PAGE,
@@ -66,7 +65,7 @@ class FavouritesView extends Component {
 
     componentDidUpdate() {
         let isLoading = this.isLoading(actionTypes.FETCH_FAVOURITES);
-        if (isLoading) {
+        if (this.state.page == this.props.loadingPage) {
             if (this.state.loadingState != constants.REST_DEFAULT) {
                 this.setState({
                     ...this.state,
@@ -79,7 +78,6 @@ class FavouritesView extends Component {
                     ...this.state,
                     currentBooksPerPage: this.props.favouriteBooks.length,
                     total: this.props.totalOfFavourites,
-                    loadingPage: null,
                     loadingState: constants.REST_SUCCESS
                 });
             } else {
@@ -90,7 +88,9 @@ class FavouritesView extends Component {
                     loadingState: constants.REST_FAILURE
                 });
             }
-        } if (this.props.successProcesses.includes(actionTypes.DELETE_BOOK)) {
+        }    
+        
+        if (this.props.successProcesses.includes(actionTypes.DELETE_BOOK)) {
                 // status of delete book...
                 this.props.resetProccessStatus(actionTypes.DELETE_BOOK);
                 this.setState({
@@ -109,7 +109,7 @@ class FavouritesView extends Component {
 
     // Table event handler
     handleChangePage = (evt, buttonCode) => {
-        if (buttonCode) {
+        if (buttonCode && this.state.total !== null) {
             let page = this.state.page;
             let pageToFetch = page;
             switch (buttonCode) {
@@ -136,20 +136,30 @@ class FavouritesView extends Component {
                 default:
                     break;
             }
-            const needFetch = this.state.total > this.state.booksPerPage * 2;
-            this.setState({ 
-                ...this.state, 
-                page: page, 
-                loadingPage: (needFetch) ? pageToFetch  : null,
-                selectedCell: null,
-                selectedBook: null
-            });
-            // Change the current page
-            this.props.favouritePageRequest(buttonCode, needFetch);
-            // Fetch the data
-            if (needFetch) {
-                this.props.fetchFavourites(this.props.currentUserId, pageToFetch, 
-                    this.state.booksPerPage, this.state.selectorValue === constants.MY_BOOKS, buttonCode);
+            
+            if (page === this.props.loadingPage) {
+                // If it is loading the page, just change page number...
+                this.setState({ 
+                    ...this.state, 
+                    page: page, 
+                    selectedCell: null,
+                    selectedBook: null
+                });
+            } else {
+                const needFetch = this.state.total > this.state.booksPerPage * 2;
+                this.setState({ 
+                    ...this.state, 
+                    page: page, 
+                    selectedCell: null,
+                    selectedBook: null
+                });
+                // Change the current page
+                this.props.favouritePageRequest(buttonCode, needFetch, pageToFetch);
+                // Fetch the data
+                if (needFetch) {
+                    this.props.fetchFavourites(this.props.currentUserId, pageToFetch, 
+                        this.state.booksPerPage, this.state.selectorValue === constants.MY_BOOKS, buttonCode);
+                }
             }
         }
     };
@@ -252,14 +262,16 @@ class FavouritesView extends Component {
     handleChangeFavouriteType(evt, newValue) {
         if (newValue !== undefined) {
             if (newValue !== this.state.selectorValue) {
+                this.props.setLoadingPage(0);
                 this.setState({
                         ...this.state,
                         selectorValue: newValue,
-                        loadingState: constants.REST_DEFAULT,
+                        loadingState: constants.REST_SUCCESS,
+                        page: 0,
                         selectedCell: null,
                         selectedBook: null,
                         previewUser: null,
-                        total: 0
+                        total: null
                     }, () => this.props.fetchFavourites(this.props.currentUserId, this.state.page, 
                             this.state.booksPerPage, this.state.selectorValue === constants.MY_BOOKS, null)
                 );
@@ -344,7 +356,7 @@ class FavouritesView extends Component {
         const { total, page, booksPerPage } = this.state;
 
         return (
-            <div className={(this.state.total > 0) ? "favouriteFoot" : "favouriteFootEmpty"}>
+            <div className={(this.state.total !== null && this.state.total > 0) ? "favouriteFoot" : "favouriteFootEmpty"}>
                 <div className="favouriteSelector">
                     <FavouritesSelector
                         disabled={this.isLoading(actionTypes.FETCH_FAVOURITES)}
@@ -403,11 +415,8 @@ class FavouritesView extends Component {
     }
 
     render() {
-        const {total, rowsPerPage, page , booksPerPage, booksPerRow} = this.state;
         const data = this.props.favouriteBooks;
 
-        //const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
-        
         switch (this.state.loadingState) {
             case constants.REST_FAILURE:
                 return (
@@ -424,7 +433,7 @@ class FavouritesView extends Component {
                 )
             
             case constants.REST_SUCCESS:
-                if (this.props.favouriteBooks !== null && this.props.favouriteBooks.length > 0) {
+                if (this.props.favouriteBooks !== null && this.state.total !== null && this.state.total > 0) {
                     return (
                         <div className="favouritesDiv">
                             <Grid container spacing={24} className="favouritesGrid">
@@ -464,7 +473,8 @@ class FavouritesView extends Component {
                                                                         className="favouriteLikesHeart" 
                                                                         style={this.heartType(+book.bookId)}
                                                                         disabled={this.state.selectorValue === constants.MY_BOOKS}
-                                                                        onClick={(evt) => this.handleLikeClick(evt, +book.bookId)}
+                                                                        onClick={(this.state.selectorValue === constants.MY_BOOKS || +book.bookId < 1) 
+                                                                                ? () => {} : (evt) => this.handleLikeClick(evt, +book.bookId)}
                                                                     />
                                                                     <span className="favouriteLikesText">{(this.state.dislikeBooks.includes(+book.bookId)) ? (+book.bookLikes - 1) : +book.bookLikes}</span>
                                                                     <IconButton 
@@ -484,7 +494,6 @@ class FavouritesView extends Component {
                                         </GridList>
                                     </div>
                                     <Divider/>
-                                    {this.tableActionButtons()}
                                 </Grid>
                                 <Grid item sm={4} xs={12} className="favouritesGridRightFather">
                                     { (this.state.selectedBook != null)? (
@@ -532,7 +541,8 @@ class FavouritesView extends Component {
                                         )
                                     }    
                                 </Grid>
-                            </Grid> 
+                            </Grid>
+                            {this.tableActionButtons()}
                             <ProfilePreviewModal allowChat={true} previewUser={this.state.previewUser} isOpen={this.state.previewUser !== null} closeCallback={this.hadleProfilePreviewClose.bind(this)} />
                             <ContinueModal open={this.state.openContinueDeleteBook} text={LS.getStringMsg('continue.delete.book')} closeCallback={this.acceptDeleteBook.bind(this)} />
                             <InfoModal open={this.state.openInfoModal} text={LS.getStringMsg('success.delete.book')} closeCallback={this.closeInfoModal.bind(this)} />
@@ -557,14 +567,16 @@ export default connect(
     (state) => ({
         currentUserId: appState.getUserId(state),
         favouriteBooks: appState.getFavourites(state),
+        loadingPage: appState.getFavouritesLoadingPage(state),
         totalOfFavourites: appState.getTotalOfFavourites(state),
         loadingProcesses: appState.getLoadingProcesses(state),
         successProcesses: appState.getSucceedProcesses(state),
         failedProcesses: appState.getFailedProcesses(state)
     }),
     (dispatch) => ({
-        favouritePageRequest: (buttonCode, fetchData) => dispatch(favouritePageRequest(buttonCode, fetchData)),
+        favouritePageRequest: (buttonCode, fetchData, loadingPage) => dispatch(favouritePageRequest(buttonCode, fetchData, loadingPage)),
         fetchFavourites: (userId, page, booksPerPage, myUploads, buttonCode) => dispatch(fetchFavourites(userId, page, booksPerPage, myUploads, buttonCode)),
+        setLoadingPage: (nPage) => dispatch(setLoadingPage(nPage)),
         doLikeBook: (bookId, userId) => dispatch(doLikeBook(bookId, userId)),
         doDislikeBook: (bookId, userId) => dispatch(doDislikeBook(bookId, userId)),
         unsubscribeBook: (bookId, userId) => dispatch(unsubscribeBook(bookId, userId)),

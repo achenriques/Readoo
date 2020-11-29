@@ -30,6 +30,7 @@ const actionTypes = {
     FETCH_SUB_COMMENTARIES: 'FETCH_SUB_COMMENTARIES',
     FETCH_FAVOURITES: 'FETCH_FAVOURITES',
     FAVOURITE_PAGE_REQUEST: 'FAVOURITE_PAGE_REQUEST',
+    SET_FAVOURITE_LOADING: 'SET_FAVOURITE_LOADING',
     FETCH_USER_DATA: 'FETCH_USER_DATA',
     FETCH_USER_PREVIEW_DATA: 'FETCH_USER_PREVIEW_DATA',
     FETCH_USER_AVATAR: 'FETCH_USER_AVATAR',
@@ -260,9 +261,14 @@ const sendComment = (newComment) => ({
     promise: bookApi.sendComment(newComment.commentFatherId, newComment.bookId, newComment.userId, newComment.commentText)
 });
 
-const favouritePageRequest = (buttonCode, fetchData) => ({
+const favouritePageRequest = (buttonCode, fetchData, loadingPage) => ({
     type: actionTypes.FAVOURITE_PAGE_REQUEST,
-    payload: { buttonCode, fetchData }
+    payload: { buttonCode, fetchData, loadingPage }
+});
+
+const setLoadingPage = (nPage) => ({
+    type: actionTypes.SET_FAVOURITE_LOADING,
+    payload: { nPage }
 });
 
 const fetchFavourites = (userId, page, booksPerPage, myUploads, buttonCode) => ({
@@ -341,6 +347,7 @@ export {
     fetchSubCommentaries,
     fetchMoreBooks,
     fetchFavourites,
+    setLoadingPage,
     favouritePageRequest,
     fetchUserData,
     fetchUserGenres,

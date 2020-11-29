@@ -66,20 +66,31 @@ export default (state = initialState.books, { type, payload, data }) => {
                 success_fetch: false,
             };
 
+        case actionTypes.SET_FAVOURITE_LOADING:
+            if (payload.nPage !== undefined) {
+                return {
+                    ...state,
+                    favourites: {
+                        ...state.favourites,
+                        loadingPage: +payload.nPage
+                    }
+                }
+            }
+            
         case successType(actionTypes.FETCH_FAVOURITES):
             if (payload.page === 0) {
                 if (data && data.data !== undefined && data.data.total !== undefined) {
                     let totalFavourites = data.data.total;
                     let currentAndPrevious = data.data.data.slice(0, (payload.booksPerPage < totalFavourites) ? payload.booksPerPage : totalFavourites);
                     let nextPage = (totalFavourites > payload.booksPerPage) 
-                            ? data.data.data.slice(payload.booksPerPage, ((payload.booksPerPage * 2) > totalFavourites) 
+                            ? data.data.data.slice(payload.booksPerPage, ((payload.booksPerPage * 2) < totalFavourites) 
                                     ? payload.booksPerPage * 2 : totalFavourites)
                             : [];
                     let lastPage = nextPage;
                     if (nextPage.length && totalFavourites > (payload.booksPerPage * 2)) {
                         lastPage = data.data.data.slice(
                                 payload.booksPerPage * 2, 
-                                ((payload.booksPerPage * 3) > totalFavourites) 
+                                ((payload.booksPerPage * 3) < totalFavourites) 
                                         ? payload.booksPerPage * 3 
                                         : totalFavourites)
                     }
@@ -91,7 +102,8 @@ export default (state = initialState.books, { type, payload, data }) => {
                             beforePage: currentAndPrevious,
                             currentPage: currentAndPrevious,
                             nextPage: nextPage,
-                            lastPage: lastPage
+                            lastPage: lastPage,
+                            loadingPage: null
                         },
                         favourites_success_fetch: true,
                     };
@@ -109,7 +121,8 @@ export default (state = initialState.books, { type, payload, data }) => {
                                 ...state.favourites,
                                 beforePage: state.favourites.currentPage.slice(),
                                 currentPage: state.favourites.nextPage.slice(),
-                                nextPage: data.data.data
+                                nextPage: data.data.data,
+                                loadingPage: null
                             }
                         };
 
@@ -122,6 +135,7 @@ export default (state = initialState.books, { type, payload, data }) => {
                                 beforePage: data.data.data,
                                 currentPage: state.beforePage.slice(),
                                 nextPage: state.currentPage.slice(),
+                                loadingPage: null
                             }
                         };
 
@@ -132,7 +146,8 @@ export default (state = initialState.books, { type, payload, data }) => {
                             favourites: {
                                 ...state.favourites,
                                 beforePage: data.data.data,
-                                currentPage: state.favourites.lastPage.slice()
+                                currentPage: state.favourites.lastPage.slice(),
+                                loadingPage: null
                             }
                         };
 
@@ -143,7 +158,8 @@ export default (state = initialState.books, { type, payload, data }) => {
                             favourites: {
                                 ...state.favourites,
                                 nextPage: data.data.data,
-                                currentPage: state.favourites.firstPage.slice()
+                                currentPage: state.favourites.firstPage.slice(),
+                                loadingPage: null
                             }
                         };
                 
@@ -153,7 +169,8 @@ export default (state = initialState.books, { type, payload, data }) => {
                             favouritesTotal: data.data.total,
                             favourites: {
                                 ...state.favourites,
-                                currentPage: data.data.data
+                                currentPage: data.data.data,
+                                loadingPage: null
                             }
                         };
                 }
@@ -162,11 +179,16 @@ export default (state = initialState.books, { type, payload, data }) => {
         case failureType(actionTypes.FETCH_FAVOURITES):
             return {
                 ...state,
-                favourites: null,
+                favourites: {
+                    ...state.favourites,
+                    currentPage: null,
+                    loadingPage: null
+                },
                 favourites_success_fetch: false,
             };
 
         case(actionTypes.FAVOURITE_PAGE_REQUEST):
+            let loadingPage = (payload.fetchData && payload.loadingPage !== undefined) ? +payload.loadingPage : null;
             switch (payload.buttonCode) { 
                 case constants.NEXT_PAGE:
                     return {
@@ -174,6 +196,7 @@ export default (state = initialState.books, { type, payload, data }) => {
                         favourites: {
                             ...state.favourites,
                             currentPage: state.favourites.nextPage.slice(),
+                            loadingPage: loadingPage
                         }
                     };
 
@@ -183,6 +206,7 @@ export default (state = initialState.books, { type, payload, data }) => {
                         favourites: {
                             ...state.favourites,
                             currentPage: state.favourites.beforePage.slice(),
+                            loadingPage: loadingPage
                         }
                     };
 
@@ -191,7 +215,8 @@ export default (state = initialState.books, { type, payload, data }) => {
                         ...state,
                         favourites: {
                             ...state.favourites,
-                            currentPage: state.favourites.lastPage.slice()
+                            currentPage: state.favourites.lastPage.slice(),
+                            loadingPage: loadingPage
                         }
                     };
 
@@ -200,7 +225,8 @@ export default (state = initialState.books, { type, payload, data }) => {
                         ...state,
                         favourites: {
                             ...state.favourites,
-                            currentPage: state.favourites.firstPage.slice()
+                            currentPage: state.favourites.firstPage.slice(),
+                            loadingPage: loadingPage
                         }
                     };
             
