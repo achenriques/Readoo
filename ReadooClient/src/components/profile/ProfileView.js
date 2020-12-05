@@ -211,7 +211,9 @@ class ProfileView extends Component {
         let toRet = /.*@[A-z]{1,15}\.[a-z]{2,3}$/.test(val);
         if (toRet) {
             // If is a register we should prove that the nick does not exists yet
-            this.props.checkEmailIsUnique(val.trim());
+            if (val.trim() !== this.props.userData.userEmail) {
+                this.props.checkEmailIsUnique(val.trim());
+            }
         } else {
             if (this.props.avaliableEmail === false && this.state.userEmail !== val) {
                 this.props.setEmailIsUniqueFalse();
@@ -242,13 +244,13 @@ class ProfileView extends Component {
             emailError = !this.checkEmail(value);
         }
 
-        // ver impletar errores en el alta de libros
         this.setState({
             ...this.state,
             [name]: value,
             noChanges: false,
             showOldPass: showOldPass,
-            helpKarmaOpen: helpKarmaOpen
+            helpKarmaOpen: helpKarmaOpen,
+            emailError: emailError
         }, callback);
     }
 
@@ -378,8 +380,10 @@ class ProfileView extends Component {
     }
 
     render = () => {
-        let noAvaliableEmail = (this.state.isARegister && this.state.userData.userEmail.trim().length > 0 
-                && this.props.avaliableEmail === false);
+        let noAvaliableEmail = (this.state.emailError || this.props.avaliableEmail === false);
+        
+        let noAvaliableSafe = this.state.acceptDisabled || noAvaliableEmail
+                || !this.state.userPass.length || (this.state.showOldPass && this.state.oldUserPass.length === 0);
 
         switch (this.state.loadingProfile) {
             case ERROR_PROFILE:
@@ -519,9 +523,9 @@ class ProfileView extends Component {
                                                     <br/>
                                                     <TextField
                                                         error={this.state.emailError || noAvaliableEmail}
-                                                        label={(!this.state.emailError && !noAvaliableEmail) ? (<LS msgId='your.email'/>) : (!noAvaliableEmail) 
+                                                        label={(!this.state.emailError && !noAvaliableEmail) ? (<LS msgId='your.email'/>) : (this.props.avaliableEmail !== false) 
                                                                 ? (<LS msgId='isnot.email'/>) : (<LS msgId='email.user.exists'/>)}
-                                                        id="userEmail"
+                                                        id="userEmail" 
                                                         name="userEmail"
                                                         fullWidth
                                                         inputProps={{
@@ -610,7 +614,7 @@ class ProfileView extends Component {
                                             </Button>
                                             <Button variant="flat" color="primary" 
                                                 onClick={this.acceptSaveProfile.bind(this)}
-                                                disabled={this.state.acceptDisabled}
+                                                disabled={this.state.acceptDisabled || noAvaliableSafe }
                                             >
                                                 <LS msgId='save' defaultMsg='Save'/>
                                             </Button>

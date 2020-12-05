@@ -34,6 +34,16 @@ class Login extends Component {
         this.state = { ...this.initialState };
     };
 
+    componentDidUpdate = () => {
+        let acceptDisabled = this.checkAcceptDisabled();
+        if (this.state.acceptDisabled !== acceptDisabled) {
+            this.setState({
+                ...this.state,
+                acceptDisabled: acceptDisabled
+            });
+        }
+    }
+
     checkEmail = (val) => {
         let toRet = /.*@[A-z]{1,15}\.[a-z]{2,3}$/.test(val);
         if (toRet) {
@@ -77,12 +87,7 @@ class Login extends Component {
 
         // if I have to dissable or not login Button
         let callback = () => {
-            let acceptDisabled = false;
-            if (!this.state.userData.userNickEmail.trim().length || !this.state.userData.userPass.length 
-                    || this.state.repeatPassError || this.state.emailError 
-                    || (this.state.isARegister && !this.state.userData.userEmail.length)) {
-                acceptDisabled = true;
-            }
+            let acceptDisabled = this.checkAcceptDisabled();
             if (this.state.acceptDisabled !== acceptDisabled) {
                 this.setState({
                     ...this.state,
@@ -172,11 +177,20 @@ class Login extends Component {
                 },
             })
         } else {
-            let logName = this.state.userData.userNickEmail.trim();
-            let logPass = this.state.userData.userPass;
-            let logEmail = this.state.userData.userEmail.trim();
-            this.props.doRegister(logName, logPass, logEmail, this.props.appLanguage);
+            if (!this.checkAcceptDisabled()) {
+                let logName = this.state.userData.userNickEmail.trim();
+                let logPass = this.state.userData.userPass;
+                let logEmail = this.state.userData.userEmail.trim();
+                this.props.doRegister(logName, logPass, logEmail, this.props.appLanguage);
+            }
         }
+    }
+
+    checkAcceptDisabled = () => {
+        return (!this.state.userData.userNickEmail.trim().length || !this.state.userData.userPass.length 
+        || this.state.repeatPassError || this.state.emailError 
+        || (this.state.isARegister && (!this.state.userData.userEmail.length || !this.props.avaliableEmail
+        || !this.props.avaliableNick)));
     }
 
     render = () => {

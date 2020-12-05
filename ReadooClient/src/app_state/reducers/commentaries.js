@@ -63,6 +63,34 @@ export default (state = initialState.commentaries, { type, payload, data }) => {
                 };
             }
         
+        case successType(actionTypes.SEND_COMMENTARY):
+            if (payload && +payload.newComment !== undefined && data && data.data !== undefined) {
+                if (payload.newComment.commentFatherId === null) {
+                    let copyOfCommentaries = state.bookCommentaries.map(c => {
+                        if (c.commentId === payload.newComment.commentId) {
+                            c.commentId = data.data.newId;
+                        }
+                        return c;
+                    });
+                    return {
+                        ...state,
+                        bookCommentaries: copyOfCommentaries
+                    };
+                } else{
+                    let copyOfSubCommentaries = state.bookSubCommentaries.map(c => {
+                        if (c.commentId === payload.newComment.commentId) {
+                            c.commentId = data.data.newId;
+                        }
+                        return c;
+                    });
+                    return {
+                        ...state,
+                        bookSubCommentaries: copyOfSubCommentaries
+                    };
+                }
+                
+            }
+        
         case failureType(actionTypes.SEND_COMMENTARY):
             if (payload.newComment.commentFatherId === null) {
                 let copyOfCommentaries = state.bookCommentaries.filter((commentary) => commentary.commentId !== payload.newComment.commentId);

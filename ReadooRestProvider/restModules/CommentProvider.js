@@ -228,7 +228,7 @@ class CommentProvider {
                 that.commentDao.addCommentary(+commentInfo.userId, +commentInfo.bookId, 
                     commentInfo.commentText, (commentInfo.commentFatherId != null) ? +commentInfo.commentFatherId : null).then(
                     function (result) {
-                        return res.header('Content-Type', 'application/json').send(JSON.stringify(result));
+                        return res.header('Content-Type', 'application/json').send(JSON.stringify({newId : result.insertId}));
                     }
                 ).catch(
                     function (err) {
